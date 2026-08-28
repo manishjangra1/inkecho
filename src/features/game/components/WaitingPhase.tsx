@@ -1,7 +1,6 @@
-'use client';
-
 import React from 'react';
 import { Pencil, FileText, Loader2 } from 'lucide-react';
+import { PlayerAvatar } from '@/shared/ui/player-avatar';
 import type { TurnPhase } from '@/domain/game/game-state-machine';
 import { GAME_COPY } from '@/shared/constants/copy/game';
 
@@ -16,13 +15,23 @@ export function WaitingPhase({ phase, activePlayerName }: WaitingPhaseProps) {
   return (
     <div className="flex h-full w-full items-center justify-center p-4 select-none">
       <div className="w-full max-w-md space-y-4 rounded-[4px] border border-border bg-[#111111] p-6 text-center shadow-2xl">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[4px] border border-neutral-700 bg-[#161616]">
-          {isDescribe ? (
-            <FileText className="h-6 w-6 text-white" />
-          ) : (
-            <Pencil className="h-6 w-6 text-white" />
-          )}
-        </div>
+        {activePlayerName ? (
+          <div className="mx-auto flex items-center justify-center">
+            <PlayerAvatar
+              name={activePlayerName}
+              seed={activePlayerName}
+              className="h-14 w-14 rounded-[4px] border border-neutral-600"
+            />
+          </div>
+        ) : (
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[4px] border border-neutral-700 bg-[#161616]">
+            {isDescribe ? (
+              <FileText className="h-6 w-6 text-white" />
+            ) : (
+              <Pencil className="h-6 w-6 text-white" />
+            )}
+          </div>
+        )}
 
         <div className="space-y-1.5">
           <h3 className="text-base font-bold text-white">{GAME_COPY.WAITING_TITLE}</h3>

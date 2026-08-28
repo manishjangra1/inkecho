@@ -1,8 +1,7 @@
-'use client';
-
 import React from 'react';
 import { cn } from '@/shared/lib/cn';
 import { AlertCircle } from 'lucide-react';
+import { PlayerAvatar } from '@/shared/ui/player-avatar';
 import type { RevealStepItem } from '../types/reveal.types';
 
 export interface RevealStepProps {
@@ -39,6 +38,13 @@ export function RevealStep({ step, isLatest, onReport, stepNumber, className }: 
           </div>
 
           <div className="flex items-center gap-1.5 text-[11px] text-neutral-400">
+            {!isPrompt && (
+              <PlayerAvatar
+                name={step.authorDisplayName}
+                seed={step.authorPlayerId || step.authorDisplayName}
+                className="h-4 w-4 rounded-[2px]"
+              />
+            )}
             <span className="truncate max-w-[100px] font-medium text-neutral-300">
               {step.authorDisplayName}
             </span>
@@ -88,9 +94,16 @@ export function RevealStep({ step, isLatest, onReport, stepNumber, className }: 
           <span className="text-[10px] text-neutral-500 font-medium">
             {isPrompt ? 'Starting idea' : isDraw ? 'Canvas Sketch' : 'Description'}
           </span>
-          <span className="font-mono text-[10px] text-neutral-400">
-            by {step.authorDisplayName}
-          </span>
+          <div className="flex items-center gap-1 font-mono text-[10px] text-neutral-400">
+            {!isPrompt && (
+              <PlayerAvatar
+                name={step.authorDisplayName}
+                seed={step.authorPlayerId || step.authorDisplayName}
+                className="h-3.5 w-3.5 rounded-[2px]"
+              />
+            )}
+            <span>by {step.authorDisplayName}</span>
+          </div>
         </div>
       </div>
     </div>

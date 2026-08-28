@@ -13,6 +13,7 @@ import {
   type AppError,
 } from '@/shared/lib/errors/app-error';
 import { authorize, type AuthContext } from '@/shared/lib/auth/authorize';
+import { getAvatarUrl } from '@/shared/lib/avatar';
 import { ROOM_CONFIG } from '@/shared/config/room.config';
 import { env } from '@/shared/config/env';
 import type { CreateRoomInput } from '../schemas/create-room.schema';
@@ -76,6 +77,7 @@ export class RoomService {
       playerId: hostPlayerId,
       userId: ctx.type === 'registered' ? ctx.userId : undefined,
       displayName,
+      avatarUrl: getAvatarUrl(hostPlayerId || displayName),
       role: 'HOST',
       isReady: true, // Host is ready by default
     });
@@ -161,6 +163,7 @@ export class RoomService {
       playerId,
       userId: ctx.type === 'registered' ? ctx.userId : undefined,
       displayName,
+      avatarUrl: getAvatarUrl(playerId || displayName),
       role,
       isReady: false,
     });

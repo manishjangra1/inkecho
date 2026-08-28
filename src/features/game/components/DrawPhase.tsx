@@ -12,7 +12,9 @@ import {
   ClearCanvasDialog,
 } from '@/features/canvas';
 import { submitDrawingAction } from '../actions/submit-drawing.action';
+import { expireTurnAction } from '../actions/expire-turn.action';
 import { useGameStore } from '../stores/game-store';
+import { useGameTimer } from '../hooks/use-game-timer';
 import { GAME_COPY } from '@/shared/constants/copy/game';
 import { CANVAS_CONFIG } from '@/shared/config/canvas.config';
 import { Pencil, Paintbrush, Eraser, Undo2, Redo2 } from 'lucide-react';
@@ -94,6 +96,48 @@ export function DrawPhase({ roomCode, roomId, currentTurn }: DrawPhaseProps) {
       setIsSubmitting(false);
     }
   };
+
+  // Auto-submit current canvas state on timer expiry
+  const handleAutoSubmitOnExpiry = React.useCallback(async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      if (engine.strokes.length > 0) {
+        const exportResult = await engine.exportDrawing();
+        if (exportResult?.dataUrl) {
+          const result = await submitDrawingAction({
+            roomCode,
+            roomId,
+            expectedVersion: version,
+            imageDataUrl: exportResult.dataUrl,
+          });
+          if (result.success) {
+            engine.clearDraft();
+            toast.info('Time up! Drawing auto-submitted.');
+            if (result.data?.gameStatus === 'REVEAL' || result.data?.gameStatus === 'COMPLETED') {
+              router.push(`/room/${encodeURIComponent(roomCode)}/reveal`);
+            }
+            return;
+          }
+        }
+      }
+
+      // If no strokes drawn or export failed, advance turn cleanly
+      const expireRes = await expireTurnAction({ roomCode, expectedVersion: version });
+      if (expireRes.success) {
+        toast.info('Time up! Moving to next turn.');
+        if (expireRes.data?.gameStatus === 'REVEAL' || expireRes.data?.gameStatus === 'COMPLETED') {
+          router.push(`/room/${encodeURIComponent(roomCode)}/reveal`);
+        }
+      }
+    } catch {
+      await expireTurnAction({ roomCode });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [engine, isSubmitting, roomCode, roomId, router, version]);
+
+  useGameTimer({ onExpired: handleAutoSubmitOnExpiry });
 
   const promptText = currentTurn.promptContext?.text || 'Sketch your prompt';
 

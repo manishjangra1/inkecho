@@ -103,37 +103,22 @@ export function LobbyView({ initialRoom, currentPlayerId }: LobbyViewProps) {
           onPlayerUpdated={() => refetch()}
         />
 
-        {/* Room Settings Info Bar */}
-        <div className="rounded-[4px] border border-border bg-[#111111] p-4">
-          <div className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-neutral-400">
-            <Sliders className="h-3.5 w-3.5" />
+        {/* Compact Room Settings Strip */}
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-[4px] border border-border bg-[#0E0E0E] px-3.5 py-2 text-xs">
+          <div className="flex items-center gap-1.5 text-neutral-400 font-semibold uppercase text-[10px] tracking-wider">
+            <Sliders className="h-3 w-3 text-neutral-400" />
             <span>Room Settings</span>
           </div>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6 text-center">
-            <div className="flex flex-col space-y-1">
-              <span className="text-[10px] uppercase text-neutral-500 font-semibold">Rounds</span>
-              <span className="font-mono text-xs font-bold text-white">{room.settings.roundCount}</span>
-            </div>
-            <div className="flex flex-col space-y-1">
-              <span className="text-[10px] uppercase text-neutral-500 font-semibold">Draw Time</span>
-              <span className="font-mono text-xs font-bold text-white">{room.settings.drawTimerSec}s</span>
-            </div>
-            <div className="flex flex-col space-y-1">
-              <span className="text-[10px] uppercase text-neutral-500 font-semibold">Describe Time</span>
-              <span className="font-mono text-xs font-bold text-white">{room.settings.describeTimerSec}s</span>
-            </div>
-            <div className="flex flex-col space-y-1">
-              <span className="text-[10px] uppercase text-neutral-500 font-semibold">Max Players</span>
-              <span className="font-mono text-xs font-bold text-white">{room.settings.maxPlayers}</span>
-            </div>
-            <div className="flex flex-col space-y-1">
-              <span className="text-[10px] uppercase text-neutral-500 font-semibold">Spectators</span>
-              <span className="font-mono text-xs font-bold text-white">{room.settings.allowSpectators ? 'On' : 'Off'}</span>
-            </div>
-            <div className="flex flex-col space-y-1">
-              <span className="text-[10px] uppercase text-neutral-500 font-semibold">Profanity Filter</span>
-              <span className="font-mono text-xs font-bold text-white">{room.settings.profanityFilter ? 'On' : 'Off'}</span>
-            </div>
+          <div className="flex flex-wrap items-center gap-3 font-mono text-[11px] text-neutral-400">
+            <span>Rounds: <strong className="text-white">{room.settings.roundCount}</strong></span>
+            <span className="text-neutral-700">•</span>
+            <span>Draw: <strong className="text-white">{room.settings.drawTimerSec}s</strong></span>
+            <span className="text-neutral-700">•</span>
+            <span>Describe: <strong className="text-white">{room.settings.describeTimerSec}s</strong></span>
+            <span className="text-neutral-700">•</span>
+            <span>Max: <strong className="text-white">{room.settings.maxPlayers}</strong></span>
+            <span className="text-neutral-700">•</span>
+            <span>Spectators: <strong className="text-white">{room.settings.allowSpectators ? 'On' : 'Off'}</strong></span>
           </div>
         </div>
 

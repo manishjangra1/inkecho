@@ -9,8 +9,10 @@ import { PauseOverlay } from './PauseOverlay';
 import { SpectatorBanner } from './SpectatorBanner';
 import { ReconnectBanner } from './ReconnectBanner';
 import { useGameState } from '../hooks/use-game-state';
+import { useGameTimer } from '../hooks/use-game-timer';
 import { pauseGameAction } from '../actions/pause-game.action';
 import { resumeGameAction } from '../actions/resume-game.action';
+import { expireTurnAction } from '../actions/expire-turn.action';
 import { getTotalTurnsPerChain } from '@/domain/game/turn-order';
 import { Loader2 } from 'lucide-react';
 
@@ -30,6 +32,18 @@ export function GameShell({ roomCode }: GameShellProps) {
     isLoading,
     isNoActiveGame,
   } = useGameState(roomCode);
+
+  // Fail-safe auto-advance if timer is expired and turn has not advanced
+  const handleFailsafeExpiry = React.useCallback(async () => {
+    if (!game || isPaused || game.status !== 'IN_PROGRESS') return;
+    try {
+      await expireTurnAction({ roomCode, expectedVersion: game.version });
+    } catch {
+      // Ignored
+    }
+  }, [game, isPaused, roomCode]);
+
+  useGameTimer({ onExpired: handleFailsafeExpiry });
 
   useEffect(() => {
     if (game?.status === 'REVEAL' || game?.status === 'COMPLETED') {

@@ -16,22 +16,22 @@ export function PromptCard({ type, text, drawingUrl, className }: PromptCardProp
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-2xl border bg-card/60 p-6 shadow-md backdrop-blur-md transition-all',
+        'relative overflow-hidden rounded-[4px] border border-border bg-[#111111] p-4 shadow-xl select-none',
         className
       )}
     >
-      <div className="mb-3 flex items-center gap-2">
+      <div className="mb-2 flex items-center gap-1.5">
         {type === 'DRAWING' ? (
           <>
-            <ImageIcon className="h-4 w-4 text-emerald-400" />
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Prior Drawing to Describe
+            <ImageIcon className="h-3.5 w-3.5 text-white" />
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+              Prior Drawing
             </span>
           </>
         ) : (
           <>
-            <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <Sparkles className="h-3.5 w-3.5 text-white" />
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
               {type === 'STARTER_PROMPT' ? 'Starter Secret Prompt' : 'Prior Prompt'}
             </span>
           </>
@@ -39,7 +39,7 @@ export function PromptCard({ type, text, drawingUrl, className }: PromptCardProp
       </div>
 
       {type === 'DRAWING' && drawingUrl ? (
-        <div className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-xl border bg-black/40">
+        <div className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-[4px] border border-neutral-800 bg-[#262626]">
           <Image
             src={drawingUrl}
             alt="Drawing to describe"
@@ -49,7 +49,7 @@ export function PromptCard({ type, text, drawingUrl, className }: PromptCardProp
           />
         </div>
       ) : (
-        <p className="font-mono text-xl font-bold leading-relaxed tracking-tight text-foreground/90 sm:text-2xl">
+        <p className="font-mono text-sm sm:text-base font-bold leading-relaxed text-white">
           &ldquo;{text || 'Write anything you want!'}&rdquo;
         </p>
       )}

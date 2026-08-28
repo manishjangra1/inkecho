@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
 import { submitDescriptionAction } from '../actions/submit-description.action';
+import { expireTurnAction } from '../actions/expire-turn.action';
 import { useGameStore } from '../stores/game-store';
+import { useGameTimer } from '../hooks/use-game-timer';
 import { GAME_CONFIG } from '@/shared/config/game.config';
 import { MessageSquare, Sparkles, Send, Loader2 } from 'lucide-react';
 import type { TurnSnapshotDto } from '../types/game.types';
@@ -67,6 +69,46 @@ export function DescribePhase({ roomCode, roomId, currentTurn }: DescribePhasePr
       setIsSubmitting(false);
     }
   };
+
+  // Auto-submit current description on timer expiry
+  const handleAutoSubmitOnExpiry = React.useCallback(async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      const trimmed = text.trim();
+      if (trimmed) {
+        const result = await submitDescriptionAction({
+          roomCode,
+          roomId,
+          text: trimmed,
+          expectedVersion: version,
+        });
+        if (result.success) {
+          toast.info('Time up! Description auto-submitted.');
+          setText('');
+          if (result.data?.gameStatus === 'REVEAL' || result.data?.gameStatus === 'COMPLETED') {
+            router.push(`/room/${roomCode}/reveal`);
+          }
+          return;
+        }
+      }
+
+      // If text is empty or submission encountered conflict, expire turn cleanly on server
+      const expireRes = await expireTurnAction({ roomCode, expectedVersion: version });
+      if (expireRes.success) {
+        toast.info('Time up! Moving to next turn.');
+        if (expireRes.data?.gameStatus === 'REVEAL' || expireRes.data?.gameStatus === 'COMPLETED') {
+          router.push(`/room/${roomCode}/reveal`);
+        }
+      }
+    } catch {
+      await expireTurnAction({ roomCode });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [isSubmitting, text, roomCode, roomId, router, version]);
+
+  useGameTimer({ onExpired: handleAutoSubmitOnExpiry });
 
   const charsLeft = GAME_CONFIG.MAX_DESCRIPTION_LENGTH - text.length;
   const isDrawingImage = Boolean(currentTurn.promptContext?.drawingUrl);

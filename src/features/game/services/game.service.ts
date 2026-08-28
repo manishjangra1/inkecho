@@ -435,7 +435,8 @@ export class GameService {
     }
 
     const now = new Date();
-    if (game.turnEndsAt.getTime() > now.getTime()) {
+    // Allow up to 1000ms clock skew tolerance between server and client
+    if (game.turnEndsAt.getTime() - now.getTime() > 1000) {
       return ok(game);
     }
 
@@ -482,6 +483,41 @@ export class GameService {
     }
 
     return updateRes;
+  }
+
+  /**
+   * Triggers timer expiration for the active turn in a room.
+   */
+  async expireTurn(
+    roomCode: string,
+    expectedVersion?: number
+  ): Promise<Result<{ version: number; gameStatus: string }, AppError>> {
+    const roomRes = await roomRepository.findByCode(roomCode);
+    if (!roomRes.ok) {
+      return err(new NotFoundError('ROOM_NOT_FOUND', 'Room not found.'));
+    }
+
+    const room = roomRes.value;
+    const gameRes = await gameRepository.findActiveByRoomId(room.id);
+    if (!gameRes.ok || !gameRes.value) {
+      return err(new NotFoundError('GAME_NOT_FOUND', 'Active game not found.'));
+    }
+
+    const game = gameRes.value;
+    if (expectedVersion && game.version !== expectedVersion) {
+      // Version already advanced
+      return ok({ version: game.version, gameStatus: game.status });
+    }
+
+    const expiryResult = await this.processTimerExpiry(game.id);
+    if (!expiryResult.ok) {
+      return err(expiryResult.error);
+    }
+
+    return ok({
+      version: expiryResult.value.version,
+      gameStatus: expiryResult.value.status,
+    });
   }
 
   /**

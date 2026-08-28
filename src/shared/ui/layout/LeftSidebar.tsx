@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/shared/lib/cn';
 import { Badge } from '@/shared/ui/badge';
-import { Avatar, AvatarFallback } from '@/shared/ui/avatar';
+import { PlayerAvatar } from '@/shared/ui/player-avatar';
 import { ROUTES } from '@/shared/constants/routes';
 
 export interface LeftSidebarProps {
@@ -98,11 +98,11 @@ export function LeftSidebar({ currentUserName = 'Guest Player', isOnline = true 
         <div className="flex items-center justify-between rounded-[4px] border border-transparent p-1.5 hover:border-neutral-800 hover:bg-[#141414] transition-colors">
           <div className="flex items-center gap-2">
             <div className="relative">
-              <Avatar className="h-7 w-7 rounded-[4px] border border-neutral-700 bg-[#1A1A1A]">
-                <AvatarFallback className="text-[10px] font-bold text-white bg-neutral-800">
-                  {currentUserName.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <PlayerAvatar
+                name={currentUserName}
+                seed={currentUserName}
+                className="h-7 w-7"
+              />
               {isOnline && (
                 <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border border-[#0E0E0E] bg-white" />
               )}

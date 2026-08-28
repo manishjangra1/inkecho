@@ -267,4 +267,80 @@ describe('GameService', () => {
     expect(eventPublisher.drawingSubmitted).toHaveBeenCalledTimes(1);
     expect(eventPublisher.turnChanged).toHaveBeenCalledTimes(1);
   });
+
+  it('expireTurn successfully advances turn on timer expiration', async () => {
+    const expiredGameEntity: GameEntity = {
+      ...mockGameEntity,
+      turnEndsAt: new Date(Date.now() - 5000), // Expired 5 seconds ago
+    };
+
+    vi.mocked(roomRepository.findByCode).mockResolvedValue(
+      ok({
+        id: 'room_123',
+        code: 'TEST01',
+        hostPlayerId: 'player_1',
+        visibility: 'PUBLIC',
+        status: 'IN_PROGRESS',
+        settings: {
+          maxPlayers: 8,
+          minPlayers: 3,
+          roundCount: 1,
+          describeTimerSec: 60,
+          drawTimerSec: 90,
+          profanityFilter: false,
+          allowSpectators: true,
+        },
+        participants: [],
+        spectators: [],
+        canStart: false,
+        canStartReasons: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+    );
+
+    vi.mocked(gameRepository.findActiveByRoomId).mockResolvedValue(ok(expiredGameEntity));
+    vi.mocked(gameRepository.findById).mockResolvedValue(ok(expiredGameEntity));
+    vi.mocked(roomRepository.findById).mockResolvedValue(
+      ok({
+        id: 'room_123',
+        code: 'TEST01',
+        hostPlayerId: 'player_1',
+        visibility: 'PUBLIC',
+        status: 'IN_PROGRESS',
+        settings: {
+          maxPlayers: 8,
+          minPlayers: 3,
+          roundCount: 1,
+          describeTimerSec: 60,
+          drawTimerSec: 90,
+          profanityFilter: false,
+          allowSpectators: true,
+        },
+        participants: [],
+        spectators: [],
+        canStart: false,
+        canStartReasons: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+    );
+
+    const advancedEntity: GameEntity = {
+      ...expiredGameEntity,
+      version: 2,
+      currentTurnIndex: 1,
+      turnPhase: 'DRAW',
+      activePlayerId: 'player_2',
+    };
+
+    vi.mocked(gameRepository.updateWithVersion).mockResolvedValue(ok(advancedEntity));
+
+    const res = await service.expireTurn('TEST01', 1);
+
+    expect(res.ok).toBe(true);
+    if (!res.ok) return;
+    expect(res.value.version).toBe(2);
+    expect(eventPublisher.turnChanged).toHaveBeenCalledTimes(1);
+  });
 });

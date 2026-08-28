@@ -39,10 +39,12 @@ export function PlayerGrid({
       {Array.from({ length: emptySlotsCount }).map((_, i) => (
         <Card
           key={`empty-${i}`}
-          className="flex h-[64px] select-none items-center justify-center gap-1.5 rounded-[4px] border border-dashed border-[#232323] bg-[#0E0E0E] px-3 py-2 text-neutral-600"
+          className="flex min-h-[170px] select-none flex-col items-center justify-center gap-2 rounded-[4px] border border-dashed border-[#232323] bg-[#0E0E0E] p-4 text-neutral-600"
         >
-          <UserPlus className="h-3.5 w-3.5" />
-          <span className="text-[11px] font-medium">Empty Slot</span>
+          <div className="flex h-12 w-12 items-center justify-center rounded-full border border-dashed border-neutral-800 bg-[#141414]">
+            <UserPlus className="h-5 w-5 text-neutral-600" />
+          </div>
+          <span className="text-xs font-medium text-neutral-600">Waiting for player...</span>
         </Card>
       ))}
     </div>
