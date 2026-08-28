@@ -25,25 +25,24 @@ export function TurnIndicator({
   const isDescribe = phase === 'DESCRIBE';
 
   return (
-    <div className={cn('flex items-center gap-3', className)}>
-      <div
-        className={cn(
-          'flex items-center gap-2 rounded-md border px-3 py-1 text-xs font-semibold uppercase tracking-wider shadow-sm',
-          isDescribe
-            ? 'border-blue-500/20 bg-blue-500/10 text-blue-400'
-            : 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
+    <div className={cn('flex items-center gap-2.5 select-none', className)}>
+      <div className="flex h-6 items-center gap-1.5 rounded-[3px] border border-neutral-700 bg-[#161616] px-2 text-[11px] font-semibold uppercase tracking-wider text-white">
+        {isDescribe ? (
+          <FileText className="h-3 w-3 text-neutral-300" />
+        ) : (
+          <Pencil className="h-3 w-3 text-neutral-300" />
         )}
-      >
-        {isDescribe ? <FileText className="h-3.5 w-3.5" /> : <Pencil className="h-3.5 w-3.5" />}
         <span>{isDescribe ? 'Describe' : 'Draw'}</span>
       </div>
 
-      <div className="text-sm font-medium text-muted-foreground">
-        Turn {turnIndex + 1} of {totalTurns}
+      <div className="text-xs font-medium text-neutral-400">
+        Turn <strong className="text-white font-mono">{turnIndex + 1}/{totalTurns}</strong>
         {isMyTurn ? (
-          <span className="ml-2 font-bold text-primary">(Your Turn)</span>
+          <span className="ml-2 rounded-[2px] bg-white px-1.5 py-0.5 text-[10px] font-bold text-black uppercase tracking-wider">
+            Your Turn
+          </span>
         ) : activePlayerName ? (
-          <span className="ml-2 font-medium text-foreground">({activePlayerName}&apos;s turn)</span>
+          <span className="ml-1.5 text-neutral-300">({activePlayerName}&apos;s turn)</span>
         ) : null}
       </div>
     </div>

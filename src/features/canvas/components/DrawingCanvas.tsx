@@ -21,7 +21,7 @@ export function DrawingCanvas({ engine, className, isLoading = false }: DrawingC
   return (
     <div
       className={cn(
-        'relative aspect-[4/3] w-full select-none overflow-hidden rounded-[4px] border border-border bg-[#111111] transition-colors',
+        'relative aspect-[4/3] w-full select-none overflow-hidden rounded-[4px] border border-neutral-700 bg-white transition-colors',
         isDrawing && 'border-white',
         className
       )}
@@ -30,7 +30,7 @@ export function DrawingCanvas({ engine, className, isLoading = false }: DrawingC
       <canvas
         ref={canvasRef}
         {...pointerHandlers}
-        className="block h-full w-full cursor-crosshair touch-none"
+        className="block h-full w-full cursor-crosshair touch-none bg-white"
         aria-label="Drawing canvas"
         role="region"
       />

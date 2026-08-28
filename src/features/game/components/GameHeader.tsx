@@ -22,7 +22,6 @@ export interface GameHeaderProps {
 }
 
 export function GameHeader({
-  roomCode,
   roundIndex,
   chainIndex,
   totalChains,
@@ -36,15 +35,15 @@ export function GameHeader({
   const { remainingSeconds, isUrgent } = useGameTimer();
 
   return (
-    <header className="flex h-12 w-full shrink-0 items-center justify-between border-b border-border bg-[#0E0E0E] px-4 select-none">
-      {/* Left: Room & Chain Info */}
-      <div className="flex items-center gap-3">
-        <span className="font-mono text-xs font-bold text-white">
-          {roomCode}
+    <div className="flex h-9 w-full shrink-0 items-center justify-between rounded-[4px] border border-border bg-[#111111] px-3 select-none">
+      {/* Left: Round & Chain Info */}
+      <div className="flex items-center gap-2">
+        <span className="font-mono text-xs font-semibold text-neutral-400">
+          Round <strong className="text-white">{roundIndex + 1}</strong>
         </span>
-        <div className="h-3 w-px bg-neutral-800" />
+        <span className="text-neutral-700">&bull;</span>
         <span className="text-xs text-neutral-400">
-          Round {roundIndex + 1} &bull; Chain {chainIndex + 1}/{totalChains}
+          Chain <strong className="text-white">{chainIndex + 1}/{totalChains}</strong>
         </span>
       </div>
 
@@ -68,23 +67,23 @@ export function GameHeader({
             size="sm"
             onClick={onPauseToggle}
             disabled={isPauseLoading}
-            className="h-7 px-2 text-xs"
+            className="h-6 px-2 text-[11px] border-[#262626] bg-[#161616] text-neutral-300 hover:text-white"
             title={isPaused ? 'Resume game' : 'Pause game'}
           >
             {isPaused ? (
               <>
-                <Play className="mr-1 h-3 w-3" />
+                <Play className="mr-1 h-2.5 w-2.5 fill-current" />
                 Resume
               </>
             ) : (
               <>
-                <Pause className="mr-1 h-3 w-3" />
+                <Pause className="mr-1 h-2.5 w-2.5" />
                 Pause
               </>
             )}
           </Button>
         )}
       </div>
-    </header>
+    </div>
   );
 }

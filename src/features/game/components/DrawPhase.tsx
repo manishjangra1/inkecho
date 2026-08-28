@@ -13,6 +13,7 @@ import {
 import { submitDrawingAction } from '../actions/submit-drawing.action';
 import { useGameStore } from '../stores/game-store';
 import { GAME_COPY } from '@/shared/constants/copy/game';
+import { Pencil } from 'lucide-react';
 import type { TurnSnapshotDto } from '../types/game.types';
 
 export interface DrawPhaseProps {
@@ -90,29 +91,32 @@ export function DrawPhase({ roomCode, roomId, currentTurn }: DrawPhaseProps) {
   const promptText = currentTurn.promptContext?.text || 'Sketch your prompt';
 
   return (
-    <div className="flex h-full w-full flex-col justify-between space-y-3">
+    <div className="flex h-full w-full flex-col justify-between space-y-2.5 select-none">
       {/* Top Prompt Banner */}
-      <div className="flex items-center justify-between rounded-[4px] border border-border bg-[#111111] px-4 py-2">
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
+      <div className="flex items-center justify-between rounded-[4px] border border-border bg-[#111111] px-3.5 py-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <Pencil className="h-3.5 w-3.5 text-white shrink-0" />
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400 shrink-0">
             Prompt:
           </span>
-          <span className="font-semibold text-sm text-white">
+          <span className="font-semibold text-xs sm:text-sm text-white truncate font-mono">
             &ldquo;{promptText}&rdquo;
           </span>
         </div>
-        <div className="text-[11px] text-neutral-400">
-          Draw what you see above before time expires
+        <div className="text-[11px] text-neutral-400 shrink-0 hidden sm:block">
+          Draw what was described before time runs out
         </div>
       </div>
 
-      {/* Canvas Area */}
-      <div className="relative flex-1 flex flex-col justify-center overflow-hidden">
-        <DrawingCanvas engine={engine} className="max-h-[58vh] w-auto mx-auto aspect-[4/3]" />
+      {/* Canvas Workspace */}
+      <div className="flex flex-1 items-center justify-center overflow-hidden py-1">
+        <div className="flex aspect-[4/3] h-full max-h-[58vh] w-auto items-center justify-center overflow-hidden rounded-[4px] border border-neutral-700 bg-[#141414] shadow-2xl">
+          <DrawingCanvas engine={engine} className="h-full w-full" />
+        </div>
       </div>
 
-      {/* Bottom Controls Row: Toolbar + Submit Button */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+      {/* Bottom Controls Row: Toolbar + Submit Action */}
+      <div className="w-full max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 pt-1">
         <div className="flex-1 w-full">
           <CanvasToolbar
             tool={engine.tool}
@@ -136,7 +140,7 @@ export function DrawPhase({ roomCode, roomId, currentTurn }: DrawPhaseProps) {
           />
         </div>
 
-        <div className="shrink-0">
+        <div className="shrink-0 w-full sm:w-auto">
           <SubmitButton
             isSubmitting={isSubmitting || engine.isExporting}
             disabled={engine.strokes.length === 0}

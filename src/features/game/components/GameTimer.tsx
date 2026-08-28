@@ -16,23 +16,25 @@ export function GameTimer({ remainingSeconds, isUrgent, isPaused, className }: G
   return (
     <div
       className={cn(
-        'flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm font-semibold tracking-wide shadow-sm transition-all',
+        'flex h-6 items-center gap-1.5 rounded-[3px] border px-2 text-xs font-mono select-none transition-colors',
         isPaused
-          ? 'border-amber-500/30 bg-amber-500/10 text-amber-400'
+          ? 'border-amber-500/40 bg-amber-500/10 text-amber-400'
           : isUrgent
-            ? 'animate-pulse border-red-500/40 bg-red-500/15 text-red-400'
-            : 'border-primary/20 bg-primary/10 text-primary',
+            ? 'animate-pulse border-[#D9534F] bg-[#D9534F]/10 text-[#D9534F]'
+            : 'border-[#262626] bg-[#161616] text-white',
         className
       )}
       role="timer"
       aria-live="polite"
     >
       {isPaused ? (
-        <AlertCircle className="h-4 w-4 animate-spin text-amber-400" />
+        <AlertCircle className="h-3 w-3 text-amber-400 animate-spin" />
       ) : (
-        <Clock className={cn('h-4 w-4', isUrgent && 'text-red-400')} />
+        <Clock className={cn('h-3 w-3', isUrgent ? 'text-[#D9534F]' : 'text-neutral-400')} />
       )}
-      <span className="tabular-nums">{isPaused ? 'PAUSED' : formatTime(remainingSeconds)}</span>
+      <span className="font-bold tabular-nums">
+        {isPaused ? 'PAUSED' : formatTime(remainingSeconds)}
+      </span>
     </div>
   );
 }
