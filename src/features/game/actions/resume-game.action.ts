@@ -20,7 +20,7 @@ export async function resumeGameAction(
 
   try {
     const validated = resumeGameSchema.parse(input);
-    const ctx = await getAuthContext();
+    const ctx = await getAuthContext(validated.roomCode);
     const result = await gameService.resumeGame(validated.roomCode, ctx);
 
     if (!result.ok) {

@@ -1,8 +1,8 @@
 import type { NextConfig } from 'next';
-import path from 'path';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  transpilePackages: ['ably'],
   serverExternalPackages: ['pino', 'pino-pretty', 'thread-stream'],
   images: {
     remotePatterns: [
@@ -40,15 +40,6 @@ const nextConfig: NextConfig = {
         ],
       },
     ];
-  },
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        ably: path.resolve(process.cwd(), 'node_modules/ably/build/ably.min.js'),
-      };
-    }
-    return config;
   },
 };
 

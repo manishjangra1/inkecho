@@ -25,7 +25,7 @@ export async function toggleReadyAction(input: { roomCode: string; isReady: bool
 
   try {
     const parsed = toggleReadySchema.parse(input);
-    const ctx = await getAuthContext();
+    const ctx = await getAuthContext(parsed.roomCode);
 
     const result = await lobbyService.toggleReady(parsed.roomCode, parsed.isReady, ctx);
     if (!result.ok) {

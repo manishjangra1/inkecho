@@ -18,7 +18,7 @@ export async function updateRoomSettingsAction(
 
   try {
     const parsed = updateRoomSettingsSchema.parse(input);
-    const ctx = await getAuthContext();
+    const ctx = await getAuthContext(parsed.roomCode);
 
     const result = await roomService.updateSettings(parsed, ctx);
     if (!result.ok) {

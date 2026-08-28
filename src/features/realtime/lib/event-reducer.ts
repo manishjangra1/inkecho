@@ -113,6 +113,17 @@ export function reduceRealtimeEvent(
       break;
     }
 
+    case REALTIME_EVENTS.REVEAL_STARTED:
+    case REALTIME_EVENTS.GAME_COMPLETED: {
+      if (store.game) {
+        store.setSnapshot({
+          ...store.game,
+          status: 'REVEAL',
+        });
+      }
+      break;
+    }
+
     default:
       break;
   }

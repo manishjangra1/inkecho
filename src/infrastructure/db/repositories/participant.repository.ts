@@ -54,15 +54,17 @@ export class ParticipantRepository {
   }
 
   async listByRoom(roomId: string): Promise<Result<ParticipantDto[], AppError>> {
-    const participants = await prisma.roomParticipant.findMany({
-      where: {
-        roomId,
-        leftAt: null,
-      },
-      orderBy: { joinedAt: 'asc' },
-    });
+    try {
+      const participants = await prisma.roomParticipant.findMany({
+        where: { roomId },
+        orderBy: { joinedAt: 'asc' },
+      });
 
-    return ok(participants.map(toParticipantDto));
+      const active = participants.filter((p) => !p.leftAt);
+      return ok(active.map(toParticipantDto));
+    } catch {
+      return ok([]);
+    }
   }
 
   async updateReady(
@@ -141,10 +143,16 @@ export class ParticipantRepository {
 
   async resetAllReady(roomId: string): Promise<Result<void, AppError>> {
     try {
-      await prisma.roomParticipant.updateMany({
-        where: { roomId, leftAt: null },
-        data: { isReady: false },
+      const participants = await prisma.roomParticipant.findMany({
+        where: { roomId },
       });
+      const activeIds = participants.filter((p) => !p.leftAt).map((p) => p.id);
+      if (activeIds.length > 0) {
+        await prisma.roomParticipant.updateMany({
+          where: { id: { in: activeIds } },
+          data: { isReady: false },
+        });
+      }
       return ok(undefined);
     } catch {
       return ok(undefined);
@@ -152,13 +160,17 @@ export class ParticipantRepository {
   }
 
   async countActivePlayers(roomId: string): Promise<number> {
-    return prisma.roomParticipant.count({
-      where: {
-        roomId,
-        leftAt: null,
-        role: { in: ['HOST', 'PLAYER'] },
-      },
-    });
+    try {
+      const participants = await prisma.roomParticipant.findMany({
+        where: {
+          roomId,
+          role: { in: ['HOST', 'PLAYER'] },
+        },
+      });
+      return participants.filter((p) => !p.leftAt).length;
+    } catch {
+      return 0;
+    }
   }
 }
 

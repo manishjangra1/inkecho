@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { PromptCard } from './PromptCard';
 import { SubmitButton } from './SubmitButton';
@@ -17,6 +18,7 @@ export interface DescribePhaseProps {
 }
 
 export function DescribePhase({ roomCode, roomId, currentTurn }: DescribePhaseProps) {
+  const router = useRouter();
   const [text, setText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const version = useGameStore((state) => state.game?.version ?? 1);
@@ -40,6 +42,14 @@ export function DescribePhase({ roomCode, roomId, currentTurn }: DescribePhasePr
       });
 
       if (!result.success) {
+        if (
+          result.error.message?.includes('REVEAL') ||
+          result.error.code === 'INVALID_GAME_TRANSITION'
+        ) {
+          toast.info('Game has finished! Moving to reveal…');
+          router.push(`/room/${roomCode}/reveal`);
+          return;
+        }
         if (result.error.code === 'VERSION_CONFLICT' && result.error.snapshot) {
           replaceFromSnapshot(result.error.snapshot as never);
         }
@@ -49,6 +59,9 @@ export function DescribePhase({ roomCode, roomId, currentTurn }: DescribePhasePr
 
       toast.success('Description submitted!');
       setText('');
+      if (result.data?.gameStatus === 'REVEAL' || result.data?.gameStatus === 'COMPLETED') {
+        router.push(`/room/${roomCode}/reveal`);
+      }
     } catch {
       toast.error('An unexpected error occurred.');
     } finally {

@@ -20,7 +20,7 @@ export async function getGameSnapshotAction(
 
   try {
     const validated = getGameSnapshotSchema.parse(input);
-    const ctx = await getAuthContext();
+    const ctx = await getAuthContext(validated.roomCode);
     const result = await gameService.getSnapshot(validated.roomCode, ctx);
 
     if (!result.ok) {

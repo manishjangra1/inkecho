@@ -4,7 +4,7 @@ import { joinRoomSchema } from '@/features/rooms/schemas/join-room.schema';
 import { getAuthContext } from '@/infrastructure/auth/session';
 import { handleApiError } from '@/shared/lib/errors/handle-api-error';
 import { getCorrelationId } from '@/infrastructure/monitoring/request-context';
-import { GUEST_COOKIE_NAME } from '@/infrastructure/auth/guest-jwt';
+import { GUEST_COOKIE_NAME, getGuestCookieName } from '@/infrastructure/auth/guest-jwt';
 import { env } from '@/shared/config/env';
 
 export async function POST(
@@ -35,13 +35,16 @@ export async function POST(
       { status: 200 }
     );
 
-    response.cookies.set(GUEST_COOKIE_NAME, token, {
+    const cookieOptions = {
       httpOnly: true,
       secure: env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'lax' as const,
       maxAge: ttlSeconds,
       path: '/',
-    });
+    };
+
+    response.cookies.set(getGuestCookieName(code), token, cookieOptions);
+    response.cookies.set(GUEST_COOKIE_NAME, token, cookieOptions);
 
     return response;
   } catch (error) {

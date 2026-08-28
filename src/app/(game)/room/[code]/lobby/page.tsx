@@ -3,6 +3,8 @@ import { roomRepository } from '@/infrastructure/db/repositories/room.repository
 import { getAuthContext } from '@/infrastructure/auth/session';
 import { LobbyView } from '@/features/lobby/components/LobbyView';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Game Lobby',
   description: 'Lobby room awaiting players to start the game.',
@@ -17,7 +19,7 @@ export default async function LobbyPage({ params }: { params: Promise<{ code: st
   }
 
   const room = roomResult.value;
-  const ctx = await getAuthContext();
+  const ctx = await getAuthContext(code);
   const currentPlayerId = ctx.type !== 'anonymous' ? ctx.playerId : undefined;
 
   return <LobbyView initialRoom={room} currentPlayerId={currentPlayerId} />;

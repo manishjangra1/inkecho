@@ -1,5 +1,7 @@
 import { GameShell } from '@/features/game/components/GameShell';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
   return {

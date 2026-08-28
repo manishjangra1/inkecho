@@ -13,6 +13,14 @@ export interface GuestJwtPayload {
 
 export const GUEST_COOKIE_NAME = 'ink_player_session';
 
+/**
+ * Returns a room-specific cookie name so multiple tabs/rooms
+ * in the same browser don't overwrite each other's sessions.
+ */
+export function getGuestCookieName(roomCode: string): string {
+  return `ink_ps_${roomCode.toUpperCase().trim()}`;
+}
+
 function getSecretKey(): Uint8Array {
   return new Uint8Array(Buffer.from(env.GUEST_SESSION_SECRET, 'utf-8'));
 }

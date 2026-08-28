@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { joinRoomSchema, type JoinRoomInput } from '../schemas/join-room.schema';
 import { roomService } from '../services/room.service';
 import { getAuthContext } from '@/infrastructure/auth/session';
-import { GUEST_COOKIE_NAME } from '@/infrastructure/auth/guest-jwt';
+import { GUEST_COOKIE_NAME, getGuestCookieName } from '@/infrastructure/auth/guest-jwt';
 import { handleActionError } from '@/shared/lib/errors/handle-action-error';
 import { getCorrelationId } from '@/infrastructure/monitoring/request-context';
 import type { ActionResult } from '@/shared/types/api.types';
@@ -32,14 +32,17 @@ export async function joinRoomAction(
     const { token, playerId, role, redirectTo, room } = result.value;
     const ttlSeconds = (env.GUEST_SESSION_TTL_HOURS || 24) * 60 * 60;
 
-    const cookieStore = await cookies();
-    cookieStore.set(GUEST_COOKIE_NAME, token, {
+    const cookieOptions = {
       httpOnly: true,
       secure: env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'lax' as const,
       maxAge: ttlSeconds,
       path: '/',
-    });
+    };
+
+    const cookieStore = await cookies();
+    cookieStore.set(getGuestCookieName(parsed.roomCode), token, cookieOptions);
+    cookieStore.set(GUEST_COOKIE_NAME, token, cookieOptions);
 
     return {
       success: true,

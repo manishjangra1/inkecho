@@ -15,7 +15,7 @@ export async function voteChainAction(
 
   try {
     const input = voteChainSchema.parse(rawInput);
-    const ctx = await getAuthContext();
+    const ctx = await getAuthContext(input.roomCode);
 
     const result = await revealService.voteChain(input, ctx);
     if (!result.ok) {

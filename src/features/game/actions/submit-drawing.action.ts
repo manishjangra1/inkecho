@@ -15,7 +15,7 @@ export async function submitDrawingAction(
 
   try {
     const validated = submitDrawingSchema.parse(input);
-    const ctx = await getAuthContext();
+    const ctx = await getAuthContext(validated.roomCode);
     const result = await gameService.submitDrawing(validated, ctx);
 
     if (!result.ok) {

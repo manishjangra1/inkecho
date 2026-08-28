@@ -1,6 +1,8 @@
 import { notFound, redirect } from 'next/navigation';
 import { roomRepository } from '@/infrastructure/db/repositories/room.repository';
 
+export const dynamic = 'force-dynamic';
+
 export default async function RoomPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
   const roomResult = await roomRepository.findByCode(code);

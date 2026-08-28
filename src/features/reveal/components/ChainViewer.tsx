@@ -30,22 +30,24 @@ export function ChainViewer({
           const showArrow = idx > 0;
 
           return (
-            <React.Fragment key={step.id}>
+            <motion.div
+              key={step.id}
+              layout
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+              className="flex w-full flex-col items-center"
+            >
               {showArrow && (
-                <motion.div
-                  initial={{ opacity: 0, scaleY: 0 }}
-                  animate={{ opacity: 1, scaleY: 1 }}
-                  transition={{ duration: 0.25, delay: 0.2, ease: 'easeOut' }}
-                  style={{ originY: 0 }}
-                  className="my-1 flex flex-col items-center justify-center text-muted-foreground/50"
-                >
+                <div className="my-2 flex flex-col items-center justify-center text-muted-foreground/50">
                   <div className="h-6 w-0.5 bg-border/80" />
                   <ArrowDown className="-mt-1 h-4 w-4 text-muted-foreground" />
-                </motion.div>
+                </div>
               )}
 
               <RevealStep step={step} isLatest={isLatest} onReport={onReportStep} />
-            </React.Fragment>
+            </motion.div>
           );
         })}
       </AnimatePresence>

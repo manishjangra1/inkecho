@@ -20,7 +20,7 @@ export async function pauseGameAction(
 
   try {
     const validated = pauseGameSchema.parse(input);
-    const ctx = await getAuthContext();
+    const ctx = await getAuthContext(validated.roomCode);
     const result = await gameService.pauseGame(validated.roomCode, ctx);
 
     if (!result.ok) {

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { GameHeader } from './GameHeader';
 import { GamePhaseRouter } from './GamePhaseRouter';
@@ -18,8 +19,16 @@ export interface GameShellProps {
 }
 
 export function GameShell({ roomCode }: GameShellProps) {
+  const router = useRouter();
   const { game, currentTurn, isHost, isSpectator, isPaused, connectionState, isLoading } =
     useGameState(roomCode);
+
+  useEffect(() => {
+    if (game?.status === 'REVEAL' || game?.status === 'COMPLETED') {
+      toast.info('Game turns finished! Directing to the story reveal…');
+      router.push(`/room/${roomCode}/reveal`);
+    }
+  }, [game?.status, roomCode, router]);
 
   const [isPauseLoading, setIsPauseLoading] = useState(false);
 

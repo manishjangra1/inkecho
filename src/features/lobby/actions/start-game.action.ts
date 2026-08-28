@@ -20,7 +20,7 @@ export async function startGameAction(
 
   try {
     const validated = startGameSchema.parse(input);
-    const ctx = await getAuthContext();
+    const ctx = await getAuthContext(validated.roomCode);
     const result = await lobbyService.startGame(validated.roomCode, ctx);
 
     if (!result.ok) {

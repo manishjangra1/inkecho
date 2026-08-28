@@ -13,7 +13,7 @@ export function useGameState(roomCode: string) {
   const isPaused = useGameStore((state) => state.isPaused);
   const connectionState = useGameStore((state) => state.connectionState);
 
-  // Fetch initial game snapshot via REST
+  // Fetch initial game snapshot via REST with periodic polling fallback
   const { data, isLoading, isError, error, refetch } = useQuery<{
     success: boolean;
     data: GameSnapshotDto;
@@ -21,12 +21,26 @@ export function useGameState(roomCode: string) {
     queryKey: ['game', roomCode],
     queryFn: async () => {
       const res = await fetch(`/api/rooms/${encodeURIComponent(roomCode)}/game`);
+      if (res.status === 404) {
+        // Active game completed or returned to lobby
+        return { success: false, data: null as unknown as GameSnapshotDto };
+      }
       if (!res.ok) {
         throw new Error('Failed to load game session');
       }
       return res.json();
     },
-    staleTime: 5000,
+    retry: false,
+    refetchInterval: (query) => {
+      // Stop polling once the game is not active or transitioned to REVEAL
+      if (!query.state.data?.success) return false;
+      const status = query.state.data?.data?.status;
+      if (status === 'REVEAL' || status === 'COMPLETED') {
+        return false;
+      }
+      return 2500;
+    },
+    staleTime: 1500,
   });
 
   useEffect(() => {

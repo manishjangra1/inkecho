@@ -6,6 +6,8 @@ import { RoomHeader } from '@/features/rooms/components/RoomHeader';
 import { RoomShell } from '@/shared/ui/layout/RoomShell';
 import { RealtimeProvider } from '@/features/realtime/providers/RealtimeProvider';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
   return {
@@ -29,7 +31,7 @@ export default async function RoomLayout({
   }
 
   const room = roomResult.value;
-  const ctx = await getAuthContext();
+  const ctx = await getAuthContext(code);
   const isHost = ctx.type !== 'anonymous' && ctx.playerId === room.hostPlayerId;
 
   const playerId =

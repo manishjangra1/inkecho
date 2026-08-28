@@ -1,5 +1,7 @@
 import { RevealShell } from '@/features/reveal/components/RevealShell';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
   return {

@@ -5,7 +5,6 @@ import { Share2 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { CopyLinkButton } from './CopyLinkButton';
 import { LOBBY_COPY } from '@/shared/constants/copy/lobby';
-import { env } from '@/shared/config/env';
 
 interface InviteLinkBarProps {
   readonly roomCode: string;
@@ -13,13 +12,12 @@ interface InviteLinkBarProps {
 
 export function InviteLinkBar({ roomCode }: InviteLinkBarProps) {
   const [inviteUrl, setInviteUrl] = React.useState('');
+  const [hasNativeShare, setHasNativeShare] = React.useState(false);
 
   React.useEffect(() => {
-    const origin =
-      typeof window !== 'undefined'
-        ? window.location.origin
-        : env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const origin = window.location.origin || 'http://localhost:3000';
     setInviteUrl(`${origin}/join/${roomCode}`);
+    setHasNativeShare(typeof navigator !== 'undefined' && !!navigator.share);
   }, [roomCode]);
 
   const handleShare = async () => {
@@ -35,8 +33,6 @@ export function InviteLinkBar({ roomCode }: InviteLinkBarProps) {
       }
     }
   };
-
-  const hasNativeShare = typeof navigator !== 'undefined' && !!navigator.share;
 
   return (
     <div className="flex w-full flex-col items-center justify-between gap-3 rounded-2xl border border-border/80 bg-card/60 p-3.5 shadow-sm backdrop-blur-md sm:flex-row">

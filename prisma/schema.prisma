@@ -214,7 +214,7 @@ model Room {
   participantIds  String[]        @default([])
   spectatorIds    String[]        @default([])
   kickedPlayerIds String[]        @default([])
-  currentGameId   String?         @unique @db.ObjectId
+  currentGameId   String?         @db.ObjectId
   lastActivityAt  DateTime        @default(now())
   closedAt        DateTime?
   closeReason     RoomCloseReason?
@@ -222,7 +222,6 @@ model Room {
   updatedAt       DateTime        @updatedAt
   deletedAt       DateTime?
 
-  currentGame  Game?             @relation("RoomCurrentGame", fields: [currentGameId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   games        Game[]            @relation("RoomGames")
   participants RoomParticipant[]
   guestSessions GuestSession[]
@@ -309,7 +308,6 @@ model Game {
   updatedAt          DateTime   @updatedAt
 
   room        Room          @relation("RoomGames", fields: [roomId], references: [id], onDelete: Cascade)
-  roomCurrent Room?         @relation("RoomCurrentGame")
   reports     Report[]
   history     GameHistory[]
 

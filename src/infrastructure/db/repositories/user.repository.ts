@@ -5,27 +5,35 @@ import { toUserProfileDto, type UserProfileDto } from '../mappers/user.mapper';
 
 export class UserRepository {
   async findById(id: string): Promise<Result<UserProfileDto, AppError>> {
-    const user = await prisma.user.findUnique({
-      where: { id, deletedAt: null },
-    });
+    try {
+      const user = await prisma.user.findFirst({
+        where: { id },
+      });
 
-    if (!user) {
+      if (!user || user.deletedAt) {
+        return err(new NotFoundError('USER_NOT_FOUND', 'User profile not found.'));
+      }
+
+      return ok(toUserProfileDto(user));
+    } catch {
       return err(new NotFoundError('USER_NOT_FOUND', 'User profile not found.'));
     }
-
-    return ok(toUserProfileDto(user));
   }
 
   async findByEmail(email: string): Promise<Result<UserProfileDto | null, AppError>> {
-    const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase().trim(), deletedAt: null },
-    });
+    try {
+      const user = await prisma.user.findFirst({
+        where: { email: email.toLowerCase().trim() },
+      });
 
-    if (!user) {
+      if (!user || user.deletedAt) {
+        return ok(null);
+      }
+
+      return ok(toUserProfileDto(user));
+    } catch {
       return ok(null);
     }
-
-    return ok(toUserProfileDto(user));
   }
 
   async updateProfile(
@@ -62,32 +70,26 @@ export class UserRepository {
     search?: string
   ): Promise<Result<{ items: UserProfileDto[]; total: number; totalPages: number }, AppError>> {
     try {
-      const where = search
-        ? {
-            deletedAt: null,
-            OR: [
-              { name: { contains: search, mode: 'insensitive' as const } },
-              { email: { contains: search, mode: 'insensitive' as const } },
-            ],
-          }
-        : { deletedAt: null };
+      const allUsers = await prisma.user.findMany({
+        where: search
+          ? {
+              OR: [
+                { name: { contains: search, mode: 'insensitive' as const } },
+                { email: { contains: search, mode: 'insensitive' as const } },
+              ],
+            }
+          : undefined,
+        orderBy: { createdAt: 'desc' },
+      });
 
+      const active = allUsers.filter((u) => !u.deletedAt);
       const skip = (Math.max(1, page) - 1) * limit;
-
-      const [users, total] = await Promise.all([
-        prisma.user.findMany({
-          where,
-          orderBy: { createdAt: 'desc' },
-          skip,
-          take: limit,
-        }),
-        prisma.user.count({ where }),
-      ]);
+      const paginated = active.slice(skip, skip + limit);
 
       return ok({
-        items: users.map(toUserProfileDto),
-        total,
-        totalPages: Math.ceil(total / limit) || 1,
+        items: paginated.map(toUserProfileDto),
+        total: active.length,
+        totalPages: Math.ceil(active.length / limit) || 1,
       });
     } catch {
       return err(new NotFoundError('USERS_FETCH_FAILED', 'Failed to fetch users.'));

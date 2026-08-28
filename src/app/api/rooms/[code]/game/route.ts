@@ -15,7 +15,7 @@ export async function GET(_request: Request, context: RouteContext) {
   try {
     const params = await context.params;
     const roomCode = roomCodeSchema.parse(params.code);
-    const ctx = await getAuthContext();
+    const ctx = await getAuthContext(roomCode);
 
     const snapshotRes = await gameService.getSnapshot(roomCode, ctx);
     if (!snapshotRes.ok) {

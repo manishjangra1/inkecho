@@ -18,7 +18,7 @@ export async function submitDescriptionAction(
 
   try {
     const validated = submitDescriptionSchema.parse(input);
-    const ctx = await getAuthContext();
+    const ctx = await getAuthContext(validated.roomCode);
     const result = await gameService.submitDescription(validated, ctx);
 
     if (!result.ok) {

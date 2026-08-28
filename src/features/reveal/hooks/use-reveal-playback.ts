@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { voteChainAction } from '../actions/vote-chain.action';
@@ -13,6 +14,7 @@ export interface UseRevealPlaybackOptions {
 }
 
 export function useRevealPlayback({ roomCode, autoPlayDefault = true }: UseRevealPlaybackOptions) {
+  const router = useRouter();
   const [selectedChainIndex, setSelectedChainIndex] = useState(0);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(autoPlayDefault);
@@ -36,6 +38,25 @@ export function useRevealPlayback({ roomCode, autoPlayDefault = true }: UseRevea
     },
     staleTime: 10000,
   });
+
+  // Poll room status to detect rematch and route all players back to lobby
+  const { data: roomStatusData } = useQuery<{ success: boolean; data: { status: string } }>({
+    queryKey: ['room-status', roomCode],
+    queryFn: async () => {
+      const res = await fetch(`/api/rooms/${encodeURIComponent(roomCode)}`);
+      if (!res.ok) return { success: false, data: { status: 'UNKNOWN' } };
+      return res.json();
+    },
+    refetchInterval: 3000,
+    staleTime: 2000,
+  });
+
+  useEffect(() => {
+    if (roomStatusData?.data?.status === 'LOBBY') {
+      toast.info('Returning to Game Lobby for rematch!');
+      router.push(`/room/${encodeURIComponent(roomCode)}/lobby`);
+    }
+  }, [roomStatusData?.data?.status, roomCode, router]);
 
   const revealData = data?.data;
   const chains: readonly RevealChainItem[] = useMemo(() => revealData?.chains ?? [], [revealData]);

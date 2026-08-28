@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { roomCodeSchema } from '@/shared/lib/validation/schemas';
 import { roomService } from '../services/room.service';
 import { getAuthContext } from '@/infrastructure/auth/session';
-import { GUEST_COOKIE_NAME } from '@/infrastructure/auth/guest-jwt';
+import { getGuestCookieName } from '@/infrastructure/auth/guest-jwt';
 import { handleActionError } from '@/shared/lib/errors/handle-action-error';
 import { getCorrelationId } from '@/infrastructure/monitoring/request-context';
 import type { ActionResult } from '@/shared/types/api.types';
@@ -22,7 +22,7 @@ export async function leaveRoomAction(input: {
 
   try {
     const parsed = leaveSchema.parse(input);
-    const ctx = await getAuthContext();
+    const ctx = await getAuthContext(parsed.roomCode);
 
     const result = await roomService.leaveRoom(parsed.roomCode, ctx);
     if (!result.ok) {
@@ -30,7 +30,7 @@ export async function leaveRoomAction(input: {
     }
 
     const cookieStore = await cookies();
-    cookieStore.delete(GUEST_COOKIE_NAME);
+    cookieStore.delete(getGuestCookieName(parsed.roomCode));
 
     return {
       success: true,

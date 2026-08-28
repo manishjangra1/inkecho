@@ -15,7 +15,7 @@ export async function rematchAction(
 
   try {
     const input = rematchSchema.parse(rawInput);
-    const ctx = await getAuthContext();
+    const ctx = await getAuthContext(input.roomCode);
 
     const result = await revealService.rematch(input, ctx);
     if (!result.ok) {

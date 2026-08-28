@@ -1,17 +1,36 @@
 import { cookies } from 'next/headers';
 import { getServerSession } from 'next-auth';
 import { authOptions } from './next-auth.config';
-import { verifyGuestToken, GUEST_COOKIE_NAME } from './guest-jwt';
+import { verifyGuestToken, GUEST_COOKIE_NAME, getGuestCookieName } from './guest-jwt';
 import { prisma } from '../db/prisma.client';
 import { UnauthorizedError, ForbiddenError } from '@/shared/lib/errors/app-error';
 import type { AuthContext } from '@/shared/lib/auth/authorize';
 
 /**
  * Resolves current request identity: Guest, Registered User, or Anonymous.
+ * @param roomCode Optional room code to look up a room-specific cookie first.
  */
-export async function getAuthContext(): Promise<AuthContext> {
+export async function getAuthContext(roomCode?: string): Promise<AuthContext> {
   const cookieStore = await cookies();
-  const guestCookie = cookieStore.get(GUEST_COOKIE_NAME)?.value;
+
+  // Resolve the guest cookie: prefer room-specific, then scan ink_ps_*, then legacy
+  let guestCookie: string | undefined;
+
+  if (roomCode) {
+    guestCookie = cookieStore.get(getGuestCookieName(roomCode))?.value;
+  }
+
+  if (!guestCookie) {
+    // Scan for any room-specific cookie
+    const allCookies = cookieStore.getAll();
+    const roomCookie = allCookies.find((c) => c.name.startsWith('ink_ps_'));
+    guestCookie = roomCookie?.value;
+  }
+
+  if (!guestCookie) {
+    // Fallback to legacy single cookie
+    guestCookie = cookieStore.get(GUEST_COOKIE_NAME)?.value;
+  }
 
   // 1. Check in-room guest/player session cookie
   if (guestCookie) {

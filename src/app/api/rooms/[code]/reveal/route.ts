@@ -9,7 +9,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ cod
 
   try {
     const { code } = await params;
-    const ctx = await getAuthContext();
+    const ctx = await getAuthContext(code);
 
     const res = await revealService.getRevealData(code.toUpperCase(), ctx);
     if (!res.ok) {

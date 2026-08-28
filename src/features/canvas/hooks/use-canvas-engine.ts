@@ -68,10 +68,13 @@ export function useCanvasEngine(options: UseCanvasEngineOptions = {}) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const scale = canvas.width / CANVAS_CONFIG.DIMENSIONS.LOGICAL_WIDTH;
+
     replayStrokes(ctx, strokes, {
       width: canvas.width,
       height: canvas.height,
       backgroundColor,
+      scale,
     });
   }, [strokes, backgroundColor]);
 
@@ -92,11 +95,6 @@ export function useCanvasEngine(options: UseCanvasEngineOptions = {}) {
 
     canvas.style.width = `${displayWidth}px`;
     canvas.style.height = `${displayHeight}px`;
-
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.scale(dpr, dpr);
-    }
 
     redraw();
   }, [redraw]);
@@ -143,6 +141,7 @@ export function useCanvasEngine(options: UseCanvasEngineOptions = {}) {
       // Draw initial tap point immediately
       const ctx = canvas.getContext('2d');
       if (ctx) {
+        const scale = canvas.width / CANVAS_CONFIG.DIMENSIONS.LOGICAL_WIDTH;
         renderStroke(
           ctx,
           {
@@ -154,7 +153,8 @@ export function useCanvasEngine(options: UseCanvasEngineOptions = {}) {
             timestamp: Date.now(),
           },
           canvas.width,
-          canvas.height
+          canvas.height,
+          scale
         );
       }
     },
@@ -186,13 +186,15 @@ export function useCanvasEngine(options: UseCanvasEngineOptions = {}) {
 
           const ctx = canvas.getContext('2d');
           if (ctx) {
+            const scale = canvas.width / CANVAS_CONFIG.DIMENSIONS.LOGICAL_WIDTH;
             renderLiveSegment(
               ctx,
               prevPoint,
               point,
               { tool, color, size: currentSize },
               canvas.width,
-              canvas.height
+              canvas.height,
+              scale
             );
           }
         }

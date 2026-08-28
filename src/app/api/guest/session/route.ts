@@ -4,7 +4,7 @@ import { guestSessionService } from '@/features/auth/services/guest-session.serv
 import { roomRepository } from '@/infrastructure/db/repositories/room.repository';
 import { handleApiError } from '@/shared/lib/errors/handle-api-error';
 import { getCorrelationId } from '@/infrastructure/monitoring/request-context';
-import { GUEST_COOKIE_NAME } from '@/infrastructure/auth/guest-jwt';
+import { getGuestCookieName } from '@/infrastructure/auth/guest-jwt';
 import { env } from '@/shared/config/env';
 
 export async function POST(request: NextRequest) {
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
 
-    response.cookies.set(GUEST_COOKIE_NAME, session.token, {
+    response.cookies.set(getGuestCookieName(roomCode!), session.token, {
       httpOnly: true,
       secure: env.NODE_ENV === 'production',
       sameSite: 'lax',

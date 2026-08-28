@@ -22,7 +22,7 @@ export async function transferHostAction(input: {
 
   try {
     const parsed = transferHostSchema.parse(input);
-    const ctx = await getAuthContext();
+    const ctx = await getAuthContext(parsed.roomCode);
 
     const result = await lobbyService.transferHost(parsed.roomCode, parsed.newHostPlayerId, ctx);
     if (!result.ok) {

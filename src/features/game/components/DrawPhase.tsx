@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { PromptCard } from './PromptCard';
 import { SubmitButton } from './SubmitButton';
@@ -22,6 +23,7 @@ export interface DrawPhaseProps {
 }
 
 export function DrawPhase({ roomCode, roomId, currentTurn }: DrawPhaseProps) {
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const version = useGameStore((state) => state.game?.version ?? 1);
   const replaceFromSnapshot = useGameStore((state) => state.replaceFromSnapshot);
@@ -59,6 +61,14 @@ export function DrawPhase({ roomCode, roomId, currentTurn }: DrawPhaseProps) {
       });
 
       if (!result.success) {
+        if (
+          result.error.message?.includes('REVEAL') ||
+          result.error.code === 'INVALID_GAME_TRANSITION'
+        ) {
+          toast.info('Game has finished! Moving to reveal…');
+          router.push(`/room/${roomCode}/reveal`);
+          return;
+        }
         if (result.error.code === 'VERSION_CONFLICT' && result.error.snapshot) {
           replaceFromSnapshot(result.error.snapshot as never);
         }
@@ -68,6 +78,9 @@ export function DrawPhase({ roomCode, roomId, currentTurn }: DrawPhaseProps) {
 
       engine.clearDraft();
       toast.success('Drawing submitted successfully!');
+      if (result.data?.gameStatus === 'REVEAL' || result.data?.gameStatus === 'COMPLETED') {
+        router.push(`/room/${roomCode}/reveal`);
+      }
     } catch {
       toast.error('An unexpected error occurred during submission.');
     } finally {

@@ -51,33 +51,42 @@ export class RoomRepository {
   }
 
   async findByCode(code: string): Promise<Result<RoomSnapshotDto, AppError>> {
-    const room = await prisma.room.findUnique({
-      where: { code: code.toUpperCase().trim(), deletedAt: null },
-      include: {
-        participants: true,
-      },
-    });
+    try {
+      const normalizedCode = code.toUpperCase().trim();
+      const room = await prisma.room.findFirst({
+        where: { code: normalizedCode },
+        include: {
+          participants: true,
+        },
+      });
 
-    if (!room) {
+      if (!room || room.deletedAt) {
+        return err(new NotFoundError('ROOM_NOT_FOUND', 'Room not found.'));
+      }
+
+      return ok(toRoomSnapshotDto(room));
+    } catch {
       return err(new NotFoundError('ROOM_NOT_FOUND', 'Room not found.'));
     }
-
-    return ok(toRoomSnapshotDto(room));
   }
 
   async findById(id: string): Promise<Result<RoomSnapshotDto, AppError>> {
-    const room = await prisma.room.findUnique({
-      where: { id, deletedAt: null },
-      include: {
-        participants: true,
-      },
-    });
+    try {
+      const room = await prisma.room.findFirst({
+        where: { id },
+        include: {
+          participants: true,
+        },
+      });
 
-    if (!room) {
+      if (!room || room.deletedAt) {
+        return err(new NotFoundError('ROOM_NOT_FOUND', 'Room not found.'));
+      }
+
+      return ok(toRoomSnapshotDto(room));
+    } catch {
       return err(new NotFoundError('ROOM_NOT_FOUND', 'Room not found.'));
     }
-
-    return ok(toRoomSnapshotDto(room));
   }
 
   async updateSettings(
@@ -93,11 +102,12 @@ export class RoomRepository {
     }>
   ): Promise<Result<RoomSnapshotDto, AppError>> {
     try {
-      const current = await prisma.room.findUnique({
-        where: { code: code.toUpperCase().trim(), deletedAt: null },
+      const normalizedCode = code.toUpperCase().trim();
+      const current = await prisma.room.findFirst({
+        where: { code: normalizedCode },
       });
 
-      if (!current) {
+      if (!current || current.deletedAt) {
         return err(new NotFoundError('ROOM_NOT_FOUND', 'Room not found.'));
       }
 
@@ -107,7 +117,7 @@ export class RoomRepository {
       };
 
       const updated = await prisma.room.update({
-        where: { code: code.toUpperCase().trim() },
+        where: { id: current.id },
         data: {
           settings: mergedSettings,
           lastActivityAt: new Date(),
@@ -128,8 +138,17 @@ export class RoomRepository {
     newHostPlayerId: string
   ): Promise<Result<RoomSnapshotDto, AppError>> {
     try {
+      const normalizedCode = code.toUpperCase().trim();
+      const current = await prisma.room.findFirst({
+        where: { code: normalizedCode },
+      });
+
+      if (!current || current.deletedAt) {
+        return err(new NotFoundError('ROOM_NOT_FOUND', 'Room not found.'));
+      }
+
       const updated = await prisma.room.update({
-        where: { code: code.toUpperCase().trim() },
+        where: { id: current.id },
         data: {
           hostPlayerId: newHostPlayerId,
           lastActivityAt: new Date(),
@@ -147,8 +166,17 @@ export class RoomRepository {
 
   async updateStatus(code: string, status: RoomStatus): Promise<Result<RoomSnapshotDto, AppError>> {
     try {
+      const normalizedCode = code.toUpperCase().trim();
+      const current = await prisma.room.findFirst({
+        where: { code: normalizedCode },
+      });
+
+      if (!current || current.deletedAt) {
+        return err(new NotFoundError('ROOM_NOT_FOUND', 'Room not found.'));
+      }
+
       const updated = await prisma.room.update({
-        where: { code: code.toUpperCase().trim() },
+        where: { id: current.id },
         data: {
           status,
           lastActivityAt: new Date(),
@@ -166,13 +194,20 @@ export class RoomRepository {
 
   async addKickedPlayer(code: string, playerId: string): Promise<Result<void, AppError>> {
     try {
-      await prisma.room.update({
-        where: { code: code.toUpperCase().trim() },
-        data: {
-          kickedPlayerIds: { push: playerId },
-          lastActivityAt: new Date(),
-        },
+      const normalizedCode = code.toUpperCase().trim();
+      const current = await prisma.room.findFirst({
+        where: { code: normalizedCode },
       });
+
+      if (current && !current.deletedAt) {
+        await prisma.room.update({
+          where: { id: current.id },
+          data: {
+            kickedPlayerIds: { push: playerId },
+            lastActivityAt: new Date(),
+          },
+        });
+      }
       return ok(undefined);
     } catch {
       return ok(undefined);
@@ -182,48 +217,53 @@ export class RoomRepository {
   async listPublic(
     params: PaginationParams = {}
   ): Promise<Result<Paginated<RoomListItemDto>, AppError>> {
-    const page = Math.max(1, params.page || 1);
-    const limit = Math.min(50, Math.max(1, params.limit || 12));
-    const skip = (page - 1) * limit;
+    try {
+      const page = Math.max(1, params.page || 1);
+      const limit = Math.min(50, Math.max(1, params.limit || 12));
+      const skip = (page - 1) * limit;
 
-    const where = {
-      status: 'LOBBY' as const,
-      visibility: 'PUBLIC' as const,
-      deletedAt: null,
-    };
-
-    const [total, items] = await Promise.all([
-      prisma.room.count({ where }),
-      prisma.room.findMany({
-        where,
+      const allRooms = await prisma.room.findMany({
+        where: {
+          status: 'LOBBY',
+          visibility: 'PUBLIC',
+        },
         include: { participants: true },
         orderBy: { lastActivityAt: 'desc' },
-        skip,
-        take: limit,
-      }),
-    ]);
+      });
 
-    const mapped = items.map(toRoomListItemDto);
+      const activeRooms = allRooms.filter((r) => !r.deletedAt);
+      const paginatedRooms = activeRooms.slice(skip, skip + limit);
+      const mapped = paginatedRooms.map(toRoomListItemDto);
 
-    return ok({
-      items: mapped,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit) || 1,
-    });
+      return ok({
+        items: mapped,
+        total: activeRooms.length,
+        page,
+        limit,
+        totalPages: Math.ceil(activeRooms.length / limit) || 1,
+      });
+    } catch {
+      return err(new NotFoundError('ROOMS_FETCH_FAILED', 'Failed to fetch public rooms.'));
+    }
   }
 
   async close(code: string, reason: RoomCloseReason = 'HOST'): Promise<Result<void, AppError>> {
     try {
-      await prisma.room.update({
-        where: { code: code.toUpperCase().trim() },
-        data: {
-          status: 'CLOSED',
-          closedAt: new Date(),
-          closeReason: reason,
-        },
+      const normalizedCode = code.toUpperCase().trim();
+      const current = await prisma.room.findFirst({
+        where: { code: normalizedCode },
       });
+
+      if (current && !current.deletedAt) {
+        await prisma.room.update({
+          where: { id: current.id },
+          data: {
+            status: 'CLOSED',
+            closedAt: new Date(),
+            closeReason: reason,
+          },
+        });
+      }
       return ok(undefined);
     } catch {
       return ok(undefined);

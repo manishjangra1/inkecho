@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { guestSessionSchema, type GuestSessionInput } from '../schemas/guest-session.schema';
 import { guestSessionService } from '../services/guest-session.service';
 import { roomRepository } from '@/infrastructure/db/repositories/room.repository';
-import { GUEST_COOKIE_NAME } from '@/infrastructure/auth/guest-jwt';
+import { getGuestCookieName } from '@/infrastructure/auth/guest-jwt';
 import { handleActionError } from '@/shared/lib/errors/handle-action-error';
 import { getCorrelationId } from '@/infrastructure/monitoring/request-context';
 import type { ActionResult } from '@/shared/types/api.types';
@@ -55,7 +55,7 @@ export async function createGuestSessionAction(
     const ttlSeconds = (env.GUEST_SESSION_TTL_HOURS || 24) * 60 * 60;
 
     const cookieStore = await cookies();
-    cookieStore.set(GUEST_COOKIE_NAME, session.token, {
+    cookieStore.set(getGuestCookieName(roomCode!), session.token, {
       httpOnly: true,
       secure: env.NODE_ENV === 'production',
       sameSite: 'lax',

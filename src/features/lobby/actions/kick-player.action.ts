@@ -21,7 +21,7 @@ export async function kickPlayerAction(input: {
 
   try {
     const parsed = kickPlayerSchema.parse(input);
-    const ctx = await getAuthContext();
+    const ctx = await getAuthContext(parsed.roomCode);
 
     const result = await lobbyService.kickPlayer(parsed.roomCode, parsed.playerId, ctx);
     if (!result.ok) {
