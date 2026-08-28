@@ -33,6 +33,7 @@ export interface RevealDataResponse {
 export interface VoteChainInput {
   readonly roomCode: string;
   readonly chainIndex: number;
+  readonly correlationId?: string;
 }
 
 export interface VoteChainResponse {

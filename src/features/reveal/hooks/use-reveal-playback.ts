@@ -23,7 +23,7 @@ export function useRevealPlayback({ roomCode, autoPlayDefault = true }: UseRevea
   const [localVotes, setLocalVotes] = useState<Record<string, number>>({});
   const [winningChainIndex, setWinningChainIndex] = useState<number | null>(null);
 
-  // Fetch initial reveal snapshot
+  // Fetch reveal snapshot with live polling fallback
   const { data, isLoading, isError, refetch } = useQuery<{
     success: boolean;
     data: RevealDataResponse;
@@ -36,7 +36,8 @@ export function useRevealPlayback({ roomCode, autoPlayDefault = true }: UseRevea
       }
       return res.json();
     },
-    staleTime: 10000,
+    refetchInterval: 2000,
+    staleTime: 500,
   });
 
   // Poll room status to detect rematch and route all players back to lobby

@@ -40,6 +40,7 @@ export const REALTIME_EVENTS = {
   REVEAL_STARTED: 'reveal_started',
   REVEAL_CHAIN_STEP: 'reveal_chain_step',
   REVEAL_COMPLETED: 'reveal_completed',
+  REVEAL_VOTES_UPDATED: 'reveal_votes_updated',
 
   // Chat Events
   CHAT_MESSAGE: 'chat_message',

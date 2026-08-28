@@ -161,6 +161,14 @@ export class RevealService {
 
     const winningChainIndex = this.calculateWinningChain(currentVotes, game.chains.length);
 
+    // Broadcast updated votes to all players in realtime
+    await eventPublisher.revealVotesUpdated(
+      room.id,
+      currentVotes,
+      winningChainIndex,
+      dto.correlationId
+    );
+
     return ok({
       votes: currentVotes,
       winningChainIndex,

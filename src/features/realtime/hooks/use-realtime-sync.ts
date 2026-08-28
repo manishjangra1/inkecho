@@ -29,6 +29,29 @@ export function useRealtimeSync(roomCode: string, playerId: string) {
         return;
       }
 
+      // Handle live reveal votes update
+      if (envelope.name === REALTIME_EVENTS.REVEAL_VOTES_UPDATED) {
+        const votesPayload = envelope.payload as {
+          votes: Record<string, number>;
+          winningChainIndex: number | null;
+        };
+        if (votesPayload?.votes) {
+          queryClient.setQueryData(['reveal', roomCode], (old: unknown) => {
+            const current = old as { success: boolean; data: Record<string, unknown> } | undefined;
+            if (!current?.data) return old;
+            return {
+              ...current,
+              data: {
+                ...current.data,
+                votes: votesPayload.votes,
+                winningChainIndex: votesPayload.winningChainIndex,
+              },
+            };
+          });
+        }
+        return;
+      }
+
       // Apply to Zustand game store
       reduceRealtimeEvent(envelope, store, playerId);
 

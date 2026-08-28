@@ -348,6 +348,22 @@ export class EventPublisher {
     );
   }
 
+  async revealVotesUpdated(
+    roomId: string,
+    votes: Record<string, number>,
+    winningChainIndex: number | null,
+    correlationId?: string
+  ) {
+    return this.publish(
+      roomId,
+      REALTIME_EVENTS.REVEAL_VOTES_UPDATED,
+      { votes, winningChainIndex },
+      0,
+      'game',
+      correlationId
+    );
+  }
+
   async returnedToLobby(roomId: string, correlationId?: string) {
     return this.publish(
       roomId,

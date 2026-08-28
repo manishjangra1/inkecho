@@ -47,11 +47,23 @@ export function GameChatSidebar({
   const [newMessagesWhileScrolled, setNewMessagesWhileScrolled] = React.useState(0);
   const prevMessagesLength = React.useRef(messages.length);
 
+  const handleToggleSound = () => {
+    const willBeEnabled = !isSoundEnabled;
+    toggleSound();
+    if (willBeEnabled) {
+      playChatNotificationSound();
+    }
+  };
+
   // Sound & Smart Auto-Scroll when new messages arrive
   React.useEffect(() => {
     if (messages.length > prevMessagesLength.current) {
       const latestMessage = messages[messages.length - 1];
-      const isFromOther = latestMessage && latestMessage.senderId !== currentUserId && !latestMessage.isSystem;
+      const isFromOther = Boolean(
+        latestMessage &&
+        (!currentUserId || latestMessage.senderId !== currentUserId) &&
+        !latestMessage.isSystem
+      );
 
       if (isFromOther && isSoundEnabled) {
         playChatNotificationSound();
@@ -159,7 +171,7 @@ export function GameChatSidebar({
           <Button
             variant="ghost"
             size="sm"
-            onClick={toggleSound}
+            onClick={handleToggleSound}
             className="h-6 w-6 p-0 text-neutral-400 hover:bg-[#1A1A1A] hover:text-white"
             title={isSoundEnabled ? 'Mute notification sound' : 'Unmute notification sound'}
           >
