@@ -6,6 +6,7 @@ import {
   ForbiddenError,
   NotFoundError,
   ValidationError,
+  ConflictError,
   type AppError,
 } from '@/shared/lib/errors/app-error';
 import { authorize, type AuthContext } from '@/shared/lib/auth/authorize';
@@ -94,6 +95,79 @@ export class LobbyService {
 
     return updatedRoom;
   }
+
+  async startGame(
+    roomCode: string,
+    ctx: AuthContext
+  ): Promise<Result<import('@/features/game/types/game.types').StartGameResponse, AppError>> {
+    authorize(ctx, 'room:start');
+
+    const roomResult = await roomRepository.findByCode(roomCode);
+    if (!roomResult.ok) {
+      return err(new NotFoundError('ROOM_NOT_FOUND', 'Room not found.'));
+    }
+
+    const room = roomResult.value;
+    if (room.status !== 'LOBBY') {
+      return err(
+        new ConflictError('INVALID_ROOM_STATE', 'Game can only be started from LOBBY state.')
+      );
+    }
+
+    const participantsResult = await participantRepository.listByRoom(room.id);
+    if (!participantsResult.ok) {
+      return err(participantsResult.error);
+    }
+
+    const participants = participantsResult.value;
+    const players = participants.filter((p) => p.role === 'HOST' || p.role === 'PLAYER');
+
+    if (players.length < room.settings.minPlayers) {
+      return err(
+        new ValidationError(
+          `At least ${room.settings.minPlayers} players are required to start the game.`
+        )
+      );
+    }
+
+    // Dynamic import to avoid circular dependency
+    const { gameService } = await import('@/features/game/services/game.service');
+    const { eventPublisher } = await import('@/infrastructure/realtime/event-publisher');
+    const { toTurnSnapshotDto } = await import('@/infrastructure/db/mappers/game.mapper');
+    const { prisma } = await import('@/infrastructure/db/prisma.client');
+
+    const playerIds = players.map((p) => p.playerId);
+    const gameResult = await gameService.createAndStart(room.id, playerIds, room.settings);
+
+    if (!gameResult.ok) {
+      return err(gameResult.error);
+    }
+
+    const game = gameResult.value;
+
+    // Link game to room and update status
+    await prisma.room.update({
+      where: { id: room.id },
+      data: {
+        status: 'IN_PROGRESS',
+        currentGameId: game.id,
+        lastActivityAt: new Date(),
+      },
+    });
+
+    await eventPublisher.gameStarted(room.id, game);
+
+    const callerPlayerId = ctx.type !== 'anonymous' && ctx.playerId ? ctx.playerId : playerIds[0]!;
+    const turnSnapshot = toTurnSnapshotDto(game, callerPlayerId);
+
+    return ok({
+      gameId: game.id,
+      status: 'IN_PROGRESS',
+      version: game.version,
+      currentTurn: turnSnapshot,
+    });
+  }
 }
 
 export const lobbyService = new LobbyService();
+

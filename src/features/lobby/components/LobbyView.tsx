@@ -39,11 +39,26 @@ export function LobbyView({ initialRoom, currentPlayerId }: LobbyViewProps) {
     }
   }, [room.status, room.code, router]);
 
+  const [isStartingGame, setIsStartingGame] = React.useState(false);
+
   const handleStartGame = async () => {
-    // In Milestone 4, this calls startGameAction.
-    // For Milestone 3, we validate readiness and notify host.
-    toast.success('Ready to start game! (Game engine initializes in Milestone 4)');
+    setIsStartingGame(true);
+    try {
+      const { startGameAction } = await import('@/features/lobby/actions/start-game.action');
+      const res = await startGameAction({ roomCode: room.code });
+      if (!res.success) {
+        toast.error(res.error.message || 'Failed to start game');
+      } else {
+        toast.success('Game started! Directing players to the board...');
+        router.push(`/room/${room.code}/game`);
+      }
+    } catch {
+      toast.error('An unexpected error occurred while starting the game.');
+    } finally {
+      setIsStartingGame(false);
+    }
   };
+
 
   if (isLoading && !room) {
     return (
@@ -163,6 +178,7 @@ export function LobbyView({ initialRoom, currentPlayerId }: LobbyViewProps) {
               canStart={room.canStart}
               canStartReasons={room.canStartReasons}
               onStartGame={handleStartGame}
+              isLoading={isStartingGame}
             />
           )}
         </div>
