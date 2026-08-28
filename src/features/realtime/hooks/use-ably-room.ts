@@ -18,18 +18,26 @@ export function useAblyRoom({ roomId, playerId, displayName, role, onMessage }: 
   const [connectionState, setConnectionState] = useState<ConnectionState>('connecting');
   const clientRef = useRef<Ably.Realtime | null>(null);
   const channelRef = useRef<Ably.RealtimeChannel | null>(null);
+  const onMessageRef = useRef(onMessage);
+
+  useEffect(() => {
+    onMessageRef.current = onMessage;
+  });
 
   useEffect(() => {
     if (!roomId || !playerId) return;
 
     let isMounted = true;
-    let client: Ably.Realtime | null = null;
 
     async function initAbly() {
       try {
-        client = await createAblyRealtimeClient(roomId, playerId);
+        const client = await createAblyRealtimeClient(roomId, playerId);
         if (!isMounted) {
-          client.close();
+          try {
+            client.close();
+          } catch {
+            // Ignore
+          }
           return;
         }
 
@@ -48,8 +56,8 @@ export function useAblyRoom({ roomId, playerId, displayName, role, onMessage }: 
 
         // Subscribe to all incoming channel messages
         const messageListener = (msg: Ably.Message) => {
-          if (onMessage) {
-            onMessage(msg);
+          if (onMessageRef.current) {
+            onMessageRef.current(msg);
           }
         };
 
@@ -75,15 +83,47 @@ export function useAblyRoom({ roomId, playerId, displayName, role, onMessage }: 
 
     return () => {
       isMounted = false;
-      if (channelRef.current) {
-        channelRef.current.presence.leave().catch(() => {});
-        channelRef.current.unsubscribe();
+
+      try {
+        if (channelRef.current) {
+          try {
+            channelRef.current.presence.leave().catch(() => {});
+          } catch {
+            // Ignore
+          }
+          try {
+            channelRef.current.unsubscribe();
+          } catch {
+            // Ignore
+          }
+          channelRef.current = null;
+        }
+      } catch {
+        // Ignore
       }
-      if (clientRef.current) {
-        clientRef.current.close();
+
+      try {
+        if (clientRef.current) {
+          const c = clientRef.current;
+          clientRef.current = null;
+          try {
+            c.connection.off();
+          } catch {
+            // Ignore
+          }
+          if (c.connection.state !== 'closed' && c.connection.state !== 'closing') {
+            try {
+              c.close();
+            } catch {
+              // Ignore
+            }
+          }
+        }
+      } catch {
+        // Ignore
       }
     };
-  }, [roomId, playerId, displayName, role, onMessage]);
+  }, [roomId, playerId, displayName, role]);
 
   return {
     channel: channelRef.current,
