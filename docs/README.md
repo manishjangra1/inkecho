@@ -7,7 +7,7 @@ Production design documentation for InkEcho — a multiplayer realtime party gam
 | Milestone | Scope | Status |
 |-----------|-------|--------|
 | **M1** | Documentation & architecture (Phase 0–7) | **Complete** |
-| **M2** | Project setup, tooling, shared infrastructure | Pending |
+| **M2** | Project setup, tooling, shared infrastructure | **Complete** |
 | **M3** | Authentication & room/lobby system | Pending |
 | **M4** | Game engine & Ably realtime synchronization | Pending |
 | **M5** | Canvas & drawing features | Pending |

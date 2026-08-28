@@ -215,7 +215,7 @@ model Room {
   participantIds  String[]        @default([])
   spectatorIds    String[]        @default([])
   kickedPlayerIds String[]        @default([])
-  currentGameId   String?         @db.ObjectId
+  currentGameId   String?         @unique @db.ObjectId
   lastActivityAt  DateTime        @default(now())
   closedAt        DateTime?
   closeReason     RoomCloseReason?

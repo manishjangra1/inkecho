@@ -1,0 +1,17 @@
+export const ERROR_COPY = {
+  VALIDATION_ERROR: 'Please check your input.',
+  UNAUTHORIZED: 'Please sign in to continue.',
+  FORBIDDEN: "You don't have permission to perform this action.",
+  NOT_FOUND: 'The requested resource was not found.',
+  ROOM_NOT_FOUND: 'Room not found. Check your 6-character room code.',
+  ROOM_FULL: 'This room has reached its maximum player capacity.',
+  NOT_HOST: 'Only the room host can perform this action.',
+  NOT_YOUR_TURN: "It's not your turn right now.",
+  GAME_ALREADY_STARTED: 'This game has already started.',
+  VERSION_CONFLICT: 'Game state has been updated. Syncing latest data...',
+  INVALID_GAME_TRANSITION: 'Action not permitted in current game phase.',
+  RATE_LIMITED: 'Too many requests. Please slow down and try again shortly.',
+  FILE_TOO_LARGE: 'The drawing file exceeds the 2MB upload limit.',
+  EXTERNAL_SERVICE_ERROR: 'A connected service is temporarily unavailable. Please retry.',
+  INTERNAL_ERROR: 'An unexpected error occurred. Please try again.',
+} as const;
