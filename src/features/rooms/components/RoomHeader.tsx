@@ -43,6 +43,11 @@ export function RoomHeader({ room, isHost }: RoomHeaderProps) {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(room.code);
+    toast.success(`Room code ${room.code} copied!`);
+  };
+
   const totalPlayers = room.participants.length;
 
   return (
@@ -53,9 +58,16 @@ export function RoomHeader({ room, isHost }: RoomHeaderProps) {
           <Logo href={ROUTES.HOME} size="md" />
           <div className="h-3 w-px bg-neutral-800" />
           <div className="flex items-center gap-2">
-            <span className="font-mono text-xs font-semibold text-neutral-300">
-              Room: <strong className="text-white font-mono">{room.code}</strong>
-            </span>
+            <button
+              type="button"
+              onClick={handleCopyCode}
+              className="group flex items-center gap-1.5 rounded-[4px] px-1.5 py-0.5 font-mono text-xs font-semibold text-neutral-300 hover:bg-[#1C1C1C] hover:text-white transition-colors cursor-pointer"
+              title="Click to copy room code"
+            >
+              <span>Room:</span>
+              <strong className="text-white font-mono">{room.code}</strong>
+              <Copy className="h-2.5 w-2.5 text-neutral-500 group-hover:text-neutral-300 opacity-60 group-hover:opacity-100 transition-all" />
+            </button>
             <Button
               variant="outline"
               size="sm"

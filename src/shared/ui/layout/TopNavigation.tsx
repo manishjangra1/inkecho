@@ -39,6 +39,12 @@ export function TopNavigation({
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleCopyCode = () => {
+    if (!roomCode) return;
+    navigator.clipboard.writeText(roomCode);
+    toast.success(`Room code ${roomCode} copied!`);
+  };
+
   const handleLeave = () => {
     if (onLeaveRoom) {
       onLeaveRoom();
@@ -57,9 +63,16 @@ export function TopNavigation({
           <>
             <div className="h-3 w-px bg-neutral-800" />
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-semibold text-neutral-200">
-                Room: <strong className="text-white font-mono">{roomCode}</strong>
-              </span>
+              <button
+                type="button"
+                onClick={handleCopyCode}
+                className="group flex items-center gap-1.5 rounded-[4px] px-1.5 py-0.5 font-mono text-xs font-semibold text-neutral-200 hover:bg-[#1C1C1C] hover:text-white transition-colors cursor-pointer"
+                title="Click to copy room code"
+              >
+                <span>Room:</span>
+                <strong className="text-white font-mono">{roomCode}</strong>
+                <Copy className="h-2.5 w-2.5 text-neutral-500 group-hover:text-neutral-300 opacity-60 group-hover:opacity-100 transition-all" />
+              </button>
               <Button
                 variant="outline"
                 size="sm"
