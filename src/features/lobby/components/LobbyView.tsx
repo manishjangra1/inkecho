@@ -22,9 +22,7 @@ export function LobbyView({ initialRoom, currentPlayerId }: LobbyViewProps) {
     data: room = initialRoom,
     refetch,
     isLoading,
-  } = useRoom(initialRoom.code, {
-    refetchInterval: 2000,
-  });
+  } = useRoom(initialRoom.code, { initialData: initialRoom });
 
   const isHost = room.hostPlayerId === currentPlayerId;
   const currentParticipant = room.participants.find((p) => p.playerId === currentPlayerId);

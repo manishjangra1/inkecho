@@ -66,7 +66,7 @@ export class ParticipantRepository {
         orderBy: { joinedAt: 'desc' },
       });
 
-      if (!participant) {
+      if (!participant || participant.leftAt) {
         return ok(null);
       }
 

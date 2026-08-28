@@ -17,12 +17,16 @@ async function fetchRoomSnapshot(roomCode: string): Promise<RoomSnapshotDto> {
   return json.data;
 }
 
-export function useRoom(roomCode: string, options: { refetchInterval?: number | false } = {}) {
+export function useRoom(
+  roomCode: string,
+  options: { initialData?: RoomSnapshotDto; refetchInterval?: number | false } = {}
+) {
   return useQuery({
     queryKey: QUERY_KEYS.ROOM(roomCode),
     queryFn: () => fetchRoomSnapshot(roomCode),
+    initialData: options.initialData,
     enabled: !!roomCode && roomCode.length === 6,
-    refetchInterval: options.refetchInterval ?? 3000, // 3s polling for lobby before Ably in M4
-    staleTime: 1000,
+    refetchInterval: options.refetchInterval ?? false,
+    staleTime: Infinity,
   });
 }

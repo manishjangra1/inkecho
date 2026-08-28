@@ -36,11 +36,11 @@ export function useRevealPlayback({ roomCode, autoPlayDefault = true }: UseRevea
       }
       return res.json();
     },
-    refetchInterval: 2000,
-    staleTime: 500,
+    refetchInterval: false,
+    staleTime: Infinity,
   });
 
-  // Poll room status to detect rematch and route all players back to lobby
+  // Query room status to detect rematch and route all players back to lobby
   const { data: roomStatusData } = useQuery<{ success: boolean; data: { status: string } }>({
     queryKey: ['room-status', roomCode],
     queryFn: async () => {
@@ -48,8 +48,8 @@ export function useRevealPlayback({ roomCode, autoPlayDefault = true }: UseRevea
       if (!res.ok) return { success: false, data: { status: 'UNKNOWN' } };
       return res.json();
     },
-    refetchInterval: 1500,
-    staleTime: 1000,
+    refetchInterval: false,
+    staleTime: Infinity,
   });
 
   useEffect(() => {

@@ -31,16 +31,8 @@ export function useGameState(roomCode: string) {
       return res.json();
     },
     retry: false,
-    refetchInterval: (query) => {
-      // Stop polling once the game is not active or transitioned to REVEAL
-      if (!query.state.data?.success) return false;
-      const status = query.state.data?.data?.status;
-      if (status === 'REVEAL' || status === 'COMPLETED') {
-        return false;
-      }
-      return 2500;
-    },
-    staleTime: 1500,
+    refetchInterval: false,
+    staleTime: Infinity,
   });
 
   useEffect(() => {

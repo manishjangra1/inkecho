@@ -22,6 +22,8 @@ import { deleteRoomAction } from '../actions/delete-room.action';
 import { useRouter } from 'next/navigation';
 import { toast } from '@/shared/ui/toast';
 import { ROUTES } from '@/shared/constants/routes';
+import { useRoom } from '../hooks/use-room';
+import { useGameStore } from '@/features/game/stores/game-store';
 import type { RoomSnapshotDto } from '../types/room.types';
 
 interface RoomHeaderProps {
@@ -29,8 +31,12 @@ interface RoomHeaderProps {
   readonly isHost: boolean;
 }
 
-export function RoomHeader({ room, isHost }: RoomHeaderProps) {
+export function RoomHeader({ room: initialRoom, isHost: initialIsHost }: RoomHeaderProps) {
   const router = useRouter();
+  const { data: room = initialRoom } = useRoom(initialRoom.code, { initialData: initialRoom });
+  const storePlayerId = useGameStore((s) => s.playerId);
+  const isHost = storePlayerId ? room.hostPlayerId === storePlayerId : initialIsHost;
+
   const [settingsOpen, setSettingsOpen] = React.useState(false);
   const [deleteAlertOpen, setDeleteAlertOpen] = React.useState(false);
   const [isLeaving, setIsLeaving] = React.useState(false);

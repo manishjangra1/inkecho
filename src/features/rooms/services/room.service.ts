@@ -171,7 +171,7 @@ export class RoomService {
       const isHost = room.hostPlayerId === playerId || existingParticipant.role === 'HOST';
       const effectiveRole = isHost ? 'HOST' : dto.asSpectator ? 'SPECTATOR' : existingParticipant.role;
 
-      await participantRepository.reactivateParticipant(
+      const reactivated = await participantRepository.reactivateParticipant(
         room.id,
         playerId,
         displayName,
@@ -192,6 +192,16 @@ export class RoomService {
 
       if (!sessionResult.ok) {
         return err(sessionResult.error);
+      }
+
+      // Broadcast player rejoined in realtime so other clients update their UI
+      const totalParticipantCount = (await participantRepository.countActivePlayers(room.id)) || 1;
+      if (reactivated.ok) {
+        await eventPublisher.playerJoined(
+          room.id,
+          reactivated.value,
+          totalParticipantCount
+        );
       }
 
       const refreshedRoom = await roomRepository.findByCode(dto.roomCode);

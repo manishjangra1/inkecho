@@ -14,17 +14,26 @@ export async function GET(request: Request) {
     const roomIdParam = searchParams.get('roomId');
     const roomId = objectIdSchema.parse(roomIdParam);
 
-    const ctx = await getAuthContext();
+    // The Ably client passes its own clientId on every auth request.
+    // We MUST honour it to avoid "clientId mismatch" errors when
+    // multiple browser tabs share the same cookie jar (e.g. incognito).
+    const clientIdParam = searchParams.get('clientId');
 
-    // Verify player is member of room or spectator
-    if (ctx.type === 'guest' && ctx.roomId !== roomId) {
-      throw new ForbiddenError('ROOM_MISMATCH', 'Session does not match this room.');
+    let playerId: string;
+    if (clientIdParam && clientIdParam.length > 0) {
+      playerId = clientIdParam;
+    } else {
+      const ctx = await getAuthContext();
+
+      if (ctx.type === 'guest' && ctx.roomId !== roomId) {
+        throw new ForbiddenError('ROOM_MISMATCH', 'Session does not match this room.');
+      }
+
+      playerId =
+        ctx.type !== 'anonymous' && ctx.playerId
+          ? ctx.playerId
+          : `spectator_${Math.random().toString(36).substring(2, 9)}`;
     }
-
-    const playerId =
-      ctx.type !== 'anonymous' && ctx.playerId
-        ? ctx.playerId
-        : `spectator_${Math.random().toString(36).substring(2, 9)}`;
 
     const tokenRes = await ablyTokenService.createTokenRequest(roomId, playerId);
     if (!tokenRes.ok) {
@@ -36,3 +45,4 @@ export async function GET(request: Request) {
     return handleApiError(error, correlationId);
   }
 }
+

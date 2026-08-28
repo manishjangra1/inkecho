@@ -10,7 +10,7 @@ export async function createAblyRealtimeClient(
   playerId: string
 ): Promise<Ably.Realtime> {
   const client = new BaseRealtime({
-    authUrl: `/api/realtime/token?roomId=${encodeURIComponent(roomId)}`,
+    authUrl: `/api/realtime/token?roomId=${encodeURIComponent(roomId)}&clientId=${encodeURIComponent(playerId)}`,
     clientId: playerId,
     autoConnect: true,
     plugins: {

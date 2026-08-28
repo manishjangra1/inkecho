@@ -22,7 +22,7 @@ export function usePublicRooms(page = 1, limit = 12) {
   return useQuery({
     queryKey: [...QUERY_KEYS.PUBLIC_ROOMS, page, limit],
     queryFn: () => fetchPublicRooms(page, limit),
-    staleTime: 5000,
-    refetchInterval: 10000,
+    staleTime: Infinity,
+    refetchInterval: false,
   });
 }
