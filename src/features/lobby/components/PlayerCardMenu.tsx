@@ -74,22 +74,22 @@ export function PlayerCardMenu({ roomCode, participant, onPlayerUpdated }: Playe
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+          className="h-6 w-6 p-0 text-neutral-400 hover:text-white hover:bg-[#1A1A1A] rounded-[3px]"
           disabled={isLoading}
         >
-          <MoreVertical className="h-4 w-4" />
+          <MoreVertical className="h-3.5 w-3.5" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-44">
-        <DropdownMenuItem onClick={handleTransferHost} className="cursor-pointer gap-2">
-          <Crown className="h-4 w-4 text-amber-400" />
+      <DropdownMenuContent align="end" className="w-40 bg-[#111111] border border-[#262626] p-1 text-xs text-neutral-300 rounded-[4px]">
+        <DropdownMenuItem onClick={handleTransferHost} className="cursor-pointer gap-2 hover:bg-[#1A1A1A] hover:text-white text-xs px-2 py-1.5 rounded-[3px]">
+          <Crown className="h-3.5 w-3.5 text-amber-400" />
           <span>{LOBBY_COPY.TRANSFER_HOST}</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={handleKick}
-          className="cursor-pointer gap-2 text-destructive focus:text-destructive"
+          className="cursor-pointer gap-2 hover:bg-[#1A1A1A] hover:text-[#D9534F] text-[#D9534F] text-xs px-2 py-1.5 rounded-[3px]"
         >
-          <UserX className="h-4 w-4" />
+          <UserX className="h-3.5 w-3.5" />
           <span>{LOBBY_COPY.KICK_PLAYER}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -29,7 +29,7 @@ export function ChainSelector({
   return (
     <div
       className={cn(
-        'scrollbar-none flex items-center gap-2 overflow-x-auto pb-2 sm:justify-center',
+        'flex items-center gap-1.5 overflow-x-auto pb-1 select-none',
         className
       )}
     >
@@ -45,28 +45,22 @@ export function ChainSelector({
             size="sm"
             onClick={() => onSelectChain(index)}
             className={cn(
-              'relative flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-200',
+              'h-7 gap-1.5 rounded-[4px] px-2.5 text-xs font-medium border transition-colors',
               isSelected
-                ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 ring-2 ring-primary/40'
-                : 'border-border/50 bg-card/60 text-muted-foreground hover:bg-muted hover:text-foreground',
-              isWinner && !isSelected && 'border-amber-500/50 text-amber-500 dark:text-amber-400'
+                ? 'bg-white text-black border-white'
+                : 'border-[#232323] bg-[#111111] text-neutral-400 hover:text-white hover:border-neutral-600'
             )}
           >
             {isWinner ? (
-              <Trophy className="h-3.5 w-3.5 animate-pulse text-amber-400" />
+              <Trophy className="h-3 w-3 text-white" />
             ) : (
-              <Sparkles className="h-3.5 w-3.5 opacity-70" />
+              <Sparkles className="h-3 w-3 text-neutral-400" />
             )}
             <span>Story {index + 1}</span>
             {voteCount > 0 && (
               <Badge
                 variant="secondary"
-                className={cn(
-                  'ml-1 rounded-full px-1.5 py-0 text-[10px] font-bold',
-                  isSelected
-                    ? 'bg-primary-foreground/20 text-primary-foreground'
-                    : 'bg-muted text-muted-foreground'
-                )}
+                className="ml-1 h-4 rounded-[2px] px-1 text-[9px] font-mono font-bold"
               >
                 {voteCount}
               </Badge>

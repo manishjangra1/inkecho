@@ -74,113 +74,119 @@ export function RoomSettingsDrawer({ room, open, onOpenChange }: RoomSettingsDra
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Room Settings</DialogTitle>
-          <DialogDescription>
-            Adjust rules and timers for room {room.code}. Changes take effect immediately.
+      <DialogContent className="sm:max-w-md bg-[#111111] border border-border p-4 rounded-[4px] select-none">
+        <DialogHeader className="space-y-1">
+          <DialogTitle className="text-base font-bold text-white">Room Settings</DialogTitle>
+          <DialogDescription className="text-xs text-neutral-400">
+            Adjust rules and timers for room <span className="font-mono text-white font-bold">{room.code}</span>.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 py-2">
-          {/* Max Players */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="font-medium text-foreground">Max Players</span>
-              <span className="rounded bg-brand-primary/10 px-2 py-0.5 font-mono text-xs font-semibold text-brand-primary">
-                {maxPlayers} Players
-              </span>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 pt-1">
+          {/* Sliders in a 2x2 compact grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 rounded-[4px] border border-border bg-[#0E0E0E] p-3">
+            {/* Max Players */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-medium text-neutral-300">Max Players</span>
+                <span className="font-mono text-[11px] font-bold text-white">
+                  {maxPlayers} Players
+                </span>
+              </div>
+              <Controller
+                control={control}
+                name="settings.maxPlayers"
+                render={({ field }) => (
+                  <Slider
+                    min={3}
+                    max={12}
+                    step={1}
+                    value={[field.value ?? 8]}
+                    onValueChange={(vals) => field.onChange(vals[0])}
+                  />
+                )}
+              />
             </div>
-            <Controller
-              control={control}
-              name="settings.maxPlayers"
-              render={({ field }) => (
-                <Slider
-                  min={3}
-                  max={12}
-                  step={1}
-                  value={[field.value ?? 8]}
-                  onValueChange={(vals) => field.onChange(vals[0])}
-                />
-              )}
-            />
+
+            {/* Round Count */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-medium text-neutral-300">Rounds</span>
+                <span className="font-mono text-[11px] font-bold text-white">
+                  {roundCount} Round{roundCount > 1 ? 's' : ''}
+                </span>
+              </div>
+              <Controller
+                control={control}
+                name="settings.roundCount"
+                render={({ field }) => (
+                  <Slider
+                    min={1}
+                    max={3}
+                    step={1}
+                    value={[field.value ?? 1]}
+                    onValueChange={(vals) => field.onChange(vals[0])}
+                  />
+                )}
+              />
+            </div>
+
+            {/* Draw Timer */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-medium text-neutral-300">Drawing Timer</span>
+                <span className="font-mono text-[11px] font-bold text-white">
+                  {drawTimerSec}s
+                </span>
+              </div>
+              <Controller
+                control={control}
+                name="settings.drawTimerSec"
+                render={({ field }) => (
+                  <Slider
+                    min={60}
+                    max={180}
+                    step={15}
+                    value={[field.value ?? 90]}
+                    onValueChange={(vals) => field.onChange(vals[0])}
+                  />
+                )}
+              />
+            </div>
+
+            {/* Describe Timer */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-medium text-neutral-300">Describe Timer</span>
+                <span className="font-mono text-[11px] font-bold text-white">
+                  {describeTimerSec}s
+                </span>
+              </div>
+              <Controller
+                control={control}
+                name="settings.describeTimerSec"
+                render={({ field }) => (
+                  <Slider
+                    min={30}
+                    max={120}
+                    step={15}
+                    value={[field.value ?? 60]}
+                    onValueChange={(vals) => field.onChange(vals[0])}
+                  />
+                )}
+              />
+            </div>
           </div>
 
-          {/* Round Count */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="font-medium text-foreground">Rounds</span>
-              <span className="rounded bg-brand-secondary/10 px-2 py-0.5 font-mono text-xs font-semibold text-brand-secondary">
-                {roundCount} Round{roundCount > 1 ? 's' : ''}
-              </span>
-            </div>
-            <Controller
-              control={control}
-              name="settings.roundCount"
-              render={({ field }) => (
-                <Slider
-                  min={1}
-                  max={3}
-                  step={1}
-                  value={[field.value ?? 1]}
-                  onValueChange={(vals) => field.onChange(vals[0])}
-                />
-              )}
-            />
-          </div>
-
-          {/* Draw Timer */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="font-medium text-foreground">Drawing Timer</span>
-              <span className="rounded bg-brand-accent/10 px-2 py-0.5 font-mono text-xs font-semibold text-brand-accent">
-                {drawTimerSec}s
-              </span>
-            </div>
-            <Controller
-              control={control}
-              name="settings.drawTimerSec"
-              render={({ field }) => (
-                <Slider
-                  min={60}
-                  max={180}
-                  step={15}
-                  value={[field.value ?? 90]}
-                  onValueChange={(vals) => field.onChange(vals[0])}
-                />
-              )}
-            />
-          </div>
-
-          {/* Describe Timer */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="font-medium text-foreground">Describe Timer</span>
-              <span className="rounded bg-amber-400/10 px-2 py-0.5 font-mono text-xs font-semibold text-amber-400">
-                {describeTimerSec}s
-              </span>
-            </div>
-            <Controller
-              control={control}
-              name="settings.describeTimerSec"
-              render={({ field }) => (
-                <Slider
-                  min={30}
-                  max={120}
-                  step={15}
-                  value={[field.value ?? 60]}
-                  onValueChange={(vals) => field.onChange(vals[0])}
-                />
-              )}
-            />
-          </div>
-
-          {/* Switches */}
-          <div className="space-y-3 pt-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="drawerAllowSpectators" className="cursor-pointer text-sm font-medium">
-                Allow Spectators
-              </Label>
+          {/* Switches in 2 columns */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
+            <div className="flex items-center justify-between rounded-[4px] border border-border bg-[#141414] px-2.5 py-1.5">
+              <div className="space-y-0.5">
+                <Label htmlFor="drawerAllowSpectators" className="cursor-pointer text-xs font-medium text-neutral-300">
+                  Allow Spectators
+                </Label>
+                <p className="text-[10px] text-neutral-500">Let late joiners watch</p>
+              </div>
               <Controller
                 control={control}
                 name="settings.allowSpectators"
@@ -194,10 +200,13 @@ export function RoomSettingsDrawer({ room, open, onOpenChange }: RoomSettingsDra
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <Label htmlFor="drawerProfanityFilter" className="cursor-pointer text-sm font-medium">
-                Profanity Filter
-              </Label>
+            <div className="flex items-center justify-between rounded-[4px] border border-border bg-[#141414] px-2.5 py-1.5">
+              <div className="space-y-0.5">
+                <Label htmlFor="drawerProfanityFilter" className="cursor-pointer text-xs font-medium text-neutral-300">
+                  Profanity Filter
+                </Label>
+                <p className="text-[10px] text-neutral-500">Mask sensitive words</p>
+              </div>
               <Controller
                 control={control}
                 name="settings.profanityFilter"
@@ -212,16 +221,24 @@ export function RoomSettingsDrawer({ room, open, onOpenChange }: RoomSettingsDra
             </div>
           </div>
 
-          <DialogFooter className="pt-4">
+          <DialogFooter className="pt-2 gap-2 sm:gap-2">
             <Button
               type="button"
               variant="outline"
+              size="sm"
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
+              className="h-8 text-xs font-medium border-[#262626] bg-[#161616] text-neutral-300 hover:text-white"
             >
               Cancel
             </Button>
-            <Button type="submit" isLoading={isLoading} disabled={isLoading}>
+            <Button
+              type="submit"
+              size="sm"
+              isLoading={isLoading}
+              disabled={isLoading}
+              className="h-8 text-xs font-semibold bg-white text-black hover:bg-neutral-200 border border-white"
+            >
               Save Settings
             </Button>
           </DialogFooter>

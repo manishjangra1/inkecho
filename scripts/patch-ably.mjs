@@ -23,5 +23,5 @@ for (const relPath of filesToPatch) {
   content = content.replace(/__super\(([^)]*)\);/g, '');
 
   fs.writeFileSync(fullPath, content, 'utf8');
-  console.log(`Successfully patched ${relPath}`);
+  console.warn(`Successfully patched ${relPath}`);
 }

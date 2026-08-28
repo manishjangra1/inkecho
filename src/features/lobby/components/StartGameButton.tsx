@@ -31,15 +31,15 @@ export function StartGameButton({
   const button = (
     <Button
       type="button"
-      size="lg"
+      size="default"
       variant="default"
       onClick={handleClick}
       isLoading={isLoading}
       disabled={!canStart || isLoading}
-      className="min-w-[160px] gap-2 bg-gradient-to-r from-brand-primary via-brand-secondary to-brand-accent text-base font-bold shadow-glow transition-opacity hover:opacity-90"
+      className="min-w-[120px] gap-1.5 font-semibold text-xs h-8 bg-white text-black hover:bg-neutral-200 border border-white"
     >
-      <Play className="h-4 w-4 fill-white" />
-      {LOBBY_COPY.START_GAME}
+      <Play className="h-3 w-3 fill-black" />
+      <span>{LOBBY_COPY.START_GAME}</span>
     </Button>
   );
 
@@ -51,7 +51,7 @@ export function StartGameButton({
             {button}
           </span>
         </TooltipTrigger>
-        <TooltipContent side="top" className="max-w-xs text-xs">
+        <TooltipContent side="top" className="max-w-xs text-xs bg-[#1A1A1A] border border-[#333] text-neutral-300">
           <ul className="list-disc space-y-1 pl-4">
             {canStartReasons.map((reason, idx) => (
               <li key={idx}>{reason}</li>

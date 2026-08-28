@@ -72,64 +72,67 @@ export function CreateRoomForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 select-none">
       {/* Display Name for guest */}
       {!session?.user && (
-        <div className="space-y-2">
-          <Label htmlFor="displayName">Your Display Name</Label>
+        <div className="space-y-1">
+          <Label htmlFor="displayName" className="text-xs text-neutral-400">
+            Your Display Name
+          </Label>
           <Input
             id="displayName"
             placeholder="e.g. CaptainDoodle"
             autoFocus
             {...register('displayName')}
             error={!!errors.displayName}
+            className="h-8 text-xs"
           />
           {errors.displayName && (
-            <p className="text-xs text-destructive">{errors.displayName.message}</p>
+            <p className="text-[11px] text-[#D9534F]">{errors.displayName.message}</p>
           )}
         </div>
       )}
 
       {/* Visibility Toggle */}
-      <div className="space-y-2">
-        <Label>Room Visibility</Label>
-        <div className="grid grid-cols-2 gap-3">
+      <div className="space-y-1">
+        <Label className="text-xs text-neutral-400">Room Visibility</Label>
+        <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={() => setValue('visibility', 'PRIVATE')}
             className={cn(
-              'flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-medium transition-all',
+              'flex items-center justify-center gap-1.5 rounded-[4px] border p-2 text-xs font-medium transition-colors',
               visibility === 'PRIVATE'
-                ? 'border-brand-primary bg-brand-primary/10 text-brand-primary ring-1 ring-brand-primary'
-                : 'border-border bg-card/40 text-muted-foreground hover:bg-muted/40'
+                ? 'border-white bg-[#1C1C1C] text-white'
+                : 'border-[#232323] bg-[#141414] text-neutral-400 hover:text-white'
             )}
           >
-            <Lock className="h-4 w-4" />
-            Private (Invite Only)
+            <Lock className="h-3 w-3" />
+            <span>Private (Invite Only)</span>
           </button>
           <button
             type="button"
             onClick={() => setValue('visibility', 'PUBLIC')}
             className={cn(
-              'flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-medium transition-all',
+              'flex items-center justify-center gap-1.5 rounded-[4px] border p-2 text-xs font-medium transition-colors',
               visibility === 'PUBLIC'
-                ? 'border-brand-primary bg-brand-primary/10 text-brand-primary ring-1 ring-brand-primary'
-                : 'border-border bg-card/40 text-muted-foreground hover:bg-muted/40'
+                ? 'border-white bg-[#1C1C1C] text-white'
+                : 'border-[#232323] bg-[#141414] text-neutral-400 hover:text-white'
             )}
           >
-            <Globe className="h-4 w-4" />
-            Public (Browse List)
+            <Globe className="h-3 w-3" />
+            <span>Public (Browse List)</span>
           </button>
         </div>
       </div>
 
-      {/* Sliders for Room Config */}
-      <div className="space-y-5 rounded-2xl border border-border/60 bg-muted/20 p-4">
+      {/* Sliders in a 2x2 compact grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 rounded-[4px] border border-border bg-[#0E0E0E] p-3">
         {/* Max Players */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className="font-medium text-foreground">Max Players</span>
-            <span className="rounded bg-brand-primary/10 px-2 py-0.5 font-mono text-xs font-semibold text-brand-primary">
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-medium text-neutral-300">Max Players</span>
+            <span className="font-mono text-[11px] font-bold text-white">
               {maxPlayers} Players
             </span>
           </div>
@@ -149,10 +152,10 @@ export function CreateRoomForm() {
         </div>
 
         {/* Round Count */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className="font-medium text-foreground">Rounds</span>
-            <span className="rounded bg-brand-secondary/10 px-2 py-0.5 font-mono text-xs font-semibold text-brand-secondary">
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-medium text-neutral-300">Rounds</span>
+            <span className="font-mono text-[11px] font-bold text-white">
               {roundCount} Round{roundCount > 1 ? 's' : ''}
             </span>
           </div>
@@ -172,10 +175,10 @@ export function CreateRoomForm() {
         </div>
 
         {/* Draw Timer */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className="font-medium text-foreground">Drawing Timer</span>
-            <span className="rounded bg-brand-accent/10 px-2 py-0.5 font-mono text-xs font-semibold text-brand-accent">
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-medium text-neutral-300">Drawing Timer</span>
+            <span className="font-mono text-[11px] font-bold text-white">
               {drawTimerSec}s
             </span>
           </div>
@@ -195,10 +198,10 @@ export function CreateRoomForm() {
         </div>
 
         {/* Describe Timer */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className="font-medium text-foreground">Describe Timer</span>
-            <span className="rounded bg-amber-400/10 px-2 py-0.5 font-mono text-xs font-semibold text-amber-400">
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-medium text-neutral-300">Describe Timer</span>
+            <span className="font-mono text-[11px] font-bold text-white">
               {describeTimerSec}s
             </span>
           </div>
@@ -218,14 +221,14 @@ export function CreateRoomForm() {
         </div>
       </div>
 
-      {/* Switches */}
-      <div className="space-y-4 pt-1">
-        <div className="flex items-center justify-between">
+      {/* Switches in 2 columns */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
+        <div className="flex items-center justify-between rounded-[4px] border border-border bg-[#141414] px-2.5 py-1.5">
           <div className="space-y-0.5">
-            <Label htmlFor="allowSpectators" className="cursor-pointer text-sm font-medium">
+            <Label htmlFor="allowSpectators" className="cursor-pointer text-xs font-medium text-neutral-300">
               Allow Spectators
             </Label>
-            <p className="text-xs text-muted-foreground">Let late joiners watch the game live</p>
+            <p className="text-[10px] text-neutral-500">Let late joiners watch</p>
           </div>
           <Controller
             control={control}
@@ -240,14 +243,12 @@ export function CreateRoomForm() {
           />
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between rounded-[4px] border border-border bg-[#141414] px-2.5 py-1.5">
           <div className="space-y-0.5">
-            <Label htmlFor="profanityFilter" className="cursor-pointer text-sm font-medium">
+            <Label htmlFor="profanityFilter" className="cursor-pointer text-xs font-medium text-neutral-300">
               Profanity Filter
             </Label>
-            <p className="text-xs text-muted-foreground">
-              Mask potentially sensitive or NSFW words
-            </p>
+            <p className="text-[10px] text-neutral-500">Mask sensitive words</p>
           </div>
           <Controller
             control={control}
@@ -263,15 +264,18 @@ export function CreateRoomForm() {
         </div>
       </div>
 
-      <Button
-        type="submit"
-        className="w-full shadow-glow"
-        size="lg"
-        isLoading={isLoading}
-        disabled={isLoading}
-      >
-        Create Room & Enter Lobby
-      </Button>
+      {/* Submit Button */}
+      <div className="pt-1">
+        <Button
+          type="submit"
+          className="w-full h-8 text-xs font-semibold bg-white text-black hover:bg-neutral-200 border border-white"
+          size="sm"
+          isLoading={isLoading}
+          disabled={isLoading}
+        >
+          Create Room & Enter Lobby
+        </Button>
+      </div>
     </form>
   );
 }

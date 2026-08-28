@@ -64,10 +64,10 @@ export function JoinRoomForm({ initialCode = '' }: JoinRoomFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5 select-none">
       {/* 6-box segmented Room Code */}
-      <div className="space-y-3 text-center">
-        <Label className="text-sm font-medium">Enter 6-Character Room Code</Label>
+      <div className="space-y-2 text-center">
+        <Label className="text-xs text-neutral-400">Enter 6-Character Room Code</Label>
         <Controller
           control={control}
           name="roomCode"
@@ -75,27 +75,30 @@ export function JoinRoomForm({ initialCode = '' }: JoinRoomFormProps) {
             <RoomCodeInput value={field.value} onChange={field.onChange} disabled={isLoading} />
           )}
         />
-        {errors.roomCode && <p className="text-xs text-destructive">{errors.roomCode.message}</p>}
+        {errors.roomCode && <p className="text-[11px] text-[#D9534F]">{errors.roomCode.message}</p>}
       </div>
 
       {/* Nickname for guest */}
       {!session?.user && (
-        <div className="space-y-2">
-          <Label htmlFor="displayName">Your Display Name</Label>
+        <div className="space-y-1">
+          <Label htmlFor="displayName" className="text-xs text-neutral-400">
+            Your Display Name
+          </Label>
           <Input
             id="displayName"
             placeholder="e.g. DoodleKnight"
             {...register('displayName')}
             error={!!errors.displayName}
+            className="h-8 text-xs"
           />
           {errors.displayName && (
-            <p className="text-xs text-destructive">{errors.displayName.message}</p>
+            <p className="text-[11px] text-[#D9534F]">{errors.displayName.message}</p>
           )}
         </div>
       )}
 
       {/* Spectator checkbox */}
-      <div className="flex items-center space-x-2 pt-1">
+      <div className="flex items-center space-x-2 pt-0.5">
         <Controller
           control={control}
           name="asSpectator"
@@ -105,7 +108,7 @@ export function JoinRoomForm({ initialCode = '' }: JoinRoomFormProps) {
         />
         <Label
           htmlFor="asSpectator"
-          className="cursor-pointer text-xs font-normal text-muted-foreground"
+          className="cursor-pointer text-xs font-normal text-neutral-400"
         >
           Join as spectator (watch only)
         </Label>
@@ -113,8 +116,8 @@ export function JoinRoomForm({ initialCode = '' }: JoinRoomFormProps) {
 
       <Button
         type="submit"
-        className="w-full shadow-glow"
-        size="lg"
+        className="w-full h-8 text-xs font-semibold bg-white text-black hover:bg-neutral-200 border border-white"
+        size="sm"
         isLoading={isLoading}
         disabled={isLoading}
       >

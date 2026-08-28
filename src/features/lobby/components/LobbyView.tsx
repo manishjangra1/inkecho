@@ -3,13 +3,11 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { useRoom } from '@/features/rooms/hooks/use-room';
-import { InviteLinkBar } from '@/features/rooms/components/InviteLinkBar';
 import { PlayerGrid } from './PlayerGrid';
 import { ReadyButton } from './ReadyButton';
 import { StartGameButton } from './StartGameButton';
-import { Card } from '@/shared/ui/card';
 import { Skeleton } from '@/shared/ui/skeleton';
-import { Users, Eye, Sparkles } from 'lucide-react';
+import { Eye, Sliders } from 'lucide-react';
 import { toast } from '@/shared/ui/toast';
 import type { RoomSnapshotDto } from '@/infrastructure/db/mappers/room.mapper';
 
@@ -25,7 +23,7 @@ export function LobbyView({ initialRoom, currentPlayerId }: LobbyViewProps) {
     refetch,
     isLoading,
   } = useRoom(initialRoom.code, {
-    refetchInterval: 2500, // Lobby state auto-polling
+    refetchInterval: 2000,
   });
 
   const isHost = room.hostPlayerId === currentPlayerId;
@@ -65,11 +63,11 @@ export function LobbyView({ initialRoom, currentPlayerId }: LobbyViewProps) {
 
   if (isLoading && !room) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-16 w-full rounded-2xl" />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-24 rounded-xl" />
+      <div className="space-y-4">
+        <Skeleton className="h-12 w-full rounded-[4px]" />
+        <div className="grid grid-cols-4 gap-3">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton key={i} className="h-20 rounded-[4px]" />
           ))}
         </div>
       </div>
@@ -80,47 +78,22 @@ export function LobbyView({ initialRoom, currentPlayerId }: LobbyViewProps) {
   const readyCount = activePlayers.filter((p) => p.isReady).length;
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
-      {/* Invite bar */}
-      <InviteLinkBar roomCode={room.code} />
-
-      {/* Lobby stats header */}
-      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <h1 className="flex items-center gap-2.5 font-display text-2xl font-bold text-foreground sm:text-3xl">
-            <Sparkles className="h-6 w-6 text-brand-primary" />
-            Game Lobby
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {isHost
-              ? 'You are the host. Customize settings and start when everyone is ready.'
-              : 'Waiting for host to start the game...'}
-          </p>
+    <div className="flex h-full flex-col justify-between space-y-6">
+      {/* Top Section: Player Grid & Status */}
+      <div className="space-y-5">
+        <div className="flex items-center justify-between border-b border-border pb-3">
+          <div>
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
+              Players ({activePlayers.length}/{room.settings.maxPlayers})
+            </h2>
+          </div>
+          <div className="flex items-center gap-2 font-mono text-xs text-neutral-400">
+            <span>Ready:</span>
+            <strong className="text-white font-semibold">{readyCount}/{activePlayers.length}</strong>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Card className="flex items-center gap-2 border-border/70 bg-card/50 px-3.5 py-2">
-            <Users className="h-4 w-4 text-brand-primary" />
-            <span className="text-sm font-semibold">
-              {activePlayers.length}/{room.settings.maxPlayers}
-            </span>
-            <span className="text-xs text-muted-foreground">Players</span>
-          </Card>
-
-          <Card className="flex items-center gap-2 border-border/70 bg-card/50 px-3.5 py-2">
-            <span className="text-sm font-semibold text-game-ready">
-              {readyCount}/{activePlayers.length}
-            </span>
-            <span className="text-xs text-muted-foreground">Ready</span>
-          </Card>
-        </div>
-      </div>
-
-      {/* Players Grid */}
-      <div className="space-y-3">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Players in Lobby
-        </h2>
+        {/* 2x4 Players Roster Grid */}
         <PlayerGrid
           participants={activePlayers}
           maxPlayers={room.settings.maxPlayers}
@@ -129,49 +102,72 @@ export function LobbyView({ initialRoom, currentPlayerId }: LobbyViewProps) {
           roomCode={room.code}
           onPlayerUpdated={() => refetch()}
         />
-      </div>
 
-      {/* Spectators section if any */}
-      {room.spectators.length > 0 && (
-        <div className="space-y-3 border-t border-border/40 pt-4">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            <Eye className="h-4 w-4" />
-            Spectators ({room.spectators.length})
+        {/* Room Settings Info Bar */}
+        <div className="rounded-[4px] border border-border bg-[#111111] p-4">
+          <div className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-neutral-400">
+            <Sliders className="h-3.5 w-3.5" />
+            <span>Room Settings</span>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {room.spectators.map((spectator) => (
-              <span
-                key={spectator.playerId}
-                className="rounded-full border border-border bg-muted/60 px-3 py-1 text-xs text-muted-foreground"
-              >
-                {spectator.displayName}
-              </span>
-            ))}
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6 text-center">
+            <div className="flex flex-col space-y-1">
+              <span className="text-[10px] uppercase text-neutral-500 font-semibold">Rounds</span>
+              <span className="font-mono text-xs font-bold text-white">{room.settings.roundCount}</span>
+            </div>
+            <div className="flex flex-col space-y-1">
+              <span className="text-[10px] uppercase text-neutral-500 font-semibold">Draw Time</span>
+              <span className="font-mono text-xs font-bold text-white">{room.settings.drawTimerSec}s</span>
+            </div>
+            <div className="flex flex-col space-y-1">
+              <span className="text-[10px] uppercase text-neutral-500 font-semibold">Describe Time</span>
+              <span className="font-mono text-xs font-bold text-white">{room.settings.describeTimerSec}s</span>
+            </div>
+            <div className="flex flex-col space-y-1">
+              <span className="text-[10px] uppercase text-neutral-500 font-semibold">Max Players</span>
+              <span className="font-mono text-xs font-bold text-white">{room.settings.maxPlayers}</span>
+            </div>
+            <div className="flex flex-col space-y-1">
+              <span className="text-[10px] uppercase text-neutral-500 font-semibold">Spectators</span>
+              <span className="font-mono text-xs font-bold text-white">{room.settings.allowSpectators ? 'On' : 'Off'}</span>
+            </div>
+            <div className="flex flex-col space-y-1">
+              <span className="text-[10px] uppercase text-neutral-500 font-semibold">Profanity Filter</span>
+              <span className="font-mono text-xs font-bold text-white">{room.settings.profanityFilter ? 'On' : 'Off'}</span>
+            </div>
           </div>
         </div>
-      )}
 
-      {/* Bottom Action Bar */}
-      <div className="sticky bottom-4 z-30 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/80 bg-card/80 p-4 shadow-xl backdrop-blur-xl">
-        <div className="text-xs text-muted-foreground">
+        {/* Spectators */}
+        {room.spectators.length > 0 && (
+          <div className="rounded-[4px] border border-border bg-[#0E0E0E] p-3">
+            <div className="flex items-center gap-1.5 text-xs text-neutral-400 font-medium">
+              <Eye className="h-3.5 w-3.5" />
+              <span>Spectators ({room.spectators.length}):</span>
+              <span className="text-neutral-300">
+                {room.spectators.map((s) => s.displayName).join(', ')}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Bottom Action Row (Always visible, zero scroll) */}
+      <div className="flex items-center justify-between border-t border-border bg-[#0E0E0E] p-3 rounded-[4px]">
+        <div className="text-xs text-neutral-400">
           {isHost ? (
             room.canStart ? (
-              <span className="font-medium text-game-ready">
-                All players ready! You can start the game.
-              </span>
+              <span className="text-white font-medium">All players ready. You can start the game.</span>
             ) : (
               <span>{room.canStartReasons[0] || 'Waiting for all players to be ready...'}</span>
             )
           ) : currentParticipant?.isReady ? (
-            <span className="font-medium text-game-ready">
-              You are marked as ready! Waiting for host.
-            </span>
+            <span className="text-white font-medium">You are ready. Waiting for host to launch...</span>
           ) : (
             <span>Click &apos;Ready&apos; when you are prepared to play.</span>
           )}
         </div>
 
-        <div className="ml-auto flex items-center gap-3">
+        <div className="flex items-center gap-3">
           {!isSpectator && currentParticipant && (
             <ReadyButton
               roomCode={room.code}

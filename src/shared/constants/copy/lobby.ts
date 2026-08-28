@@ -5,10 +5,10 @@ export const LOBBY_COPY = {
   COPY_LINK: 'Copy Invite Link',
   LINK_COPIED: 'Invite link copied to clipboard!',
   READY_BUTTON: {
-    READY: "✓ I'm Ready",
-    NOT_READY: 'Set Not Ready',
+    READY: "I'm Ready",
+    NOT_READY: 'Cancel Ready',
   },
-  START_GAME: '▶ Start Game',
+  START_GAME: 'Start Game',
   SETTINGS: 'Room Settings',
   LEAVE_ROOM: 'Leave Room',
   KICK_PLAYER: 'Kick Player',

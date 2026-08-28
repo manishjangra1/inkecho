@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Container } from './Container';
 
 interface RoomShellProps {
   readonly header: React.ReactNode;
@@ -8,10 +7,12 @@ interface RoomShellProps {
 
 export function RoomShell({ header, children }: RoomShellProps) {
   return (
-    <div className="flex min-h-screen flex-col bg-background selection:bg-brand-primary selection:text-white">
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-[#080808] text-foreground selection:bg-neutral-800 selection:text-white">
       {header}
-      <main className="flex-1 py-6 sm:py-8">
-        <Container size="lg">{children}</Container>
+      <main className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8">
+        <div className="mx-auto flex h-full w-full max-w-6xl flex-col">
+          {children}
+        </div>
       </main>
     </div>
   );

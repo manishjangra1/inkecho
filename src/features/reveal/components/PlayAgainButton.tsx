@@ -37,10 +37,8 @@ export function PlayAgainButton({ roomCode, isHost, className }: PlayAgainButton
 
   if (!isHost) {
     return (
-      <div className={cn('py-2 text-center', className)}>
-        <p className="animate-pulse text-xs font-medium text-muted-foreground">
-          Waiting for host to start the next match...
-        </p>
+      <div className={cn('text-xs text-neutral-400 font-mono', className)}>
+        Waiting for host...
       </div>
     );
   }
@@ -48,20 +46,20 @@ export function PlayAgainButton({ roomCode, isHost, className }: PlayAgainButton
   return (
     <Button
       variant="default"
-      size="lg"
+      size="sm"
       onClick={handleRematch}
       disabled={isLoading}
       className={cn(
-        'rounded-full px-8 py-6 text-base font-bold shadow-lg shadow-primary/25 transition-all hover:scale-105 active:scale-95',
+        'h-7 gap-1.5 rounded-[4px] px-3 text-xs font-semibold bg-white text-black hover:bg-neutral-200 border border-white',
         className
       )}
     >
       {isLoading ? (
-        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+        <Loader2 className="h-3 w-3 animate-spin" />
       ) : (
-        <RotateCcw className="mr-2 h-5 w-5" />
+        <RotateCcw className="h-3 w-3" />
       )}
-      <span>Play Again (Return to Lobby)</span>
+      <span>Play Again</span>
     </Button>
   );
 }

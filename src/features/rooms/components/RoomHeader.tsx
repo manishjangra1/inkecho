@@ -2,10 +2,9 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Sparkles, LogOut, Settings, Users } from 'lucide-react';
+import { Sparkles, LogOut, Settings, Users, Copy, Check } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
-import { ThemeToggle } from '@/shared/ui/theme-toggle';
 import { RoomSettingsDrawer } from './RoomSettingsDrawer';
 import { leaveRoomAction } from '../actions/leave-room.action';
 import { useRouter } from 'next/navigation';
@@ -22,6 +21,7 @@ export function RoomHeader({ room, isHost }: RoomHeaderProps) {
   const router = useRouter();
   const [settingsOpen, setSettingsOpen] = React.useState(false);
   const [isLeaving, setIsLeaving] = React.useState(false);
+  const [copied, setCopied] = React.useState(false);
 
   const handleLeave = async () => {
     try {
@@ -34,58 +34,70 @@ export function RoomHeader({ room, isHost }: RoomHeaderProps) {
     }
   };
 
+  const handleCopyInvite = () => {
+    const url = typeof window !== 'undefined' ? `${window.location.origin}/room/${room.code}` : '';
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    toast.success('Invite link copied to clipboard');
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const totalPlayers = room.participants.length;
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-          {/* Logo & Room Code */}
-          <div className="flex items-center gap-3">
-            <Link href={ROUTES.HOME} className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-brand-primary to-brand-secondary text-white shadow-sm">
-                <Sparkles className="h-5 w-5" />
-              </div>
-            </Link>
-            <div className="hidden h-4 w-px bg-border sm:block" />
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-lg font-extrabold tracking-wider text-foreground sm:text-xl">
-                {room.code}
-              </span>
-              <Badge variant="outline" className="hidden gap-1 text-xs sm:inline-flex">
-                <Users className="h-3 w-3" />
-                {totalPlayers}/{room.settings.maxPlayers}
-              </Badge>
-            </div>
-          </div>
-
-          {/* Right Action Controls */}
+      <header className="sticky top-0 z-40 flex h-12 w-full shrink-0 items-center justify-between border-b border-border bg-[#0E0E0E] px-4 select-none">
+        {/* Left: Brand & Room Code */}
+        <div className="flex items-center gap-3">
+          <Link href={ROUTES.HOME} className="flex items-center gap-2 text-white hover:opacity-90">
+            <Sparkles className="h-4 w-4 text-white" />
+            <span className="font-semibold text-xs tracking-wider uppercase">InkEcho</span>
+          </Link>
+          <div className="h-3 w-px bg-neutral-800" />
           <div className="flex items-center gap-2">
-            {isHost && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSettingsOpen(true)}
-                className="gap-1.5"
-              >
-                <Settings className="h-4 w-4" />
-                <span className="hidden sm:inline">Settings</span>
-              </Button>
-            )}
-
-            <ThemeToggle />
-
+            <span className="font-mono text-xs font-semibold text-neutral-300">
+              Room: <strong className="text-white font-mono">{room.code}</strong>
+            </span>
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              onClick={handleLeave}
-              disabled={isLeaving}
-              className="gap-1.5 text-muted-foreground hover:text-destructive"
+              onClick={handleCopyInvite}
+              className="h-6 gap-1 px-2 text-[11px] text-neutral-300 hover:text-white"
             >
-              <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">Leave</span>
+              {copied ? <Check className="h-3 w-3 text-white" /> : <Copy className="h-3 w-3" />}
+              <span>{copied ? 'Copied' : 'Copy Invite'}</span>
             </Button>
+            <Badge variant="secondary" className="h-5 px-1.5 text-[10px] text-neutral-400">
+              <Users className="h-2.5 w-2.5 mr-1" />
+              {totalPlayers}/{room.settings.maxPlayers}
+            </Badge>
           </div>
+        </div>
+
+        {/* Right Action Controls */}
+        <div className="flex items-center gap-2">
+          {isHost && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSettingsOpen(true)}
+              className="h-7 gap-1.5 px-2.5 text-xs text-neutral-300 hover:text-white"
+            >
+              <Settings className="h-3.5 w-3.5" />
+              <span>Settings</span>
+            </Button>
+          )}
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLeave}
+            disabled={isLeaving}
+            className="h-7 gap-1.5 px-2.5 text-xs text-neutral-400 hover:text-[#D9534F] hover:bg-neutral-900"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            <span>Leave Room</span>
+          </Button>
         </div>
       </header>
 

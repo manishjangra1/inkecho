@@ -4,10 +4,8 @@ import React from 'react';
 import { CANVAS_CONFIG, type CanvasTool } from '@/shared/config/canvas.config';
 import { cn } from '@/shared/lib/cn';
 import { Button } from '@/shared/ui/button';
-import { Paintbrush, Eraser } from 'lucide-react';
+import { Undo2, Redo2, Paintbrush, Eraser } from 'lucide-react';
 import { ColorPicker } from './ColorPicker';
-import { BrushSizeSlider } from './BrushSizeSlider';
-import { UndoRedoButtons } from './UndoRedoButtons';
 import { ClearCanvasDialog } from './ClearCanvasDialog';
 
 export interface CanvasToolbarProps {
@@ -43,80 +41,101 @@ export function CanvasToolbar({
   const isEraser = tool === CANVAS_CONFIG.TOOLS.ERASER;
 
   return (
-    <div className="flex w-full flex-col gap-3 rounded-2xl border border-border/60 bg-card/80 p-2.5 shadow-lg backdrop-blur-md sm:p-3">
-      {/* Top Row: Primary Tools, Undo/Redo, Clear */}
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        {/* Tool Mode Buttons (Brush & Eraser) */}
-        <div className="flex items-center gap-1.5 rounded-xl border border-border/40 bg-muted/60 p-1">
-          <Button
-            type="button"
-            variant={isBrush ? 'default' : 'ghost'}
-            size="sm"
-            disabled={disabled}
-            onClick={() => onSelectTool(CANVAS_CONFIG.TOOLS.BRUSH)}
-            className={cn(
-              'h-9 min-h-[40px] min-w-[44px] gap-1.5 rounded-lg px-3 text-xs font-semibold',
-              isBrush && 'shadow-sm'
-            )}
-            aria-label="Brush tool"
-            aria-pressed={isBrush}
-          >
-            <Paintbrush className="h-4 w-4" />
-            <span className="hidden sm:inline">Brush</span>
-          </Button>
+    <div className="flex w-full items-center justify-between gap-2 rounded-[4px] border border-border bg-[#111111] p-2 select-none">
+      {/* Left: Undo, Redo, Tools, Size */}
+      <div className="flex items-center gap-1.5">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          disabled={disabled || !canUndo}
+          onClick={onUndo}
+          className="h-7 w-7 p-0 text-neutral-400 hover:text-white"
+          title="Undo (⌘Z)"
+        >
+          <Undo2 className="h-3.5 w-3.5" />
+        </Button>
 
-          <Button
-            type="button"
-            variant={isEraser ? 'default' : 'ghost'}
-            size="sm"
-            disabled={disabled}
-            onClick={() => onSelectTool(CANVAS_CONFIG.TOOLS.ERASER)}
-            className={cn(
-              'h-9 min-h-[40px] min-w-[44px] gap-1.5 rounded-lg px-3 text-xs font-semibold',
-              isEraser && 'shadow-sm'
-            )}
-            aria-label="Eraser tool"
-            aria-pressed={isEraser}
-          >
-            <Eraser className="h-4 w-4" />
-            <span className="hidden sm:inline">Eraser</span>
-          </Button>
-        </div>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          disabled={disabled || !canRedo}
+          onClick={onRedo}
+          className="h-7 w-7 p-0 text-neutral-400 hover:text-white"
+          title="Redo (⌘⇧Z)"
+        >
+          <Redo2 className="h-3.5 w-3.5" />
+        </Button>
 
-        {/* Undo, Redo, Clear */}
+        <div className="h-4 w-px bg-[#232323] mx-1" />
+
+        {/* Tool Selectors */}
+        <Button
+          type="button"
+          variant={isBrush ? 'secondary' : 'ghost'}
+          size="sm"
+          disabled={disabled}
+          onClick={() => onSelectTool(CANVAS_CONFIG.TOOLS.BRUSH)}
+          className={cn(
+            'h-7 gap-1 px-2 text-xs',
+            isBrush ? 'bg-[#222222] text-white border border-neutral-600' : 'text-neutral-400 hover:text-white'
+          )}
+        >
+          <Paintbrush className="h-3.5 w-3.5" />
+          <span className="hidden md:inline">Brush</span>
+        </Button>
+
+        <Button
+          type="button"
+          variant={isEraser ? 'secondary' : 'ghost'}
+          size="sm"
+          disabled={disabled}
+          onClick={() => onSelectTool(CANVAS_CONFIG.TOOLS.ERASER)}
+          className={cn(
+            'h-7 gap-1 px-2 text-xs',
+            isEraser ? 'bg-[#222222] text-white border border-neutral-600' : 'text-neutral-400 hover:text-white'
+          )}
+        >
+          <Eraser className="h-3.5 w-3.5" />
+          <span className="hidden md:inline">Eraser</span>
+        </Button>
+
+        <div className="h-4 w-px bg-[#232323] mx-1" />
+
+        {/* Brush Size Preset */}
         <div className="flex items-center gap-1">
-          <UndoRedoButtons
-            canUndo={canUndo}
-            canRedo={canRedo}
-            onUndo={onUndo}
-            onRedo={onRedo}
-            disabled={disabled}
-          />
-          <div className="mx-1 h-5 w-px bg-border/60" />
-          <ClearCanvasDialog onClear={onClear} disabled={disabled} />
+          {[2, 4, 8].map((s) => (
+            <button
+              key={s}
+              type="button"
+              disabled={disabled}
+              onClick={() => onChangeSize(s)}
+              className={cn(
+                'h-6 px-1.5 rounded-[3px] font-mono text-[10px] transition-colors border',
+                size === s
+                  ? 'border-white bg-white text-black font-bold'
+                  : 'border-transparent text-neutral-400 hover:bg-[#1A1A1A] hover:text-white'
+              )}
+            >
+              {s}px
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Bottom Row: Colors & Brush Size */}
-      <div className="flex flex-col items-center justify-between gap-3 border-t border-border/40 pt-2 md:flex-row">
-        {/* Color Palette (only active/visible when Brush is selected) */}
-        <div className={cn('flex items-center', !isBrush && 'pointer-events-none opacity-40')}>
-          <ColorPicker
-            selectedColor={color}
-            onSelectColor={onSelectColor}
-            disabled={disabled || !isBrush}
-          />
-        </div>
+      {/* Center: Color Palette (Only Colorful Component) */}
+      <div className="flex items-center gap-1.5">
+        <ColorPicker
+          selectedColor={color}
+          onSelectColor={onSelectColor}
+          disabled={disabled || !isBrush}
+        />
+      </div>
 
-        {/* Size Slider */}
-        <div className="flex w-full justify-end md:w-auto">
-          <BrushSizeSlider
-            size={size}
-            onChange={onChangeSize}
-            color={isBrush ? color : '#FFFFFF'}
-            disabled={disabled}
-          />
-        </div>
+      {/* Right: Clear Dialog */}
+      <div className="flex items-center">
+        <ClearCanvasDialog onClear={onClear} disabled={disabled} />
       </div>
     </div>
   );

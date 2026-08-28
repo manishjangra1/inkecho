@@ -4,97 +4,91 @@
 
 @layer base {
   :root {
-    /* Light Mode */
-    --background: 0 0% 100%;
-    --foreground: 240 10% 4%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 4%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 4%;
-    --primary: 262 83% 50%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 240 10% 4%;
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%;
-    --accent: 240 5% 94%;
-    --accent-foreground: 240 10% 4%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 262 83% 50%;
+    /* Strict Dark Monochrome System (Default & Universal) */
+    --background: 0 0% 3%;       /* #080808 */
+    --foreground: 0 0% 100%;     /* #FFFFFF */
+    --card: 0 0% 7%;             /* #111111 */
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 9%;          /* #161616 */
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 0% 100%;        /* #FFFFFF */
+    --primary-foreground: 0 0% 3%; /* #080808 */
+    --secondary: 0 0% 11%;       /* #1C1C1C */
+    --secondary-foreground: 0 0% 90%;
+    --muted: 0 0% 10%;           /* #1A1A1A */
+    --muted-foreground: 0 0% 60%; /* #999999 */
+    --accent: 0 0% 12%;          /* #1E1E1E */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 65% 58%;    /* #D9534F */
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 14%;          /* #232323 */
+    --border-subtle: 0 0% 10%;   /* #1A1A1A */
+    --input: 0 0% 14%;           /* #232323 */
+    --ring: 0 0% 100%;
 
-    --brand-primary: 262 83% 50%;
-    --brand-secondary: 330 70% 50%;
-    --brand-accent: 199 80% 40%;
+    --brand-primary: 0 0% 100%;
+    --brand-secondary: 0 0% 80%;
+    --brand-accent: 0 0% 90%;
 
-    --canvas-bg: 240 10% 95%;
-    --canvas-border: 240 5% 85%;
-    --timer-normal: 199 89% 48%;
+    --canvas-bg: 0 0% 11%;       /* #1C1C1C */
+    --canvas-border: 0 0% 14%;   /* #232323 */
+    --timer-normal: 0 0% 100%;
     --timer-warning: 38 92% 50%;
     --timer-critical: 0 72% 51%;
-    --ready: 142 71% 45%;
-    --waiting: 240 5% 55%;
-    --online: 142 71% 45%;
+    --ready: 0 0% 100%;
+    --waiting: 0 0% 48%;
+    --online: 0 0% 100%;
     --reconnecting: 38 92% 50%;
-    --offline: 240 5% 55%;
-    --spectator: 199 89% 48%;
+    --offline: 0 0% 35%;
+    --spectator: 0 0% 70%;
 
-    --radius: 0.75rem;
-    --radius-xl: 1rem;
-    --radius-2xl: 1.5rem;
-
-    --glass-bg: 0 0% 100% / 0.7;
-    --glass-border: 0 0% 0% / 0.08;
-    --glass-blur: 16px;
+    --radius: 0.25rem;           /* 4px crisp radius */
+    --radius-xl: 0.375rem;       /* 6px radius */
+    --radius-2xl: 0.5rem;        /* 8px radius */
   }
 
   .dark {
-    /* Dark Mode (Default) */
-    --background: 240 10% 4%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 6%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 8%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 262 83% 58%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 5% 16%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 5% 16%;
-    --muted-foreground: 240 5% 65%;
-    --accent: 240 5% 16%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5% 18%;
-    --input: 240 5% 18%;
-    --ring: 262 83% 58%;
+    /* Strict Dark Monochrome System */
+    --background: 0 0% 3%;       /* #080808 */
+    --foreground: 0 0% 100%;     /* #FFFFFF */
+    --card: 0 0% 7%;             /* #111111 */
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 9%;          /* #161616 */
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 0% 100%;        /* #FFFFFF */
+    --primary-foreground: 0 0% 3%; /* #080808 */
+    --secondary: 0 0% 11%;       /* #1C1C1C */
+    --secondary-foreground: 0 0% 90%;
+    --muted: 0 0% 10%;           /* #1A1A1A */
+    --muted-foreground: 0 0% 60%; /* #999999 */
+    --accent: 0 0% 12%;          /* #1E1E1E */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 65% 58%;    /* #D9534F */
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 14%;          /* #232323 */
+    --border-subtle: 0 0% 10%;   /* #1A1A1A */
+    --input: 0 0% 14%;           /* #232323 */
+    --ring: 0 0% 100%;
 
-    --brand-primary: 262 83% 58%;
-    --brand-secondary: 330 81% 60%;
-    --brand-accent: 199 89% 48%;
+    --brand-primary: 0 0% 100%;
+    --brand-secondary: 0 0% 80%;
+    --brand-accent: 0 0% 90%;
 
-    --canvas-bg: 240 20% 12%;
-    --canvas-border: 240 5% 22%;
-    --timer-normal: 199 89% 48%;
+    --canvas-bg: 0 0% 11%;       /* #1C1C1C */
+    --canvas-border: 0 0% 14%;   /* #232323 */
+    --timer-normal: 0 0% 100%;
     --timer-warning: 38 92% 50%;
     --timer-critical: 0 72% 51%;
-    --ready: 142 71% 45%;
-    --waiting: 240 5% 40%;
-    --online: 142 71% 45%;
+    --ready: 0 0% 100%;
+    --waiting: 0 0% 48%;
+    --online: 0 0% 100%;
     --reconnecting: 38 92% 50%;
-    --offline: 240 5% 40%;
-    --spectator: 199 89% 48%;
+    --offline: 0 0% 35%;
+    --spectator: 0 0% 70%;
 
-    --radius: 0.75rem;
-    --radius-xl: 1rem;
-    --radius-2xl: 1.5rem;
-
-    --glass-bg: 240 10% 10% / 0.6;
-    --glass-border: 0 0% 100% / 0.08;
-    --glass-blur: 16px;
+    --radius: 0.25rem;           /* 4px crisp radius */
+    --radius-xl: 0.375rem;       /* 6px radius */
+    --radius-2xl: 0.5rem;        /* 8px radius */
   }
 }
 
@@ -103,16 +97,29 @@
     @apply border-border;
   }
   body {
-    @apply bg-background font-sans text-foreground antialiased;
+    @apply bg-background font-sans text-foreground antialiased selection:bg-neutral-800 selection:text-white;
     font-feature-settings:
       'rlig' 1,
       'calt' 1;
+    overflow-x: hidden;
   }
 }
 
-.glass {
-  background-color: hsl(var(--glass-bg));
-  border: 1px solid hsl(var(--glass-border));
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
+/* Custom Scrollbars for High Information Density */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080808;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #232323;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #383838;
 }

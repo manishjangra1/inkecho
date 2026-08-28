@@ -6,6 +6,7 @@ import { Button } from '@/shared/ui/button';
 import { toggleReadyAction } from '../actions/toggle-ready.action';
 import { toast } from '@/shared/ui/toast';
 import { LOBBY_COPY } from '@/shared/constants/copy/lobby';
+import { cn } from '@/shared/lib/cn';
 
 interface ReadyButtonProps {
   readonly roomCode: string;
@@ -42,26 +43,27 @@ export function ReadyButton({ roomCode, isReady, onToggled }: ReadyButtonProps) 
   return (
     <Button
       type="button"
-      size="lg"
-      variant={isReady ? 'secondary' : 'default'}
+      size="default"
+      variant={isReady ? 'outline' : 'default'}
       onClick={handleToggle}
       isLoading={isLoading}
       disabled={isLoading}
-      className={`min-w-[140px] gap-2 font-semibold ${
+      className={cn(
+        'min-w-[120px] gap-1.5 font-semibold text-xs h-8 rounded-[4px] transition-colors',
         isReady
-          ? 'border border-game-ready/40 bg-game-ready/20 text-game-ready hover:bg-game-ready/30'
-          : 'shadow-glow'
-      }`}
+          ? 'border border-neutral-700 bg-[#161616] text-neutral-300 hover:border-neutral-500 hover:text-white'
+          : 'border border-white bg-white text-black hover:bg-neutral-200'
+      )}
     >
       {isReady ? (
         <>
-          <Check className="h-4 w-4" />
-          {LOBBY_COPY.READY_BUTTON.READY}
+          <X className="h-3.5 w-3.5 text-neutral-400" />
+          <span>{LOBBY_COPY.READY_BUTTON.NOT_READY}</span>
         </>
       ) : (
         <>
-          <X className="h-4 w-4" />
-          {LOBBY_COPY.READY_BUTTON.NOT_READY}
+          <Check className="h-3.5 w-3.5" />
+          <span>{LOBBY_COPY.READY_BUTTON.READY}</span>
         </>
       )}
     </Button>

@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { PromptCard } from './PromptCard';
 import { SubmitButton } from './SubmitButton';
 import {
   DrawingCanvas,
@@ -88,56 +87,56 @@ export function DrawPhase({ roomCode, roomId, currentTurn }: DrawPhaseProps) {
     }
   };
 
+  const promptText = currentTurn.promptContext?.text || 'Sketch your prompt';
+
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-4 duration-300 animate-in fade-in slide-in-from-bottom-3 sm:space-y-6">
-      {/* Turn Header */}
-      <div className="space-y-1 text-center">
-        <h2 className="text-2xl font-bold tracking-tight">{GAME_COPY.DRAW_PHASE_TITLE}</h2>
-        <p className="text-sm text-muted-foreground">{GAME_COPY.DRAW_PHASE_SUBTITLE}</p>
-      </div>
-
-      {/* Prompt Context Card */}
-      {currentTurn.promptContext && (
-        <PromptCard
-          type={currentTurn.promptContext.type}
-          text={currentTurn.promptContext.text}
-          drawingUrl={currentTurn.promptContext.drawingUrl}
-        />
-      )}
-
-      {/* Drawing Canvas Area */}
-      <div className="space-y-3">
-        <DrawingCanvas engine={engine} />
-
-        {/* Toolbar */}
-        <CanvasToolbar
-          tool={engine.tool}
-          onSelectTool={engine.setTool}
-          color={engine.color}
-          onSelectColor={engine.setColor}
-          size={engine.currentSize}
-          onChangeSize={(size) => {
-            if (engine.tool === 'eraser') {
-              engine.setEraserSize(size);
-            } else {
-              engine.setBrushSize(size);
-            }
-          }}
-          canUndo={engine.canUndo}
-          canRedo={engine.canRedo}
-          onUndo={engine.undo}
-          onRedo={engine.redo}
-          onClear={engine.clearStrokes}
-          disabled={isSubmitting || engine.isExporting}
-        />
-      </div>
-
-      {/* Submit Button */}
-      <div className="flex items-center justify-between pt-2">
-        <div className="hidden text-xs text-muted-foreground sm:block">
-          {engine.strokes.length} strokes • Autosaved locally
+    <div className="flex h-full w-full flex-col justify-between space-y-3">
+      {/* Top Prompt Banner */}
+      <div className="flex items-center justify-between rounded-[4px] border border-border bg-[#111111] px-4 py-2">
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
+            Prompt:
+          </span>
+          <span className="font-semibold text-sm text-white">
+            &ldquo;{promptText}&rdquo;
+          </span>
         </div>
-        <div className="flex w-full justify-end sm:w-auto">
+        <div className="text-[11px] text-neutral-400">
+          Draw what you see above before time expires
+        </div>
+      </div>
+
+      {/* Canvas Area */}
+      <div className="relative flex-1 flex flex-col justify-center overflow-hidden">
+        <DrawingCanvas engine={engine} className="max-h-[58vh] w-auto mx-auto aspect-[4/3]" />
+      </div>
+
+      {/* Bottom Controls Row: Toolbar + Submit Button */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="flex-1 w-full">
+          <CanvasToolbar
+            tool={engine.tool}
+            onSelectTool={engine.setTool}
+            color={engine.color}
+            onSelectColor={engine.setColor}
+            size={engine.currentSize}
+            onChangeSize={(size) => {
+              if (engine.tool === 'eraser') {
+                engine.setEraserSize(size);
+              } else {
+                engine.setBrushSize(size);
+              }
+            }}
+            canUndo={engine.canUndo}
+            canRedo={engine.canRedo}
+            onUndo={engine.undo}
+            onRedo={engine.redo}
+            onClear={engine.clearStrokes}
+            disabled={isSubmitting || engine.isExporting}
+          />
+        </div>
+
+        <div className="shrink-0">
           <SubmitButton
             isSubmitting={isSubmitting || engine.isExporting}
             disabled={engine.strokes.length === 0}

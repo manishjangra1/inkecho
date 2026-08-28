@@ -21,8 +21,8 @@ export function DrawingCanvas({ engine, className, isLoading = false }: DrawingC
   return (
     <div
       className={cn(
-        'relative aspect-[4/3] w-full select-none overflow-hidden rounded-2xl border border-border/80 bg-[#1A1A2E] shadow-inner transition-shadow',
-        isDrawing && 'ring-2 ring-primary/40',
+        'relative aspect-[4/3] w-full select-none overflow-hidden rounded-[4px] border border-border bg-[#111111] transition-colors',
+        isDrawing && 'border-white',
         className
       )}
       style={{ touchAction: 'none' }}
@@ -37,10 +37,10 @@ export function DrawingCanvas({ engine, className, isLoading = false }: DrawingC
 
       {/* Exporting Loading Overlay */}
       {isExporting && (
-        <div className="backdrop-blur-xs absolute inset-0 flex items-center justify-center bg-background/60 duration-200 animate-in fade-in">
-          <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 shadow-md">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-            <span className="text-xs font-semibold">Processing Drawing…</span>
+        <div className="absolute inset-0 flex items-center justify-center bg-black/70 duration-150 animate-in fade-in">
+          <div className="flex items-center gap-2 rounded-[4px] border border-border bg-[#161616] px-3.5 py-1.5 shadow-none">
+            <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            <span className="text-xs font-medium text-white">Saving Drawing…</span>
           </div>
         </div>
       )}

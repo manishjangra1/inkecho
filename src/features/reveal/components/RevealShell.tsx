@@ -9,7 +9,7 @@ import { VoteButtons } from './VoteButtons';
 import { WinnerBanner } from './WinnerBanner';
 import { PlayAgainButton } from './PlayAgainButton';
 import { ReportButton } from './ReportButton';
-import { Loader2, Sparkles } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import type { RevealStepItem } from '../types/reveal.types';
 
 export interface RevealShellProps {
@@ -43,9 +43,9 @@ export function RevealShell({ roomCode }: RevealShellProps) {
 
   if (isLoading || !revealData) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center space-y-4 p-4">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-sm font-medium text-muted-foreground">Loading story reveal...</p>
+      <div className="flex h-full flex-col items-center justify-center space-y-3 p-4">
+        <Loader2 className="h-6 w-6 animate-spin text-white" />
+        <p className="text-xs font-mono text-neutral-400">Loading story reveal...</p>
       </div>
     );
   }
@@ -57,79 +57,67 @@ export function RevealShell({ roomCode }: RevealShellProps) {
   const isCurrentChainVotedByMe = votedChainIndex === selectedChainIndex;
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground selection:bg-primary/20">
-      {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-border/40 bg-background/80 px-4 py-3.5 backdrop-blur-md">
-        <div className="mx-auto flex max-w-5xl items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
-              <Sparkles className="h-5 w-5" />
-            </div>
-            <div>
-              <h1 className="text-base font-bold tracking-tight">Story Reveal</h1>
-              <p className="font-mono text-xs text-muted-foreground">Room: {roomCode}</p>
-            </div>
-          </div>
-
-          <PlayAgainButton roomCode={roomCode} isHost={isHost} className="hidden sm:inline-flex" />
+    <div className="flex h-full flex-col justify-between space-y-4 select-none">
+      {/* Top Header Row: Story Switcher Tabs & Actions */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3">
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-semibold uppercase tracking-wider text-white">
+            Story Reveal
+          </span>
+          <ChainSelector
+            chains={chains}
+            selectedChainIndex={selectedChainIndex}
+            onSelectChain={goToChain}
+            votes={votes}
+            winningChainIndex={winningChainIndex}
+          />
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center px-4 py-6 sm:py-10">
-        {/* Chain Selector Tabs */}
-        <ChainSelector
-          chains={chains}
-          selectedChainIndex={selectedChainIndex}
-          onSelectChain={goToChain}
-          votes={votes}
-          winningChainIndex={winningChainIndex}
-          className="mb-6 w-full"
-        />
-
-        {/* Winner Banner if voting completed/active */}
-        {winningChain && <WinnerBanner winningChain={winningChain} voteCount={winningVoteCount} />}
-
-        {/* Active Chain Viewer */}
-        {currentChain && (
-          <div className="my-2 flex w-full flex-col items-center">
-            <ChainViewer
-              chain={currentChain}
-              currentStepIndex={currentStepIndex}
-              onReportStep={(step) => setReportingStep(step)}
+        <div className="flex items-center gap-2">
+          {currentChain && (
+            <VoteButtons
+              chainIndex={selectedChainIndex}
+              voteCount={currentChainVotes}
+              hasVoted={hasVoted}
+              isVotedByMe={isCurrentChainVotedByMe}
+              onVote={castVote}
             />
+          )}
+          <PlayAgainButton roomCode={roomCode} isHost={isHost} />
+        </div>
+      </div>
 
-            {/* Voting Component */}
-            <div className="my-8 w-full">
-              <VoteButtons
-                chainIndex={selectedChainIndex}
-                voteCount={currentChainVotes}
-                hasVoted={hasVoted}
-                isVotedByMe={isCurrentChainVotedByMe}
-                onVote={castVote}
-              />
-            </div>
+      {/* Center: Horizontal Side-by-Side Story Chain */}
+      <div className="flex-1 flex flex-col justify-center overflow-hidden">
+        {winningChain && (
+          <div className="mb-2">
+            <WinnerBanner winningChain={winningChain} voteCount={winningVoteCount} />
           </div>
         )}
 
-        {/* Rematch button on mobile */}
-        <div className="my-6 flex w-full justify-center sm:hidden">
-          <PlayAgainButton roomCode={roomCode} isHost={isHost} />
-        </div>
-      </main>
+        {currentChain && (
+          <ChainViewer
+            chain={currentChain}
+            currentStepIndex={currentStepIndex}
+            onReportStep={(step) => setReportingStep(step)}
+          />
+        )}
+      </div>
 
-      {/* Playback Controls (Sticky bottom) */}
+      {/* Bottom Playback Bar */}
       {currentChain && (
-        <RevealControls
-          isPlaying={isPlaying}
-          onTogglePlay={togglePlayPause}
-          onNext={nextStep}
-          onPrev={prevStep}
-          canPrev={selectedChainIndex > 0 || currentStepIndex > 0}
-          canNext={!isAllCompleted}
-          currentStepIndex={currentStepIndex}
-          totalSteps={totalSteps}
-        />
+        <div className="border-t border-border bg-[#0E0E0E] p-2 rounded-[4px]">
+          <RevealControls
+            isPlaying={isPlaying}
+            onTogglePlay={togglePlayPause}
+            onNext={nextStep}
+            onPrev={prevStep}
+            canPrev={selectedChainIndex > 0 || currentStepIndex > 0}
+            canNext={!isAllCompleted}
+            currentStepIndex={currentStepIndex}
+            totalSteps={totalSteps}
+          />
+        </div>
       )}
 
       {/* Moderation Report Dialog */}

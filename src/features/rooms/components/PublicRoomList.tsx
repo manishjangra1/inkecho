@@ -1,34 +1,23 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import { usePublicRooms } from '../hooks/use-public-rooms';
-import { PublicRoomCard } from './PublicRoomCard';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { Button } from '@/shared/ui/button';
-import { RefreshCw, Search, PlusCircle } from 'lucide-react';
-import Link from 'next/link';
+import { RefreshCw, Plus, ArrowRight } from 'lucide-react';
 import { ROUTES } from '@/shared/constants/routes';
 
 export function PublicRoomList() {
   const [page, setPage] = React.useState(1);
-  const { data, isLoading, isError, refetch, isRefetching } = usePublicRooms(page, 12);
+  const { data, isLoading, isError, refetch, isRefetching } = usePublicRooms(page, 15);
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div
-            key={i}
-            className="h-44 space-y-3 rounded-2xl border border-border/40 bg-card/30 p-4"
-          >
-            <div className="flex justify-between">
-              <Skeleton className="h-6 w-20" />
-              <Skeleton className="h-6 w-12" />
-            </div>
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-4 w-48" />
-            <Skeleton className="mt-2 h-9 w-full" />
-          </div>
+      <div className="space-y-2">
+        <Skeleton className="h-10 w-full rounded-[4px]" />
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} className="h-12 w-full rounded-[4px]" />
         ))}
       </div>
     );
@@ -36,10 +25,10 @@ export function PublicRoomList() {
 
   if (isError) {
     return (
-      <div className="space-y-4 py-12 text-center">
-        <p className="text-sm text-destructive">Could not load public rooms.</p>
-        <Button variant="outline" size="sm" onClick={() => refetch()} className="gap-2">
-          <RefreshCw className="h-4 w-4" />
+      <div className="space-y-3 py-12 text-center">
+        <p className="text-xs text-[#D9534F]">Could not load public rooms.</p>
+        <Button variant="outline" size="sm" onClick={() => refetch()} className="gap-1.5 text-xs">
+          <RefreshCw className="h-3.5 w-3.5" />
           Retry
         </Button>
       </div>
@@ -50,69 +39,107 @@ export function PublicRoomList() {
 
   if (items.length === 0) {
     return (
-      <div className="space-y-4 rounded-2xl border border-dashed border-border/80 bg-card/30 px-4 py-16 text-center">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
-          <Search className="h-6 w-6" />
+      <div className="space-y-3 rounded-[4px] border border-dashed border-[#232323] bg-[#0E0E0E] p-12 text-center">
+        <h3 className="text-xs font-semibold text-white">No active public rooms</h3>
+        <p className="text-[11px] text-neutral-500">
+          Create a room to start sketching and invite your friends.
+        </p>
+        <div className="pt-2">
+          <Link href={ROUTES.CREATE}>
+            <Button variant="default" size="sm" className="gap-1.5 text-xs font-medium">
+              <Plus className="h-3.5 w-3.5" />
+              Create Room
+            </Button>
+          </Link>
         </div>
-        <div className="space-y-1">
-          <h3 className="text-base font-semibold text-foreground">No active public rooms</h3>
-          <p className="mx-auto max-w-xs text-xs text-muted-foreground">
-            Be the first to host a game and invite your friends!
-          </p>
-        </div>
-        <Link href={ROUTES.CREATE}>
-          <Button variant="default" size="sm" className="gap-2 shadow-glow">
-            <PlusCircle className="h-4 w-4" />
-            Create a Room
-          </Button>
-        </Link>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 select-none">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-muted-foreground">
-          Showing {items.length} of {data?.total ?? 0} public lobbies
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+          Active Public Rooms ({data?.total ?? items.length})
         </span>
         <Button
           variant="ghost"
           size="sm"
           onClick={() => refetch()}
           disabled={isRefetching}
-          className="gap-2 text-xs text-muted-foreground hover:text-foreground"
+          className="h-6 gap-1 px-2 text-[11px] text-neutral-400 hover:text-white"
         >
-          <RefreshCw className={`h-3.5 w-3.5 ${isRefetching ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`h-3 w-3 ${isRefetching ? 'animate-spin' : ''}`} />
           Refresh
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map((room) => (
-          <PublicRoomCard key={room.id} room={room} />
-        ))}
+      {/* High Density Table */}
+      <div className="rounded-[4px] border border-border bg-[#111111] overflow-hidden">
+        <table className="w-full text-left text-xs">
+          <thead className="border-b border-border bg-[#0E0E0E] text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">
+            <tr>
+              <th className="px-3.5 py-2">Room Code</th>
+              <th className="px-3.5 py-2">Host</th>
+              <th className="px-3.5 py-2">Players</th>
+              <th className="px-3.5 py-2">Rounds</th>
+              <th className="px-3.5 py-2">Draw Time</th>
+              <th className="px-3.5 py-2 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[#1C1C1C]">
+            {items.map((room) => (
+              <tr key={room.id} className="hover:bg-[#161616] transition-colors">
+                <td className="px-3.5 py-2 font-mono font-bold text-white">
+                  {room.code}
+                </td>
+                <td className="px-3.5 py-2 text-neutral-300 font-medium truncate max-w-[120px]">
+                  {room.hostDisplayName}
+                </td>
+                <td className="px-3.5 py-2 font-mono text-neutral-400">
+                  {room.playerCount} / {room.maxPlayers}
+                </td>
+                <td className="px-3.5 py-2 font-mono text-neutral-400">
+                  {room.roundCount}
+                </td>
+                <td className="px-3.5 py-2 font-mono text-neutral-400">
+                  {room.drawTimerSec}s
+                </td>
+                <td className="px-3.5 py-2 text-right">
+                  <Link href={`/join/${room.code}`}>
+                    <Button variant="outline" size="sm" className="h-6 gap-1 px-2 text-[11px]">
+                      <span>Join</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </Button>
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      {/* Pagination Controls */}
+      {/* Pagination */}
       {data && data.totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 pt-4">
+        <div className="flex items-center justify-center gap-2 pt-2">
           <Button
             variant="outline"
             size="sm"
             disabled={page <= 1}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
+            className="h-6 px-2 text-[11px]"
           >
             Previous
           </Button>
-          <span className="px-2 text-xs text-muted-foreground">
-            Page {page} of {data.totalPages}
+          <span className="font-mono text-[11px] text-neutral-500">
+            {page} / {data.totalPages}
           </span>
           <Button
             variant="outline"
             size="sm"
             disabled={page >= data.totalPages}
             onClick={() => setPage((p) => Math.min(data.totalPages, p + 1))}
+            className="h-6 px-2 text-[11px]"
           >
             Next
           </Button>

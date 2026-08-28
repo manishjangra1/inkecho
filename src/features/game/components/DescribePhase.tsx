@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { PromptCard } from './PromptCard';
 import { SubmitButton } from './SubmitButton';
 import { submitDescriptionAction } from '../actions/submit-description.action';
 import { useGameStore } from '../stores/game-store';
@@ -72,44 +71,59 @@ export function DescribePhase({ roomCode, roomId, currentTurn }: DescribePhasePr
   const charsLeft = GAME_CONFIG.MAX_DESCRIPTION_LENGTH - text.length;
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-6 duration-300 animate-in fade-in slide-in-from-bottom-3">
-      <div className="space-y-1.5 text-center">
-        <h2 className="text-2xl font-bold tracking-tight">{GAME_COPY.DESCRIBE_PHASE_TITLE}</h2>
-        <p className="text-sm text-muted-foreground">{GAME_COPY.DESCRIBE_PHASE_SUBTITLE}</p>
+    <div className="flex h-full w-full flex-col justify-between space-y-4">
+      {/* Top Banner */}
+      <div className="flex items-center justify-between rounded-[4px] border border-border bg-[#111111] px-4 py-2">
+        <span className="text-xs font-semibold text-white uppercase tracking-wider">
+          Guess Phase
+        </span>
+        <span className="text-[11px] text-neutral-400">
+          Describe the drawing below as accurately as possible
+        </span>
       </div>
 
-      {currentTurn.promptContext && (
-        <PromptCard
-          type={currentTurn.promptContext.type}
-          text={currentTurn.promptContext.text}
-          drawingUrl={currentTurn.promptContext.drawingUrl}
-        />
-      )}
+      {/* Center: Prior Drawing Preview */}
+      <div className="relative flex-1 flex flex-col items-center justify-center overflow-hidden">
+        {currentTurn.promptContext && (
+          <div className="max-h-[50vh] w-auto max-w-lg aspect-[4/3] rounded-[4px] border border-border bg-[#111111] overflow-hidden flex items-center justify-center">
+            {currentTurn.promptContext.drawingUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={currentTurn.promptContext.drawingUrl}
+                alt="Previous Drawing"
+                className="h-full w-full object-contain"
+              />
+            ) : (
+              <div className="p-6 text-center text-sm text-neutral-300 font-mono">
+                &ldquo;{currentTurn.promptContext.text}&rdquo;
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="relative rounded-2xl border bg-card/60 p-4 shadow-sm backdrop-blur-md transition-all focus-within:ring-2 focus-within:ring-primary/40">
+      {/* Bottom: Description Input Form */}
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <div className="rounded-[4px] border border-border bg-[#111111] p-3 transition-colors focus-within:border-white">
           <label htmlFor="describe-input" className="sr-only">
             {GAME_COPY.DESCRIBE_INPUT_LABEL}
           </label>
-          <textarea
+          <input
             id="describe-input"
+            type="text"
             value={text}
             onChange={(e) => setText(e.target.value.slice(0, GAME_CONFIG.MAX_DESCRIPTION_LENGTH))}
             placeholder={GAME_COPY.DESCRIBE_INPUT_PLACEHOLDER}
             disabled={isSubmitting}
-            rows={4}
-            className="w-full resize-none border-0 bg-transparent text-base leading-relaxed placeholder:text-muted-foreground/60 focus:outline-none sm:text-lg"
+            className="w-full border-0 bg-transparent text-sm text-white placeholder:text-neutral-500 focus:outline-none"
             autoFocus
           />
-          <div className="flex items-center justify-between border-t border-border/50 pt-2 text-xs text-muted-foreground">
-            <span>Make it fun and imaginative!</span>
-            <span className={charsLeft < 20 ? 'font-bold text-amber-500' : ''}>
-              {charsLeft} chars left
-            </span>
-          </div>
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex items-center justify-between">
+          <span className="font-mono text-xs text-neutral-500">
+            {charsLeft} characters remaining
+          </span>
           <SubmitButton
             isSubmitting={isSubmitting}
             disabled={!text.trim()}

@@ -59,9 +59,9 @@ export function GameShell({ roomCode }: GameShellProps) {
 
   if (isLoading || !game || !currentTurn) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center space-y-4 p-4">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-sm font-medium text-muted-foreground">Loading game session...</p>
+      <div className="flex h-screen w-screen flex-col items-center justify-center space-y-3 bg-[#080808] p-4 text-foreground">
+        <Loader2 className="h-6 w-6 animate-spin text-white" />
+        <p className="text-xs font-mono text-neutral-400">Loading game session...</p>
       </div>
     );
   }
@@ -70,7 +70,7 @@ export function GameShell({ roomCode }: GameShellProps) {
   const isDisconnected = connectionState === 'disconnected' || connectionState === 'suspended';
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground selection:bg-primary/20">
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-[#080808] text-foreground select-none">
       {isSpectator && <SpectatorBanner />}
       {isDisconnected && <ReconnectBanner />}
 
@@ -87,13 +87,15 @@ export function GameShell({ roomCode }: GameShellProps) {
         isPauseLoading={isPauseLoading}
       />
 
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center px-4 py-8 sm:py-12">
-        <GamePhaseRouter
-          roomCode={roomCode}
-          roomId={game.roomId}
-          currentTurn={currentTurn}
-          isSpectator={isSpectator}
-        />
+      <main className="relative flex flex-1 flex-col overflow-hidden p-3 sm:p-4 md:p-6">
+        <div className="mx-auto flex h-full w-full max-w-5xl flex-col">
+          <GamePhaseRouter
+            roomCode={roomCode}
+            roomId={game.roomId}
+            currentTurn={currentTurn}
+            isSpectator={isSpectator}
+          />
+        </div>
       </main>
 
       {isPaused && (

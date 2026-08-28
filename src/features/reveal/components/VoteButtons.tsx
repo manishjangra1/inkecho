@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Button } from '@/shared/ui/button';
 import { Heart } from 'lucide-react';
 import { cn } from '@/shared/lib/cn';
@@ -24,32 +23,25 @@ export function VoteButtons({
   className,
 }: VoteButtonsProps) {
   return (
-    <div className={cn('flex items-center justify-center gap-3', className)}>
-      <motion.div whileTap={{ scale: 0.95 }}>
-        <Button
-          variant={isVotedByMe ? 'default' : 'outline'}
-          size="lg"
-          disabled={hasVoted && !isVotedByMe}
-          onClick={() => onVote(chainIndex)}
-          className={cn(
-            'group relative rounded-full px-6 py-3 font-semibold shadow-md transition-all duration-300',
-            isVotedByMe
-              ? 'bg-rose-500 text-white shadow-rose-500/20 hover:bg-rose-600'
-              : 'border-border/60 bg-card hover:border-rose-500/50 hover:text-rose-500'
-          )}
-        >
-          <Heart
-            className={cn(
-              'mr-2 h-5 w-5 transition-transform duration-300 group-hover:scale-110',
-              isVotedByMe ? 'fill-white text-white' : 'text-rose-500'
-            )}
-          />
-          <span>{isVotedByMe ? 'Voted!' : 'Vote for this Story'}</span>
-          <span className="ml-2 inline-flex items-center justify-center rounded-full bg-black/10 px-2.5 py-0.5 text-xs font-bold dark:bg-white/20">
-            {voteCount}
-          </span>
-        </Button>
-      </motion.div>
+    <div className={cn('flex items-center gap-2', className)}>
+      <Button
+        variant={isVotedByMe ? 'default' : 'outline'}
+        size="sm"
+        disabled={hasVoted && !isVotedByMe}
+        onClick={() => onVote(chainIndex)}
+        className={cn(
+          'h-7 gap-1.5 rounded-[4px] px-3 text-xs font-medium border transition-colors',
+          isVotedByMe
+            ? 'bg-white text-black border-white'
+            : 'border-[#232323] bg-[#111111] text-neutral-300 hover:text-white hover:border-neutral-600'
+        )}
+      >
+        <Heart className={cn('h-3.5 w-3.5', isVotedByMe ? 'fill-black text-black' : 'text-neutral-400')} />
+        <span>{isVotedByMe ? 'Voted' : 'Vote for this Story'}</span>
+        {voteCount > 0 && (
+          <span className="font-mono text-[10px] font-bold text-neutral-400">({voteCount})</span>
+        )}
+      </Button>
     </div>
   );
 }

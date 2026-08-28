@@ -76,7 +76,7 @@ export function RoomCodeInput({
   };
 
   return (
-    <div className="flex items-center justify-center gap-2 sm:gap-3" onPaste={handlePaste}>
+    <div className="flex items-center justify-center gap-1.5 sm:gap-2" onPaste={handlePaste}>
       {Array.from({ length }).map((_, i) => (
         <input
           key={i}
@@ -91,10 +91,10 @@ export function RoomCodeInput({
           onChange={(e) => handleChange(i, e)}
           onKeyDown={(e) => handleKeyDown(i, e)}
           className={cn(
-            'sm:w-13 h-14 w-11 rounded-xl border bg-background/80 text-center font-mono text-2xl font-extrabold uppercase transition-all focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-primary sm:h-16',
+            'h-10 w-9 sm:h-11 sm:w-10 rounded-[4px] border bg-[#161616] text-center font-mono text-lg font-bold uppercase transition-colors focus:border-white focus:outline-none select-none',
             chars[i]
-              ? 'border-brand-primary/80 bg-brand-primary/5 text-foreground shadow-glow'
-              : 'border-border/80 text-muted-foreground'
+              ? 'border-white text-white'
+              : 'border-[#262626] text-neutral-400'
           )}
         />
       ))}

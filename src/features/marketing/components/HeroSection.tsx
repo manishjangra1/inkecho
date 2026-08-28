@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Play, Sparkles, Users, ArrowRight, Pencil, MessageSquare, Flame } from 'lucide-react';
+import { Play, Sparkles, Users, ArrowRight, Pencil, MessageSquare } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Card } from '@/shared/ui/card';
 import { Badge } from '@/shared/ui/badge';
@@ -30,16 +30,6 @@ export function HeroSection() {
             transition={{ duration: MOTION.duration.slow, ease: MOTION.ease.out }}
             className="flex flex-col items-start space-y-6 text-left lg:col-span-7"
           >
-            {/* Pill Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-muted/40 px-3.5 py-1.5 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur-sm">
-              <span className="flex h-2 w-2 animate-pulse rounded-full bg-game-ready" />
-              <span>Realtime Party Game 2.0</span>
-              <span className="text-border">|</span>
-              <span className="flex items-center gap-1 font-semibold text-brand-accent">
-                <Flame className="h-3.5 w-3.5 text-amber-500" /> Free to play
-              </span>
-            </div>
-
             {/* Headline */}
             <h1 className="font-display text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-6xl lg:text-6xl">
               <span>{COMMON_COPY.HERO.TITLE}</span>{' '}
