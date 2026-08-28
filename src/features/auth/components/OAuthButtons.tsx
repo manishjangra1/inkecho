@@ -24,7 +24,7 @@ export function OAuthButtons({ callbackUrl = '/' }: { callbackUrl?: string }) {
   };
 
   return (
-    <div className="grid grid-cols-2 gap-3 w-full">
+    <div className="grid w-full grid-cols-2 gap-3">
       <Button
         type="button"
         variant="outline"

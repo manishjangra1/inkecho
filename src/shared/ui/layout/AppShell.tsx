@@ -8,9 +8,12 @@ export interface AppShellProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function AppShell({ header, footer, children, className, ...props }: AppShellProps) {
   return (
-    <div className={cn('min-h-screen flex flex-col bg-background text-foreground', className)} {...props}>
+    <div
+      className={cn('flex min-h-screen flex-col bg-background text-foreground', className)}
+      {...props}
+    >
       {header}
-      <main className="flex-1 flex flex-col">{children}</main>
+      <main className="flex flex-1 flex-col">{children}</main>
       {footer}
     </div>
   );

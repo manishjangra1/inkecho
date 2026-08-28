@@ -173,4 +173,98 @@ describe('GameService', () => {
     expect(eventPublisher.descriptionSubmitted).toHaveBeenCalledTimes(1);
     expect(eventPublisher.turnChanged).toHaveBeenCalledTimes(1);
   });
+
+  it('submitDrawing rejects submission when current turn phase is not DRAW', async () => {
+    vi.mocked(gameRepository.findActiveByRoomId).mockResolvedValue(ok(mockGameEntity)); // turnPhase is DESCRIBE
+
+    const activePlayerCtx: AuthContext = {
+      type: 'guest',
+      guestSessionId: 'g_1',
+      playerId: 'player_1',
+      roomId: 'room_123',
+      displayName: 'Alice',
+      role: 'PLAYER',
+    };
+
+    const res = await service.submitDrawing(
+      {
+        roomCode: 'TEST01',
+        roomId: 'room_123',
+        expectedVersion: 1,
+        imageDataUrl: 'data:image/webp;base64,mock',
+      },
+      activePlayerCtx
+    );
+
+    expect(res.ok).toBe(false);
+    if (res.ok) return;
+    expect(res.error.code).toBe('INVALID_GAME_TRANSITION');
+  });
+
+  it('submitDrawing successfully transitions DRAW phase and publishes drawingSubmitted event', async () => {
+    const drawPhaseGameEntity: GameEntity = {
+      ...mockGameEntity,
+      turnPhase: 'DRAW',
+      activePlayerId: 'player_1',
+    };
+
+    vi.mocked(gameRepository.findActiveByRoomId).mockResolvedValue(ok(drawPhaseGameEntity));
+    vi.mocked(roomRepository.findById).mockResolvedValue(
+      ok({
+        id: 'room_123',
+        code: 'TEST01',
+        hostPlayerId: 'player_1',
+        visibility: 'PUBLIC',
+        status: 'IN_PROGRESS',
+        settings: {
+          maxPlayers: 8,
+          minPlayers: 3,
+          roundCount: 1,
+          describeTimerSec: 60,
+          drawTimerSec: 90,
+          profanityFilter: false,
+          allowSpectators: true,
+        },
+        participants: [],
+        spectators: [],
+        canStart: false,
+        canStartReasons: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+    );
+
+    const updatedEntity: GameEntity = {
+      ...drawPhaseGameEntity,
+      version: 2,
+      currentTurnIndex: 1,
+      turnPhase: 'DESCRIBE',
+      activePlayerId: 'player_2',
+    };
+
+    vi.mocked(gameRepository.updateWithVersion).mockResolvedValue(ok(updatedEntity));
+
+    const activePlayerCtx: AuthContext = {
+      type: 'guest',
+      guestSessionId: 'g_1',
+      playerId: 'player_1',
+      roomId: 'room_123',
+      displayName: 'Alice',
+      role: 'PLAYER',
+    };
+
+    const res = await service.submitDrawing(
+      {
+        roomCode: 'TEST01',
+        roomId: 'room_123',
+        expectedVersion: 1,
+        imageDataUrl: 'data:image/webp;base64,mockdrawingdata',
+      },
+      activePlayerCtx
+    );
+
+    expect(res.ok).toBe(true);
+    expect(eventPublisher.drawingSubmitted).toHaveBeenCalledTimes(1);
+    expect(eventPublisher.turnChanged).toHaveBeenCalledTimes(1);
+  });
 });

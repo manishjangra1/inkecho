@@ -97,10 +97,27 @@ export class PayloadTooLargeError extends AppError {
 }
 
 export class ExternalServiceError extends AppError {
-  readonly code = 'EXTERNAL_SERVICE_ERROR';
+  readonly code: string;
   readonly statusCode = 502;
   override readonly isOperational = false;
-  constructor(message: string = 'Service temporarily unavailable.') {
+  constructor(
+    message: string = 'Service temporarily unavailable.',
+    code: string = 'EXTERNAL_SERVICE_ERROR'
+  ) {
     super(message);
+    this.code = code;
+  }
+}
+
+export class InternalError extends AppError {
+  readonly code: string;
+  readonly statusCode = 500;
+  override readonly isOperational = false;
+  constructor(
+    code: string = 'INTERNAL_ERROR',
+    message: string = 'An internal server error occurred.'
+  ) {
+    super(message);
+    this.code = code;
   }
 }

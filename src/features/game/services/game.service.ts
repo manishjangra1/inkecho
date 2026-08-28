@@ -21,9 +21,12 @@ import {
   type GameSnapshotDto,
 } from '@/infrastructure/db/mappers/game.mapper';
 import { computeTurnEndsAt, getPhaseDurationSeconds } from '@/domain/timer/timer-calculator';
+import { cloudinaryService } from '@/infrastructure/storage/cloudinary.service';
 import type {
   SubmitDescriptionInput,
   SubmitDescriptionResponse,
+  SubmitDrawingInput,
+  SubmitDrawingResponse,
   PauseGameResponse,
   ResumeGameResponse,
 } from '../types/game.types';
@@ -169,14 +172,127 @@ export class GameService {
       updatedGame.version
     );
 
-    await eventPublisher.turnChanged(
-      dto.roomId,
-      updatedGame,
-      { chainIndex: game.currentChainIndex, turnIndex: game.currentTurnIndex }
-    );
+    await eventPublisher.turnChanged(dto.roomId, updatedGame, {
+      chainIndex: game.currentChainIndex,
+      turnIndex: game.currentTurnIndex,
+    });
 
     return ok({
       version: updatedGame.version,
+      gameStatus: updatedGame.status,
+      currentTurn: toTurnSnapshotDto(updatedGame, ctx.playerId),
+    });
+  }
+
+  /**
+   * Submits a drawing image for the active turn.
+   */
+  async submitDrawing(
+    dto: SubmitDrawingInput,
+    ctx: AuthContext
+  ): Promise<Result<SubmitDrawingResponse, AppError>> {
+    authorize(ctx, 'game:submit');
+
+    if (ctx.type === 'anonymous' || !ctx.playerId) {
+      return err(new ForbiddenError('NOT_IN_ROOM', 'Must have an active player session.'));
+    }
+
+    const activeGameResult = await gameRepository.findActiveByRoomId(dto.roomId);
+    if (!activeGameResult.ok || !activeGameResult.value) {
+      return err(new NotFoundError('GAME_NOT_FOUND', 'Active game session not found.'));
+    }
+
+    const game = activeGameResult.value;
+
+    if (game.activePlayerId !== ctx.playerId) {
+      return err(new ForbiddenError('NOT_YOUR_TURN', 'It is not your turn to submit.'));
+    }
+
+    if (game.turnPhase !== 'DRAW') {
+      return err(new ConflictError('INVALID_GAME_TRANSITION', 'Current turn phase is not DRAW.'));
+    }
+
+    // Determine drawing image payload (Buffer, data URL, or base64)
+    const imagePayload = dto.imageBuffer || dto.imageDataUrl || dto.imageBase64;
+    if (!imagePayload) {
+      return err(new ValidationError('Drawing image payload is required.'));
+    }
+
+    // Upload to Cloudinary
+    const uploadResult = await cloudinaryService.uploadDrawing(imagePayload, {
+      publicId: `game_${game.id}_c${game.currentChainIndex}_t${game.currentTurnIndex}_${ctx.playerId}`,
+    });
+
+    if (!uploadResult.ok) {
+      return err(uploadResult.error);
+    }
+
+    const roomResult = await roomRepository.findById(dto.roomId);
+    const settings = roomResult.ok
+      ? roomResult.value.settings
+      : { describeTimerSec: 60, drawTimerSec: 90 };
+
+    const transitionRes = transitionGame(game, {
+      type: 'SUBMIT_DRAWING',
+      playerId: ctx.playerId,
+      drawingUrl: uploadResult.value.url,
+      drawingPublicId: uploadResult.value.publicId,
+      describeTimerSec: settings.describeTimerSec,
+      drawTimerSec: settings.drawTimerSec,
+    });
+
+    if (!transitionRes.ok) {
+      return err(
+        new ConflictError(
+          transitionRes.error.code,
+          transitionRes.error.message,
+          transitionRes.error.context
+        )
+      );
+    }
+
+    const nextGameState = transitionRes.value;
+
+    // Optimistically update DB with expectedVersion check
+    const updateResult = await gameRepository.updateWithVersion(
+      game.id,
+      dto.expectedVersion,
+      () => ({
+        currentRoundIndex: nextGameState.currentRoundIndex,
+        currentChainIndex: nextGameState.currentChainIndex,
+        currentTurnIndex: nextGameState.currentTurnIndex,
+        turnPhase: nextGameState.turnPhase,
+        activePlayerId: nextGameState.activePlayerId,
+        turnStartedAt: nextGameState.turnStartedAt,
+        turnEndsAt: nextGameState.turnEndsAt,
+        status: nextGameState.status,
+        chains: chainsToPrisma(nextGameState.chains),
+      })
+    );
+
+    if (!updateResult.ok) {
+      return err(updateResult.error);
+    }
+
+    const updatedGame = updateResult.value;
+
+    // Broadcast Realtime events
+    await eventPublisher.drawingSubmitted(
+      dto.roomId,
+      game.currentChainIndex,
+      game.currentTurnIndex,
+      ctx.playerId,
+      updatedGame.version
+    );
+
+    await eventPublisher.turnChanged(dto.roomId, updatedGame, {
+      chainIndex: game.currentChainIndex,
+      turnIndex: game.currentTurnIndex,
+    });
+
+    return ok({
+      version: updatedGame.version,
+      drawingUrl: uploadResult.value.url,
       gameStatus: updatedGame.status,
       currentTurn: toTurnSnapshotDto(updatedGame, ctx.playerId),
     });
@@ -206,24 +322,15 @@ export class GameService {
     const pauseTransition = transitionGame(game, { type: 'PAUSE' });
 
     if (!pauseTransition.ok) {
-      return err(
-        new ConflictError(
-          pauseTransition.error.code,
-          pauseTransition.error.message
-        )
-      );
+      return err(new ConflictError(pauseTransition.error.code, pauseTransition.error.message));
     }
 
     const nextState = pauseTransition.value;
-    const updateRes = await gameRepository.updateWithVersion(
-      game.id,
-      game.version,
-      () => ({
-        status: 'PAUSED',
-        pausedAt: nextState.pausedAt,
-        pauseRemainingMs: nextState.pauseRemainingMs,
-      })
-    );
+    const updateRes = await gameRepository.updateWithVersion(game.id, game.version, () => ({
+      status: 'PAUSED',
+      pausedAt: nextState.pausedAt,
+      pauseRemainingMs: nextState.pauseRemainingMs,
+    }));
 
     if (!updateRes.ok) {
       return err(updateRes.error);
@@ -269,33 +376,22 @@ export class GameService {
     const resumeTransition = transitionGame(game, { type: 'RESUME' });
 
     if (!resumeTransition.ok) {
-      return err(
-        new ConflictError(
-          resumeTransition.error.code,
-          resumeTransition.error.message
-        )
-      );
+      return err(new ConflictError(resumeTransition.error.code, resumeTransition.error.message));
     }
 
     const nextState = resumeTransition.value;
-    const updateRes = await gameRepository.updateWithVersion(
-      game.id,
-      game.version,
-      () => ({
-        status: 'IN_PROGRESS',
-        pausedAt: null,
-        pauseRemainingMs: null,
-        turnEndsAt: nextState.turnEndsAt,
-      })
-    );
+    const updateRes = await gameRepository.updateWithVersion(game.id, game.version, () => ({
+      status: 'IN_PROGRESS',
+      pausedAt: null,
+      pauseRemainingMs: null,
+      turnEndsAt: nextState.turnEndsAt,
+    }));
 
     if (!updateRes.ok) {
       return err(updateRes.error);
     }
 
-    const remainingSec = Math.ceil(
-      (nextState.turnEndsAt.getTime() - Date.now()) / 1000
-    );
+    const remainingSec = Math.ceil((nextState.turnEndsAt.getTime() - Date.now()) / 1000);
 
     await eventPublisher.gameResumed(
       room.id,
@@ -345,28 +441,23 @@ export class GameService {
     }
 
     const nextState = expiryTransition.value;
-    const updateRes = await gameRepository.updateWithVersion(
-      game.id,
-      game.version,
-      () => ({
-        currentRoundIndex: nextState.currentRoundIndex,
-        currentChainIndex: nextState.currentChainIndex,
-        currentTurnIndex: nextState.currentTurnIndex,
-        turnPhase: nextState.turnPhase,
-        activePlayerId: nextState.activePlayerId,
-        turnStartedAt: nextState.turnStartedAt,
-        turnEndsAt: nextState.turnEndsAt,
-        status: nextState.status,
-        chains: chainsToPrisma(nextState.chains),
-      })
-    );
+    const updateRes = await gameRepository.updateWithVersion(game.id, game.version, () => ({
+      currentRoundIndex: nextState.currentRoundIndex,
+      currentChainIndex: nextState.currentChainIndex,
+      currentTurnIndex: nextState.currentTurnIndex,
+      turnPhase: nextState.turnPhase,
+      activePlayerId: nextState.activePlayerId,
+      turnStartedAt: nextState.turnStartedAt,
+      turnEndsAt: nextState.turnEndsAt,
+      status: nextState.status,
+      chains: chainsToPrisma(nextState.chains),
+    }));
 
     if (updateRes.ok) {
-      await eventPublisher.turnChanged(
-        game.roomId,
-        updateRes.value,
-        { chainIndex: game.currentChainIndex, turnIndex: game.currentTurnIndex }
-      );
+      await eventPublisher.turnChanged(game.roomId, updateRes.value, {
+        chainIndex: game.currentChainIndex,
+        turnIndex: game.currentTurnIndex,
+      });
     }
 
     return updateRes;
@@ -390,8 +481,7 @@ export class GameService {
       return err(new NotFoundError('GAME_NOT_FOUND', 'Active game not found.'));
     }
 
-    const viewerPlayerId =
-      ctx.type !== 'anonymous' && ctx.playerId ? ctx.playerId : 'spectator';
+    const viewerPlayerId = ctx.type !== 'anonymous' && ctx.playerId ? ctx.playerId : 'spectator';
 
     return ok(toGameSnapshotDto(gameRes.value, viewerPlayerId));
   }

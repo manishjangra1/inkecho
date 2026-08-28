@@ -1,6 +1,9 @@
 'use server';
 
-import { updateRoomSettingsSchema, type UpdateRoomSettingsInput } from '../schemas/room-settings.schema';
+import {
+  updateRoomSettingsSchema,
+  type UpdateRoomSettingsInput,
+} from '../schemas/room-settings.schema';
 import { roomService } from '../services/room.service';
 import { getAuthContext } from '@/infrastructure/auth/session';
 import { handleActionError } from '@/shared/lib/errors/handle-action-error';

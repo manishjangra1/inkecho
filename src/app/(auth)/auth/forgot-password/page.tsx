@@ -16,10 +16,7 @@ export default function ForgotPasswordPage() {
       footer={
         <p className="text-center text-xs text-muted-foreground">
           Remembered your password?{' '}
-          <Link
-            href={ROUTES.AUTH.LOGIN}
-            className="font-medium text-brand-primary hover:underline"
-          >
+          <Link href={ROUTES.AUTH.LOGIN} className="font-medium text-brand-primary hover:underline">
             Sign in
           </Link>
         </p>

@@ -16,11 +16,7 @@ export interface DescribePhaseProps {
   readonly currentTurn: TurnSnapshotDto;
 }
 
-export function DescribePhase({
-  roomCode,
-  roomId,
-  currentTurn,
-}: DescribePhaseProps) {
+export function DescribePhase({ roomCode, roomId, currentTurn }: DescribePhaseProps) {
   const [text, setText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const version = useGameStore((state) => state.game?.version ?? 1);
@@ -63,14 +59,10 @@ export function DescribePhase({
   const charsLeft = GAME_CONFIG.MAX_DESCRIPTION_LENGTH - text.length;
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-300">
-      <div className="text-center space-y-1.5">
-        <h2 className="text-2xl font-bold tracking-tight">
-          {GAME_COPY.DESCRIBE_PHASE_TITLE}
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          {GAME_COPY.DESCRIBE_PHASE_SUBTITLE}
-        </p>
+    <div className="mx-auto w-full max-w-2xl space-y-6 duration-300 animate-in fade-in slide-in-from-bottom-3">
+      <div className="space-y-1.5 text-center">
+        <h2 className="text-2xl font-bold tracking-tight">{GAME_COPY.DESCRIBE_PHASE_TITLE}</h2>
+        <p className="text-sm text-muted-foreground">{GAME_COPY.DESCRIBE_PHASE_SUBTITLE}</p>
       </div>
 
       {currentTurn.promptContext && (
@@ -82,7 +74,7 @@ export function DescribePhase({
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="relative rounded-2xl border bg-card/60 backdrop-blur-md p-4 shadow-sm focus-within:ring-2 focus-within:ring-primary/40 transition-all">
+        <div className="relative rounded-2xl border bg-card/60 p-4 shadow-sm backdrop-blur-md transition-all focus-within:ring-2 focus-within:ring-primary/40">
           <label htmlFor="describe-input" className="sr-only">
             {GAME_COPY.DESCRIBE_INPUT_LABEL}
           </label>
@@ -93,12 +85,12 @@ export function DescribePhase({
             placeholder={GAME_COPY.DESCRIBE_INPUT_PLACEHOLDER}
             disabled={isSubmitting}
             rows={4}
-            className="w-full bg-transparent border-0 resize-none text-base sm:text-lg focus:outline-none placeholder:text-muted-foreground/60 leading-relaxed"
+            className="w-full resize-none border-0 bg-transparent text-base leading-relaxed placeholder:text-muted-foreground/60 focus:outline-none sm:text-lg"
             autoFocus
           />
-          <div className="flex items-center justify-between pt-2 border-t border-border/50 text-xs text-muted-foreground">
+          <div className="flex items-center justify-between border-t border-border/50 pt-2 text-xs text-muted-foreground">
             <span>Make it fun and imaginative!</span>
-            <span className={charsLeft < 20 ? 'text-amber-500 font-bold' : ''}>
+            <span className={charsLeft < 20 ? 'font-bold text-amber-500' : ''}>
               {charsLeft} chars left
             </span>
           </div>

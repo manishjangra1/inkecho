@@ -14,13 +14,7 @@ export interface UseAblyRoomParams {
   readonly onMessage?: (message: Ably.Message) => void;
 }
 
-export function useAblyRoom({
-  roomId,
-  playerId,
-  displayName,
-  role,
-  onMessage,
-}: UseAblyRoomParams) {
+export function useAblyRoom({ roomId, playerId, displayName, role, onMessage }: UseAblyRoomParams) {
   const [connectionState, setConnectionState] = useState<ConnectionState>('connecting');
   const clientRef = useRef<Ably.Realtime | null>(null);
   const channelRef = useRef<Ably.RealtimeChannel | null>(null);
@@ -64,7 +58,6 @@ export function useAblyRoom({
       };
 
       channel.presence.enter(presenceData).catch(() => {});
-
     } catch {
       setConnectionState('disconnected');
     }

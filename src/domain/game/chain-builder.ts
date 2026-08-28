@@ -29,11 +29,7 @@ export interface BuildInitialChainsParams {
 /**
  * Creates an empty turn shell assigned to a specific player.
  */
-export function createTurnEntity(
-  id: string,
-  turnIndex: number,
-  playerId: string
-): GameTurnEntity {
+export function createTurnEntity(id: string, turnIndex: number, playerId: string): GameTurnEntity {
   return {
     id,
     turnIndex,
@@ -58,8 +54,7 @@ export function buildInitialChains(params: BuildInitialChainsParams): GameChainE
   const effectiveRoundCount = Math.max(1, roundCount);
 
   for (let c = 0; c < effectiveRoundCount; c++) {
-    const starterPrompt =
-      starterPrompts[c] || `Round ${c + 1} Starter Prompt`;
+    const starterPrompt = starterPrompts[c] || `Round ${c + 1} Starter Prompt`;
 
     // Generate initial turn slot for turn 0
     const turns: GameTurnEntity[] = [];

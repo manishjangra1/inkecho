@@ -15,13 +15,7 @@ export function ThemeToggle({ className }: { className?: string }) {
 
   if (!mounted) {
     return (
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-label="Toggle theme"
-        className={className}
-        disabled
-      >
+      <Button variant="ghost" size="icon" aria-label="Toggle theme" className={className} disabled>
         <span className="h-5 w-5" />
       </Button>
     );
@@ -38,9 +32,9 @@ export function ThemeToggle({ className }: { className?: string }) {
       className={className}
     >
       {isDark ? (
-        <Sun className="h-5 w-5 text-amber-400 transition-all duration-300 rotate-0 scale-100" />
+        <Sun className="h-5 w-5 rotate-0 scale-100 text-amber-400 transition-all duration-300" />
       ) : (
-        <Moon className="h-5 w-5 text-violet-600 transition-all duration-300 rotate-0 scale-100" />
+        <Moon className="h-5 w-5 rotate-0 scale-100 text-violet-600 transition-all duration-300" />
       )}
     </Button>
   );

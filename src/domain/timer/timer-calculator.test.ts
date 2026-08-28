@@ -1,8 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  calculateRemainingSeconds,
-  isTimerExpired,
-} from './timer-calculator';
+import { calculateRemainingSeconds, isTimerExpired } from './timer-calculator';
 import { calculatePauseRemainingMs, calculateResumeTurnEndsAt } from './timer-rules';
 
 describe('Timer Calculator & Rules', () => {

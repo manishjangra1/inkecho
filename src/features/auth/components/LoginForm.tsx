@@ -26,7 +26,9 @@ export function LoginForm() {
   React.useEffect(() => {
     if (authError) {
       if (authError === 'OAuthAccountNotLinked') {
-        toast.error('To confirm your identity, please sign in with the original provider or password.');
+        toast.error(
+          'To confirm your identity, please sign in with the original provider or password.'
+        );
       } else if (authError === 'CredentialsSignin') {
         toast.error('Invalid email or password.');
       } else {
@@ -97,9 +99,7 @@ export function LoginForm() {
             {...register('email')}
             error={!!errors.email}
           />
-          {errors.email && (
-            <p className="text-xs text-destructive">{errors.email.message}</p>
-          )}
+          {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
         </div>
 
         <div className="space-y-2">
@@ -120,14 +120,15 @@ export function LoginForm() {
             {...register('password')}
             error={!!errors.password}
           />
-          {errors.password && (
-            <p className="text-xs text-destructive">{errors.password.message}</p>
-          )}
+          {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
         </div>
 
         <div className="flex items-center space-x-2 pt-1">
           <Checkbox id="rememberMe" defaultChecked {...register('rememberMe')} />
-          <Label htmlFor="rememberMe" className="text-xs font-normal text-muted-foreground cursor-pointer">
+          <Label
+            htmlFor="rememberMe"
+            className="cursor-pointer text-xs font-normal text-muted-foreground"
+          >
             Remember me for 30 days
           </Label>
         </div>

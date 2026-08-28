@@ -47,9 +47,9 @@ export function ReadyButton({ roomCode, isReady, onToggled }: ReadyButtonProps) 
       onClick={handleToggle}
       isLoading={isLoading}
       disabled={isLoading}
-      className={`min-w-[140px] font-semibold gap-2 ${
+      className={`min-w-[140px] gap-2 font-semibold ${
         isReady
-          ? 'bg-game-ready/20 text-game-ready border border-game-ready/40 hover:bg-game-ready/30'
+          ? 'border border-game-ready/40 bg-game-ready/20 text-game-ready hover:bg-game-ready/30'
           : 'shadow-glow'
       }`}
     >

@@ -11,23 +11,17 @@ export interface PauseOverlayProps {
   readonly isResuming?: boolean;
 }
 
-export function PauseOverlay({
-  isHost,
-  onResume,
-  isResuming,
-}: PauseOverlayProps) {
+export function PauseOverlay({ isHost, onResume, isResuming }: PauseOverlayProps) {
   return (
-    <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
-      <div className="max-w-md w-full p-8 rounded-3xl border bg-card text-center space-y-6 shadow-2xl">
-        <div className="mx-auto w-16 h-16 rounded-full bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20">
-          <PauseCircle className="w-8 h-8" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-md duration-200 animate-in fade-in">
+      <div className="w-full max-w-md space-y-6 rounded-3xl border bg-card p-8 text-center shadow-2xl">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-amber-500/20 bg-amber-500/10 text-amber-400">
+          <PauseCircle className="h-8 w-8" />
         </div>
 
         <div className="space-y-2">
-          <h3 className="text-2xl font-bold tracking-tight">
-            {GAME_COPY.PAUSED_TITLE}
-          </h3>
-          <p className="text-muted-foreground text-sm leading-relaxed">
+          <h3 className="text-2xl font-bold tracking-tight">{GAME_COPY.PAUSED_TITLE}</h3>
+          <p className="text-sm leading-relaxed text-muted-foreground">
             {GAME_COPY.PAUSED_SUBTITLE}
           </p>
         </div>
@@ -36,13 +30,13 @@ export function PauseOverlay({
           <Button
             onClick={onResume}
             disabled={isResuming}
-            className="w-full font-semibold py-6 text-base"
+            className="w-full py-6 text-base font-semibold"
           >
-            <Play className="w-5 h-5 mr-2" />
+            <Play className="mr-2 h-5 w-5" />
             {GAME_COPY.RESUME_BUTTON}
           </Button>
         ) : (
-          <p className="text-xs text-muted-foreground font-mono">
+          <p className="font-mono text-xs text-muted-foreground">
             Waiting for room host to resume the session...
           </p>
         )}

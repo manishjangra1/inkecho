@@ -13,11 +13,7 @@ const serverSchema = z.object({
     ),
   NEXTAUTH_URL: z
     .string()
-    .default(
-      process.env.BETTER_AUTH_URL ||
-        process.env.NEXTAUTH_URL ||
-        'http://localhost:3000'
-    ),
+    .default(process.env.BETTER_AUTH_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000'),
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
   GITHUB_CLIENT_ID: z.string().optional(),
@@ -25,10 +21,7 @@ const serverSchema = z.object({
   GUEST_SESSION_SECRET: z
     .string()
     .min(1)
-    .default(
-      process.env.GUEST_SESSION_SECRET ||
-        'development_guest_secret_32_characters_long'
-    ),
+    .default(process.env.GUEST_SESSION_SECRET || 'development_guest_secret_32_characters_long'),
   GUEST_SESSION_TTL_HOURS: z.coerce.number().default(24),
   ABLY_API_KEY: z.string().default('dummy:dummy'),
   ABLY_TOKEN_TTL_SECONDS: z.coerce.number().default(3600),

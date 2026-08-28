@@ -23,7 +23,7 @@ export function PlayerGrid({
   const emptySlotsCount = Math.max(0, maxPlayers - participants.length);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {participants.map((player) => (
         <PlayerCard
           key={player.playerId}
@@ -39,7 +39,7 @@ export function PlayerGrid({
       {Array.from({ length: emptySlotsCount }).map((_, i) => (
         <Card
           key={`empty-${i}`}
-          className="p-4 border-dashed border-border/50 bg-card/20 flex items-center justify-center min-h-[82px] text-muted-foreground/40 gap-2 select-none"
+          className="flex min-h-[82px] select-none items-center justify-center gap-2 border-dashed border-border/50 bg-card/20 p-4 text-muted-foreground/40"
         >
           <UserPlus className="h-4 w-4" />
           <span className="text-xs font-medium">Waiting for player...</span>

@@ -15,11 +15,11 @@ export function PublicRoomCard({ room }: PublicRoomCardProps) {
   return (
     <Card
       variant="interactive"
-      className="border-border/60 bg-card/60 backdrop-blur-sm p-2 flex flex-col justify-between"
+      className="flex flex-col justify-between border-border/60 bg-card/60 p-2 backdrop-blur-sm"
     >
       <CardHeader className="space-y-2 p-4 pb-2">
         <div className="flex items-center justify-between">
-          <span className="font-mono font-bold text-lg tracking-wider text-brand-primary">
+          <span className="font-mono text-lg font-bold tracking-wider text-brand-primary">
             {room.code}
           </span>
           <Badge variant={isAlmostFull ? 'secondary' : 'default'} className="gap-1">
@@ -27,8 +27,8 @@ export function PublicRoomCard({ room }: PublicRoomCardProps) {
             {room.playerCount}/{room.maxPlayers}
           </Badge>
         </div>
-        <CardTitle className="text-sm font-medium text-muted-foreground truncate">
-          Host: <span className="text-foreground font-semibold">{room.hostDisplayName}</span>
+        <CardTitle className="truncate text-sm font-medium text-muted-foreground">
+          Host: <span className="font-semibold text-foreground">{room.hostDisplayName}</span>
         </CardTitle>
       </CardHeader>
 
@@ -36,11 +36,15 @@ export function PublicRoomCard({ room }: PublicRoomCardProps) {
         <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
             <Flame className="h-3.5 w-3.5 text-brand-secondary" />
-            <span>{room.roundCount} Round{room.roundCount > 1 ? 's' : ''}</span>
+            <span>
+              {room.roundCount} Round{room.roundCount > 1 ? 's' : ''}
+            </span>
           </div>
           <div className="flex items-center gap-1">
             <Clock className="h-3.5 w-3.5 text-brand-accent" />
-            <span>{room.drawTimerSec}s / {room.describeTimerSec}s</span>
+            <span>
+              {room.drawTimerSec}s / {room.describeTimerSec}s
+            </span>
           </div>
         </div>
 

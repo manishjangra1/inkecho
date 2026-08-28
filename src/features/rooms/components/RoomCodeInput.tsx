@@ -62,7 +62,10 @@ export function RoomCodeInput({
 
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    const pasted = e.clipboardData.getData('text').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const pasted = e.clipboardData
+      .getData('text')
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, '');
     if (!pasted) return;
 
     const trimmed = pasted.slice(0, length);
@@ -88,9 +91,9 @@ export function RoomCodeInput({
           onChange={(e) => handleChange(i, e)}
           onKeyDown={(e) => handleKeyDown(i, e)}
           className={cn(
-            'w-11 h-14 sm:w-13 sm:h-16 text-center font-mono font-extrabold text-2xl uppercase rounded-xl border bg-background/80 transition-all focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent',
+            'sm:w-13 h-14 w-11 rounded-xl border bg-background/80 text-center font-mono text-2xl font-extrabold uppercase transition-all focus:border-transparent focus:outline-none focus:ring-2 focus:ring-brand-primary sm:h-16',
             chars[i]
-              ? 'border-brand-primary/80 shadow-glow bg-brand-primary/5 text-foreground'
+              ? 'border-brand-primary/80 bg-brand-primary/5 text-foreground shadow-glow'
               : 'border-border/80 text-muted-foreground'
           )}
         />

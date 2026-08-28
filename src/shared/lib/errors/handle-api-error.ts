@@ -14,7 +14,10 @@ export interface ApiErrorResponse {
   };
 }
 
-export function handleApiError(error: unknown, correlationId: string): NextResponse<ApiErrorResponse> {
+export function handleApiError(
+  error: unknown,
+  correlationId: string
+): NextResponse<ApiErrorResponse> {
   if (error instanceof ZodError) {
     logger.warn({ err: error, correlationId }, 'API request validation failed');
     return NextResponse.json(

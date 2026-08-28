@@ -14,21 +14,19 @@ export function WaitingPhase({ phase, activePlayerName }: WaitingPhaseProps) {
   const isDescribe = phase === 'DESCRIBE';
 
   return (
-    <div className="w-full max-w-lg mx-auto py-16 px-6 text-center space-y-6 rounded-3xl border bg-card/40 backdrop-blur-md shadow-lg animate-in fade-in zoom-in-95 duration-300">
-      <div className="relative mx-auto w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
-        <div className="absolute inset-0 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+    <div className="mx-auto w-full max-w-lg space-y-6 rounded-3xl border bg-card/40 px-6 py-16 text-center shadow-lg backdrop-blur-md duration-300 animate-in fade-in zoom-in-95">
+      <div className="relative mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-primary/20 bg-primary/10">
+        <div className="absolute inset-0 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
         {isDescribe ? (
-          <FileText className="w-8 h-8 text-primary" />
+          <FileText className="h-8 w-8 text-primary" />
         ) : (
-          <Pencil className="w-8 h-8 text-primary" />
+          <Pencil className="h-8 w-8 text-primary" />
         )}
       </div>
 
       <div className="space-y-2">
-        <h3 className="text-2xl font-bold tracking-tight">
-          {GAME_COPY.WAITING_TITLE}
-        </h3>
-        <p className="text-muted-foreground text-sm max-w-sm mx-auto leading-relaxed">
+        <h3 className="text-2xl font-bold tracking-tight">{GAME_COPY.WAITING_TITLE}</h3>
+        <p className="mx-auto max-w-sm text-sm leading-relaxed text-muted-foreground">
           <span className="font-semibold text-foreground">
             {activePlayerName || 'Another player'}
           </span>{' '}
@@ -37,8 +35,8 @@ export function WaitingPhase({ phase, activePlayerName }: WaitingPhaseProps) {
         </p>
       </div>
 
-      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-muted/60 text-xs text-muted-foreground font-medium">
-        <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
+      <div className="inline-flex items-center gap-2 rounded-full bg-muted/60 px-4 py-1.5 text-xs font-medium text-muted-foreground">
+        <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
         <span>Waiting for turn submission...</span>
       </div>
     </div>

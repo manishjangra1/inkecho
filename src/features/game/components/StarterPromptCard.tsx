@@ -9,11 +9,5 @@ export interface StarterPromptCardProps {
 }
 
 export function StarterPromptCard({ text, className }: StarterPromptCardProps) {
-  return (
-    <PromptCard
-      type="STARTER_PROMPT"
-      text={text}
-      className={className}
-    />
-  );
+  return <PromptCard type="STARTER_PROMPT" text={text} className={className} />;
 }

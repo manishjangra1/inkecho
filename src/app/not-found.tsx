@@ -7,18 +7,19 @@ import { ROUTES } from '@/shared/constants/routes';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <Container size="sm">
-        <Card variant="glass" className="p-8 text-center space-y-6">
+        <Card variant="glass" className="space-y-6 p-8 text-center">
           <div className="space-y-2">
-            <span className="font-display font-extrabold text-7xl sm:text-8xl bg-gradient-to-r from-brand-primary via-brand-secondary to-brand-accent bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-brand-primary via-brand-secondary to-brand-accent bg-clip-text font-display text-7xl font-extrabold text-transparent sm:text-8xl">
               404
             </span>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground font-display">
+            <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">
               Lost in the Echo?
             </h1>
-            <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-              The page or game room you are looking for does not exist, was closed, or drifted off into the doodle cosmos.
+            <p className="mx-auto max-w-sm text-sm text-muted-foreground">
+              The page or game room you are looking for does not exist, was closed, or drifted off
+              into the doodle cosmos.
             </p>
           </div>
 

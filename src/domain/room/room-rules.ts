@@ -27,7 +27,9 @@ export function evaluateCanStartGame(
   const reasons: string[] = [];
 
   if (activePlayers.length < minPlayers) {
-    reasons.push(`Need at least ${minPlayers} players to start (currently ${activePlayers.length}).`);
+    reasons.push(
+      `Need at least ${minPlayers} players to start (currently ${activePlayers.length}).`
+    );
   }
 
   if (activePlayers.length > maxPlayers) {

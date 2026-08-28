@@ -98,7 +98,7 @@ export function CreateRoomForm() {
             type="button"
             onClick={() => setValue('visibility', 'PRIVATE')}
             className={cn(
-              'flex items-center justify-center gap-2 p-3 rounded-xl border transition-all text-sm font-medium',
+              'flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-medium transition-all',
               visibility === 'PRIVATE'
                 ? 'border-brand-primary bg-brand-primary/10 text-brand-primary ring-1 ring-brand-primary'
                 : 'border-border bg-card/40 text-muted-foreground hover:bg-muted/40'
@@ -111,7 +111,7 @@ export function CreateRoomForm() {
             type="button"
             onClick={() => setValue('visibility', 'PUBLIC')}
             className={cn(
-              'flex items-center justify-center gap-2 p-3 rounded-xl border transition-all text-sm font-medium',
+              'flex items-center justify-center gap-2 rounded-xl border p-3 text-sm font-medium transition-all',
               visibility === 'PUBLIC'
                 ? 'border-brand-primary bg-brand-primary/10 text-brand-primary ring-1 ring-brand-primary'
                 : 'border-border bg-card/40 text-muted-foreground hover:bg-muted/40'
@@ -124,12 +124,12 @@ export function CreateRoomForm() {
       </div>
 
       {/* Sliders for Room Config */}
-      <div className="space-y-5 p-4 rounded-2xl bg-muted/20 border border-border/60">
+      <div className="space-y-5 rounded-2xl border border-border/60 bg-muted/20 p-4">
         {/* Max Players */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium text-foreground">Max Players</span>
-            <span className="font-mono text-xs font-semibold text-brand-primary bg-brand-primary/10 px-2 py-0.5 rounded">
+            <span className="rounded bg-brand-primary/10 px-2 py-0.5 font-mono text-xs font-semibold text-brand-primary">
               {maxPlayers} Players
             </span>
           </div>
@@ -152,7 +152,7 @@ export function CreateRoomForm() {
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium text-foreground">Rounds</span>
-            <span className="font-mono text-xs font-semibold text-brand-secondary bg-brand-secondary/10 px-2 py-0.5 rounded">
+            <span className="rounded bg-brand-secondary/10 px-2 py-0.5 font-mono text-xs font-semibold text-brand-secondary">
               {roundCount} Round{roundCount > 1 ? 's' : ''}
             </span>
           </div>
@@ -175,7 +175,7 @@ export function CreateRoomForm() {
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium text-foreground">Drawing Timer</span>
-            <span className="font-mono text-xs font-semibold text-brand-accent bg-brand-accent/10 px-2 py-0.5 rounded">
+            <span className="rounded bg-brand-accent/10 px-2 py-0.5 font-mono text-xs font-semibold text-brand-accent">
               {drawTimerSec}s
             </span>
           </div>
@@ -198,7 +198,7 @@ export function CreateRoomForm() {
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="font-medium text-foreground">Describe Timer</span>
-            <span className="font-mono text-xs font-semibold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded">
+            <span className="rounded bg-amber-400/10 px-2 py-0.5 font-mono text-xs font-semibold text-amber-400">
               {describeTimerSec}s
             </span>
           </div>
@@ -222,12 +222,10 @@ export function CreateRoomForm() {
       <div className="space-y-4 pt-1">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label htmlFor="allowSpectators" className="text-sm font-medium cursor-pointer">
+            <Label htmlFor="allowSpectators" className="cursor-pointer text-sm font-medium">
               Allow Spectators
             </Label>
-            <p className="text-xs text-muted-foreground">
-              Let late joiners watch the game live
-            </p>
+            <p className="text-xs text-muted-foreground">Let late joiners watch the game live</p>
           </div>
           <Controller
             control={control}
@@ -244,7 +242,7 @@ export function CreateRoomForm() {
 
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label htmlFor="profanityFilter" className="text-sm font-medium cursor-pointer">
+            <Label htmlFor="profanityFilter" className="cursor-pointer text-sm font-medium">
               Profanity Filter
             </Label>
             <p className="text-xs text-muted-foreground">

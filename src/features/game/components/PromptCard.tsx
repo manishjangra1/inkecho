@@ -12,30 +12,25 @@ export interface PromptCardProps {
   readonly className?: string;
 }
 
-export function PromptCard({
-  type,
-  text,
-  drawingUrl,
-  className,
-}: PromptCardProps) {
+export function PromptCard({ type, text, drawingUrl, className }: PromptCardProps) {
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-2xl border bg-card/60 backdrop-blur-md p-6 shadow-md transition-all',
+        'relative overflow-hidden rounded-2xl border bg-card/60 p-6 shadow-md backdrop-blur-md transition-all',
         className
       )}
     >
-      <div className="flex items-center gap-2 mb-3">
+      <div className="mb-3 flex items-center gap-2">
         {type === 'DRAWING' ? (
           <>
-            <ImageIcon className="w-4 h-4 text-emerald-400" />
+            <ImageIcon className="h-4 w-4 text-emerald-400" />
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Prior Drawing to Describe
             </span>
           </>
         ) : (
           <>
-            <Sparkles className="w-4 h-4 text-primary" />
+            <Sparkles className="h-4 w-4 text-primary" />
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               {type === 'STARTER_PROMPT' ? 'Starter Secret Prompt' : 'Prior Prompt'}
             </span>
@@ -44,7 +39,7 @@ export function PromptCard({
       </div>
 
       {type === 'DRAWING' && drawingUrl ? (
-        <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden border bg-black/40 flex items-center justify-center">
+        <div className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-xl border bg-black/40">
           <Image
             src={drawingUrl}
             alt="Drawing to describe"
@@ -54,7 +49,7 @@ export function PromptCard({
           />
         </div>
       ) : (
-        <p className="text-xl sm:text-2xl font-bold tracking-tight text-foreground/90 leading-relaxed font-mono">
+        <p className="font-mono text-xl font-bold leading-relaxed tracking-tight text-foreground/90 sm:text-2xl">
           &ldquo;{text || 'Write anything you want!'}&rdquo;
         </p>
       )}

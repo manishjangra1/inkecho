@@ -55,9 +55,7 @@ export const useGameStore = create<GameStoreState>((set) => ({
       ? Math.ceil(snapshot.pauseRemainingMs / 1000)
       : Math.max(
           0,
-          Math.ceil(
-            (new Date(snapshot.currentTurn.turnEndsAt).getTime() - Date.now()) / 1000
-          )
+          Math.ceil((new Date(snapshot.currentTurn.turnEndsAt).getTime() - Date.now()) / 1000)
         );
 
     set({
@@ -73,9 +71,7 @@ export const useGameStore = create<GameStoreState>((set) => ({
       ? Math.ceil(snapshot.pauseRemainingMs / 1000)
       : Math.max(
           0,
-          Math.ceil(
-            (new Date(snapshot.currentTurn.turnEndsAt).getTime() - Date.now()) / 1000
-          )
+          Math.ceil((new Date(snapshot.currentTurn.turnEndsAt).getTime() - Date.now()) / 1000)
         );
 
     set({
@@ -88,8 +84,7 @@ export const useGameStore = create<GameStoreState>((set) => ({
   setPaused: (isPaused, remainingSeconds) =>
     set((state) => ({
       isPaused,
-      remainingSeconds:
-        remainingSeconds !== undefined ? remainingSeconds : state.remainingSeconds,
+      remainingSeconds: remainingSeconds !== undefined ? remainingSeconds : state.remainingSeconds,
       game: state.game
         ? {
             ...state.game,

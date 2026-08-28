@@ -7,11 +7,7 @@ import {
   type RoomSnapshotDto,
   type RoomListItemDto,
 } from '../mappers/room.mapper';
-import type {
-  RoomVisibility,
-  RoomStatus,
-  RoomCloseReason,
-} from '@prisma/client';
+import type { RoomVisibility, RoomStatus, RoomCloseReason } from '@prisma/client';
 import type { Paginated, PaginationParams } from '@/shared/types/pagination.types';
 
 export interface CreateRoomData {
@@ -127,7 +123,10 @@ export class RoomRepository {
     }
   }
 
-  async updateHost(code: string, newHostPlayerId: string): Promise<Result<RoomSnapshotDto, AppError>> {
+  async updateHost(
+    code: string,
+    newHostPlayerId: string
+  ): Promise<Result<RoomSnapshotDto, AppError>> {
     try {
       const updated = await prisma.room.update({
         where: { code: code.toUpperCase().trim() },
@@ -180,7 +179,9 @@ export class RoomRepository {
     }
   }
 
-  async listPublic(params: PaginationParams = {}): Promise<Result<Paginated<RoomListItemDto>, AppError>> {
+  async listPublic(
+    params: PaginationParams = {}
+  ): Promise<Result<Paginated<RoomListItemDto>, AppError>> {
     const page = Math.max(1, params.page || 1);
     const limit = Math.min(50, Math.max(1, params.limit || 12));
     const skip = (page - 1) * limit;

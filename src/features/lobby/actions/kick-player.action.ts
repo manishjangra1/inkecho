@@ -13,9 +13,10 @@ const kickPlayerSchema = z.object({
   playerId: uuidSchema,
 });
 
-export async function kickPlayerAction(
-  input: { roomCode: string; playerId: string }
-): Promise<ActionResult<{ kickedPlayerId: string }>> {
+export async function kickPlayerAction(input: {
+  roomCode: string;
+  playerId: string;
+}): Promise<ActionResult<{ kickedPlayerId: string }>> {
   const correlationId = await getCorrelationId();
 
   try {

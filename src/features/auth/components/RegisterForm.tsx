@@ -89,9 +89,7 @@ export function RegisterForm() {
             {...register('name')}
             error={!!errors.name}
           />
-          {errors.name && (
-            <p className="text-xs text-destructive">{errors.name.message}</p>
-          )}
+          {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
         </div>
 
         <div className="space-y-2">
@@ -104,9 +102,7 @@ export function RegisterForm() {
             {...register('email')}
             error={!!errors.email}
           />
-          {errors.email && (
-            <p className="text-xs text-destructive">{errors.email.message}</p>
-          )}
+          {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
         </div>
 
         <div className="space-y-2">
@@ -119,9 +115,7 @@ export function RegisterForm() {
             {...register('password')}
             error={!!errors.password}
           />
-          {errors.password && (
-            <p className="text-xs text-destructive">{errors.password.message}</p>
-          )}
+          {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
         </div>
 
         <div className="space-y-2">

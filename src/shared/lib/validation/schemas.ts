@@ -38,7 +38,12 @@ export const roomSettingsSchema = z.object({
     .max(ROOM_CONFIG.MAX_PLAYERS)
     .default(ROOM_CONFIG.DEFAULT_MAX_PLAYERS),
   minPlayers: z.number().int().min(ROOM_CONFIG.MIN_PLAYERS).default(ROOM_CONFIG.MIN_PLAYERS),
-  roundCount: z.number().int().min(1).max(ROOM_CONFIG.MAX_ROUNDS).default(ROOM_CONFIG.DEFAULT_ROUNDS),
+  roundCount: z
+    .number()
+    .int()
+    .min(1)
+    .max(ROOM_CONFIG.MAX_ROUNDS)
+    .default(ROOM_CONFIG.DEFAULT_ROUNDS),
   describeTimerSec: z.number().int().min(30).max(120).default(60),
   drawTimerSec: z.number().int().min(60).max(180).default(90),
   profanityFilter: z.boolean().default(false),

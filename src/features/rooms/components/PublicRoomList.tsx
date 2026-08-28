@@ -15,16 +15,19 @@ export function PublicRoomList() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-44 rounded-2xl border border-border/40 p-4 space-y-3 bg-card/30">
+          <div
+            key={i}
+            className="h-44 space-y-3 rounded-2xl border border-border/40 bg-card/30 p-4"
+          >
             <div className="flex justify-between">
               <Skeleton className="h-6 w-20" />
               <Skeleton className="h-6 w-12" />
             </div>
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-4 w-48" />
-            <Skeleton className="h-9 w-full mt-2" />
+            <Skeleton className="mt-2 h-9 w-full" />
           </div>
         ))}
       </div>
@@ -33,7 +36,7 @@ export function PublicRoomList() {
 
   if (isError) {
     return (
-      <div className="text-center py-12 space-y-4">
+      <div className="space-y-4 py-12 text-center">
         <p className="text-sm text-destructive">Could not load public rooms.</p>
         <Button variant="outline" size="sm" onClick={() => refetch()} className="gap-2">
           <RefreshCw className="h-4 w-4" />
@@ -47,13 +50,13 @@ export function PublicRoomList() {
 
   if (items.length === 0) {
     return (
-      <div className="text-center py-16 px-4 rounded-2xl border border-dashed border-border/80 bg-card/30 space-y-4">
+      <div className="space-y-4 rounded-2xl border border-dashed border-border/80 bg-card/30 px-4 py-16 text-center">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
           <Search className="h-6 w-6" />
         </div>
         <div className="space-y-1">
           <h3 className="text-base font-semibold text-foreground">No active public rooms</h3>
-          <p className="text-xs text-muted-foreground max-w-xs mx-auto">
+          <p className="mx-auto max-w-xs text-xs text-muted-foreground">
             Be the first to host a game and invite your friends!
           </p>
         </div>
@@ -85,7 +88,7 @@ export function PublicRoomList() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((room) => (
           <PublicRoomCard key={room.id} room={room} />
         ))}
@@ -102,7 +105,7 @@ export function PublicRoomList() {
           >
             Previous
           </Button>
-          <span className="text-xs text-muted-foreground px-2">
+          <span className="px-2 text-xs text-muted-foreground">
             Page {page} of {data.totalPages}
           </span>
           <Button

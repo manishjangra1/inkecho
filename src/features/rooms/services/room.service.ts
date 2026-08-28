@@ -28,16 +28,8 @@ export class RoomService {
   async createRoom(
     dto: CreateRoomInput,
     ctx: AuthContext
-  ): Promise<
-    Result<
-      CreateRoomResponse & { token: string; expiresAt: Date },
-      AppError
-    >
-  > {
-    const displayName =
-      ctx.type === 'registered'
-        ? ctx.displayName
-        : dto.displayName?.trim();
+  ): Promise<Result<CreateRoomResponse & { token: string; expiresAt: Date }, AppError>> {
+    const displayName = ctx.type === 'registered' ? ctx.displayName : dto.displayName?.trim();
 
     if (!displayName) {
       return err(new ValidationError('Display name is required to create a room.'));
@@ -119,12 +111,7 @@ export class RoomService {
   async joinRoom(
     dto: JoinRoomInput,
     ctx: AuthContext
-  ): Promise<
-    Result<
-      JoinRoomResponse & { token: string; expiresAt: Date },
-      AppError
-    >
-  > {
+  ): Promise<Result<JoinRoomResponse & { token: string; expiresAt: Date }, AppError>> {
     const roomResult = await roomRepository.findByCode(dto.roomCode);
     if (!roomResult.ok) {
       return err(new NotFoundError('ROOM_NOT_FOUND', 'Room not found.'));
@@ -136,10 +123,7 @@ export class RoomService {
       return err(new GameStateError('ROOM_CLOSED', 'This room has been closed.'));
     }
 
-    const displayName =
-      ctx.type === 'registered'
-        ? ctx.displayName
-        : dto.displayName?.trim();
+    const displayName = ctx.type === 'registered' ? ctx.displayName : dto.displayName?.trim();
 
     if (!displayName) {
       return err(new ValidationError('Display name is required to join a room.'));
@@ -151,10 +135,14 @@ export class RoomService {
 
     if (dto.asSpectator || (room.status !== 'LOBBY' && room.settings.allowSpectators)) {
       role = 'SPECTATOR';
-      redirectTo = room.status === 'IN_PROGRESS' ? 'game' : room.status === 'REVEAL' ? 'reveal' : 'spectate';
+      redirectTo =
+        room.status === 'IN_PROGRESS' ? 'game' : room.status === 'REVEAL' ? 'reveal' : 'spectate';
     } else if (room.status !== 'LOBBY') {
       return err(
-        new GameStateError('GAME_IN_PROGRESS', 'Game is already in progress. You may join as a spectator.')
+        new GameStateError(
+          'GAME_IN_PROGRESS',
+          'Game is already in progress. You may join as a spectator.'
+        )
       );
     } else {
       const activeCount = await participantRepository.countActivePlayers(room.id);

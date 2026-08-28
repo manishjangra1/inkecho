@@ -2,10 +2,7 @@ import { getAblyServerClient } from './ably.server';
 import { env } from '@/shared/config/env';
 import { getRoomChannelName } from '@/features/realtime/lib/channel-names';
 import { ok, err, type Result } from '@/domain/shared/result';
-import {
-  ExternalServiceError,
-  type AppError,
-} from '@/shared/lib/errors/app-error';
+import { ExternalServiceError, type AppError } from '@/shared/lib/errors/app-error';
 import * as Ably from 'ably';
 
 export class AblyTokenService {
@@ -46,9 +43,7 @@ export class AblyTokenService {
 
       return ok(tokenRequest);
     } catch {
-      return err(
-        new ExternalServiceError('Failed to generate Ably realtime token request.')
-      );
+      return err(new ExternalServiceError('Failed to generate Ably realtime token request.'));
     }
   }
 }

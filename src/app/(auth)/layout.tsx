@@ -6,9 +6,7 @@ import { Footer } from '@/features/marketing/components/Footer';
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <AppShell header={<MarketingHeader />} footer={<Footer />}>
-      <div className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6">
-        {children}
-      </div>
+      <div className="flex flex-1 items-center justify-center px-4 py-12 sm:px-6">{children}</div>
     </AppShell>
   );
 }

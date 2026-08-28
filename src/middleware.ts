@@ -1,8 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest): NextResponse {
-  const correlationId =
-    request.headers.get('x-correlation-id') ?? crypto.randomUUID();
+  const correlationId = request.headers.get('x-correlation-id') ?? crypto.randomUUID();
 
   // Clone the request headers and set the correlation ID
   const requestHeaders = new Headers(request.headers);

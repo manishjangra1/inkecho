@@ -11,12 +11,16 @@ describe('Game State Machine', () => {
     expect(canTransitionGame(GAME_STATUS.IN_PROGRESS, GAME_EVENT.SUBMIT_DESCRIPTION)).toBe(true);
     expect(canTransitionGame(GAME_STATUS.IN_PROGRESS, GAME_EVENT.PAUSE)).toBe(true);
     expect(canTransitionGame(GAME_STATUS.IN_PROGRESS, GAME_EVENT.START_REVEAL)).toBe(true);
-    expect(transitionGameStatus(GAME_STATUS.IN_PROGRESS, GAME_EVENT.PAUSE)).toBe(GAME_STATUS.PAUSED);
+    expect(transitionGameStatus(GAME_STATUS.IN_PROGRESS, GAME_EVENT.PAUSE)).toBe(
+      GAME_STATUS.PAUSED
+    );
   });
 
   it('allows resuming from PAUSED', () => {
     expect(canTransitionGame(GAME_STATUS.PAUSED, GAME_EVENT.RESUME)).toBe(true);
-    expect(transitionGameStatus(GAME_STATUS.PAUSED, GAME_EVENT.RESUME)).toBe(GAME_STATUS.IN_PROGRESS);
+    expect(transitionGameStatus(GAME_STATUS.PAUSED, GAME_EVENT.RESUME)).toBe(
+      GAME_STATUS.IN_PROGRESS
+    );
   });
 
   it('rejects invalid transitions', () => {

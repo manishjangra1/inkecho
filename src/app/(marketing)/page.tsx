@@ -4,7 +4,7 @@ import { FeaturesGrid } from '@/features/marketing/components/FeaturesGrid';
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex w-full flex-col">
       <HeroSection />
       <HowItWorksSection />
       <FeaturesGrid />

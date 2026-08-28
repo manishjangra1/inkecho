@@ -39,7 +39,7 @@ export function RoomHeader({ room, isHost }: RoomHeaderProps) {
   return (
     <>
       <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
           {/* Logo & Room Code */}
           <div className="flex items-center gap-3">
             <Link href={ROUTES.HOME} className="flex items-center gap-2">
@@ -47,12 +47,12 @@ export function RoomHeader({ room, isHost }: RoomHeaderProps) {
                 <Sparkles className="h-5 w-5" />
               </div>
             </Link>
-            <div className="h-4 w-px bg-border hidden sm:block" />
+            <div className="hidden h-4 w-px bg-border sm:block" />
             <div className="flex items-center gap-2">
-              <span className="font-mono font-extrabold text-lg sm:text-xl tracking-wider text-foreground">
+              <span className="font-mono text-lg font-extrabold tracking-wider text-foreground sm:text-xl">
                 {room.code}
               </span>
-              <Badge variant="outline" className="hidden sm:inline-flex gap-1 text-xs">
+              <Badge variant="outline" className="hidden gap-1 text-xs sm:inline-flex">
                 <Users className="h-3 w-3" />
                 {totalPlayers}/{room.settings.maxPlayers}
               </Badge>
@@ -80,7 +80,7 @@ export function RoomHeader({ room, isHost }: RoomHeaderProps) {
               size="sm"
               onClick={handleLeave}
               disabled={isLeaving}
-              className="text-muted-foreground hover:text-destructive gap-1.5"
+              className="gap-1.5 text-muted-foreground hover:text-destructive"
             >
               <LogOut className="h-4 w-4" />
               <span className="hidden sm:inline">Leave</span>
@@ -90,11 +90,7 @@ export function RoomHeader({ room, isHost }: RoomHeaderProps) {
       </header>
 
       {isHost && (
-        <RoomSettingsDrawer
-          room={room}
-          open={settingsOpen}
-          onOpenChange={setSettingsOpen}
-        />
+        <RoomSettingsDrawer room={room} open={settingsOpen} onOpenChange={setSettingsOpen} />
       )}
     </>
   );

@@ -1,5 +1,9 @@
 import { guestSessionRepository } from '@/infrastructure/db/repositories/guest-session.repository';
-import { signGuestToken, verifyGuestToken, type GuestJwtPayload } from '@/infrastructure/auth/guest-jwt';
+import {
+  signGuestToken,
+  verifyGuestToken,
+  type GuestJwtPayload,
+} from '@/infrastructure/auth/guest-jwt';
 import { ok, err, type Result } from '@/domain/shared/result';
 import { UnauthorizedError, type AppError } from '@/shared/lib/errors/app-error';
 import { env } from '@/shared/config/env';

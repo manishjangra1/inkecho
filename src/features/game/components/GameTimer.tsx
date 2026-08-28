@@ -12,34 +12,27 @@ export interface GameTimerProps {
   readonly className?: string;
 }
 
-export function GameTimer({
-  remainingSeconds,
-  isUrgent,
-  isPaused,
-  className,
-}: GameTimerProps) {
+export function GameTimer({ remainingSeconds, isUrgent, isPaused, className }: GameTimerProps) {
   return (
     <div
       className={cn(
-        'flex items-center gap-2 px-3.5 py-1.5 rounded-full text-sm font-semibold tracking-wide transition-all border shadow-sm',
+        'flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm font-semibold tracking-wide shadow-sm transition-all',
         isPaused
-          ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+          ? 'border-amber-500/30 bg-amber-500/10 text-amber-400'
           : isUrgent
-            ? 'bg-red-500/15 text-red-400 border-red-500/40 animate-pulse'
-            : 'bg-primary/10 text-primary border-primary/20',
+            ? 'animate-pulse border-red-500/40 bg-red-500/15 text-red-400'
+            : 'border-primary/20 bg-primary/10 text-primary',
         className
       )}
       role="timer"
       aria-live="polite"
     >
       {isPaused ? (
-        <AlertCircle className="w-4 h-4 text-amber-400 animate-spin" />
+        <AlertCircle className="h-4 w-4 animate-spin text-amber-400" />
       ) : (
-        <Clock className={cn('w-4 h-4', isUrgent && 'text-red-400')} />
+        <Clock className={cn('h-4 w-4', isUrgent && 'text-red-400')} />
       )}
-      <span className="tabular-nums">
-        {isPaused ? 'PAUSED' : formatTime(remainingSeconds)}
-      </span>
+      <span className="tabular-nums">{isPaused ? 'PAUSED' : formatTime(remainingSeconds)}</span>
     </div>
   );
 }

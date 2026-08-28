@@ -1,8 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  filterChainsForViewer,
-  getActivePlayerPromptContext,
-} from './visibility-filter';
+import { filterChainsForViewer, getActivePlayerPromptContext } from './visibility-filter';
 import type { GameChainEntity } from './chain-builder';
 
 describe('Visibility Filter', () => {

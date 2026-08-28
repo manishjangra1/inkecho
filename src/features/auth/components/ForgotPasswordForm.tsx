@@ -40,8 +40,8 @@ export function ForgotPasswordForm() {
 
   if (isSubmitted) {
     return (
-      <div className="text-center space-y-4 py-4">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-game-ready/10 text-game-ready border border-game-ready/20">
+      <div className="space-y-4 py-4 text-center">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-game-ready/20 bg-game-ready/10 text-game-ready">
           ✓
         </div>
         <div className="space-y-1">
@@ -65,9 +65,7 @@ export function ForgotPasswordForm() {
           {...register('email')}
           error={!!errors.email}
         />
-        {errors.email && (
-          <p className="text-xs text-destructive">{errors.email.message}</p>
-        )}
+        {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
       </div>
 
       <Button

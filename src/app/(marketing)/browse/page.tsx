@@ -17,7 +17,7 @@ export default function BrowsePage() {
           title={COMMON_COPY.BROWSE.PAGE_TITLE}
           description={COMMON_COPY.BROWSE.PAGE_SUBTITLE}
           badge={
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-primary/10 text-brand-primary border border-brand-primary/20">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-primary/20 bg-brand-primary/10 px-3 py-1 text-xs font-semibold text-brand-primary">
               <Globe className="h-3.5 w-3.5" />
               Live Lobbies
             </span>

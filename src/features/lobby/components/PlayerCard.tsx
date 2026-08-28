@@ -46,24 +46,24 @@ export function PlayerCard({
     >
       <Card
         className={cn(
-          'p-4 flex items-center justify-between border transition-all backdrop-blur-sm',
+          'flex items-center justify-between border p-4 backdrop-blur-sm transition-all',
           isReady
-            ? 'bg-card/80 border-game-ready/40 shadow-[0_0_12px_rgba(34,197,94,0.1)]'
-            : 'bg-card/40 border-border/70',
+            ? 'border-game-ready/40 bg-card/80 shadow-[0_0_12px_rgba(34,197,94,0.1)]'
+            : 'border-border/70 bg-card/40',
           isCurrentPlayer && 'ring-1 ring-brand-primary'
         )}
       >
-        <div className="flex items-center gap-3.5 min-w-0">
+        <div className="flex min-w-0 items-center gap-3.5">
           <div className="relative">
             <Avatar className="h-12 w-12 border-2 border-border shadow-sm">
               <AvatarImage src={participant.avatarUrl || undefined} />
-              <AvatarFallback className="bg-brand-primary/10 text-brand-primary font-bold">
+              <AvatarFallback className="bg-brand-primary/10 font-bold text-brand-primary">
                 {initials}
               </AvatarFallback>
             </Avatar>
             {isHost && (
               <div
-                className="absolute -top-2 -right-1 bg-amber-400 text-black p-0.5 rounded-full shadow-sm"
+                className="absolute -right-1 -top-2 rounded-full bg-amber-400 p-0.5 text-black shadow-sm"
                 title="Room Host"
               >
                 <Crown className="h-3.5 w-3.5 fill-black" />
@@ -71,13 +71,16 @@ export function PlayerCard({
             )}
           </div>
 
-          <div className="space-y-1 min-w-0">
+          <div className="min-w-0 space-y-1">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-sm text-foreground truncate max-w-[120px] sm:max-w-[160px]">
+              <span className="max-w-[120px] truncate text-sm font-semibold text-foreground sm:max-w-[160px]">
                 {participant.displayName}
               </span>
               {isCurrentPlayer && (
-                <Badge variant="outline" className="text-[10px] py-0 px-1.5 h-4 border-brand-primary/40 text-brand-primary">
+                <Badge
+                  variant="outline"
+                  className="h-4 border-brand-primary/40 px-1.5 py-0 text-[10px] text-brand-primary"
+                >
                   {LOBBY_COPY.YOU_BADGE}
                 </Badge>
               )}
@@ -86,12 +89,12 @@ export function PlayerCard({
               <ConnectionBadge status={participant.connectionStatus} />
               <span className="text-xs text-muted-foreground">
                 {isReady ? (
-                  <span className="text-game-ready font-medium inline-flex items-center gap-1">
+                  <span className="inline-flex items-center gap-1 font-medium text-game-ready">
                     <Check className="h-3 w-3" />
                     {LOBBY_COPY.STATUS.READY}
                   </span>
                 ) : (
-                  <span className="text-muted-foreground/70 inline-flex items-center gap-1">
+                  <span className="inline-flex items-center gap-1 text-muted-foreground/70">
                     <Clock className="h-3 w-3" />
                     {LOBBY_COPY.STATUS.WAITING}
                   </span>

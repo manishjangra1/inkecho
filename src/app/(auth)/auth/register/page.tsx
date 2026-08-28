@@ -24,10 +24,7 @@ export default async function RegisterPage() {
       footer={
         <p className="text-center text-xs text-muted-foreground">
           Already have an account?{' '}
-          <Link
-            href={ROUTES.AUTH.LOGIN}
-            className="font-medium text-brand-primary hover:underline"
-          >
+          <Link href={ROUTES.AUTH.LOGIN} className="font-medium text-brand-primary hover:underline">
             Sign in
           </Link>
         </p>

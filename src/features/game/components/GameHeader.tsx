@@ -37,20 +37,20 @@ export function GameHeader({
   const { remainingSeconds, isUrgent } = useGameTimer();
 
   return (
-    <header className="w-full border-b bg-card/40 backdrop-blur-md sticky top-0 z-30 px-4 sm:px-8 py-3">
-      <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4">
+    <header className="sticky top-0 z-30 w-full border-b bg-card/40 px-4 py-3 backdrop-blur-md sm:px-8">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4">
         {/* Left: Room & Chain Info */}
         <div className="flex items-center gap-3">
-          <div className="font-mono text-sm font-bold bg-muted px-2.5 py-1 rounded-md border border-border/60">
+          <div className="rounded-md border border-border/60 bg-muted px-2.5 py-1 font-mono text-sm font-bold">
             {roomCode}
           </div>
-          <div className="text-xs text-muted-foreground font-medium hidden sm:block">
+          <div className="hidden text-xs font-medium text-muted-foreground sm:block">
             Round {roundIndex + 1} • Chain {chainIndex + 1}/{totalChains}
           </div>
         </div>
 
         {/* Center: Turn Info & Progress */}
-        <div className="flex flex-col sm:flex-row items-center gap-3">
+        <div className="flex flex-col items-center gap-3 sm:flex-row">
           <TurnIndicator
             phase={currentTurn.phase}
             turnIndex={currentTurn.turnIndex}
@@ -66,11 +66,7 @@ export function GameHeader({
 
         {/* Right: Timer & Pause Button */}
         <div className="flex items-center gap-2.5">
-          <GameTimer
-            remainingSeconds={remainingSeconds}
-            isUrgent={isUrgent}
-            isPaused={isPaused}
-          />
+          <GameTimer remainingSeconds={remainingSeconds} isUrgent={isUrgent} isPaused={isPaused} />
 
           {isHost && (
             <Button
@@ -83,12 +79,12 @@ export function GameHeader({
             >
               {isPaused ? (
                 <>
-                  <Play className="w-3.5 h-3.5 mr-1" />
+                  <Play className="mr-1 h-3.5 w-3.5" />
                   Resume
                 </>
               ) : (
                 <>
-                  <Pause className="w-3.5 h-3.5 mr-1" />
+                  <Pause className="mr-1 h-3.5 w-3.5" />
                   Pause
                 </>
               )}

@@ -36,7 +36,7 @@ export function StartGameButton({
       onClick={handleClick}
       isLoading={isLoading}
       disabled={!canStart || isLoading}
-      className="shadow-glow min-w-[160px] font-bold text-base bg-gradient-to-r from-brand-primary via-brand-secondary to-brand-accent hover:opacity-90 transition-opacity gap-2"
+      className="min-w-[160px] gap-2 bg-gradient-to-r from-brand-primary via-brand-secondary to-brand-accent text-base font-bold shadow-glow transition-opacity hover:opacity-90"
     >
       <Play className="h-4 w-4 fill-white" />
       {LOBBY_COPY.START_GAME}
@@ -52,7 +52,7 @@ export function StartGameButton({
           </span>
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-xs text-xs">
-          <ul className="list-disc pl-4 space-y-1">
+          <ul className="list-disc space-y-1 pl-4">
             {canStartReasons.map((reason, idx) => (
               <li key={idx}>{reason}</li>
             ))}

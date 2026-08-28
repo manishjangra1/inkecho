@@ -16,12 +16,7 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
     };
 
     return (
-      <Button
-        ref={ref}
-        variant={variant}
-        className={cn(sizeClasses[size], className)}
-        {...props}
-      />
+      <Button ref={ref} variant={variant} className={cn(sizeClasses[size], className)} {...props} />
     );
   }
 );

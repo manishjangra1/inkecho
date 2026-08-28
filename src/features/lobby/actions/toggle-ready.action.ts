@@ -14,9 +14,7 @@ const toggleReadySchema = z.object({
   isReady: z.boolean(),
 });
 
-export async function toggleReadyAction(
-  input: { roomCode: string; isReady: boolean }
-): Promise<
+export async function toggleReadyAction(input: { roomCode: string; isReady: boolean }): Promise<
   ActionResult<{
     playerId: string;
     isReady: boolean;

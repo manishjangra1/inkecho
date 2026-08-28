@@ -8,6 +8,7 @@ export const GAME_COPY = {
   DRAW_PHASE_TITLE: 'Draw This Prompt',
   DRAW_PHASE_SUBTITLE: 'Use your canvas tools to illustrate what was described.',
   DRAW_PLACEHOLDER: 'Canvas Drawing is enabled in Milestone 5.',
+  DRAW_SUBMIT_BUTTON: 'Submit Drawing',
   WAITING_TITLE: 'Waiting for Players',
   WAITING_SUBTITLE: 'is currently taking their turn. Sit tight!',
   PAUSED_TITLE: 'Game Paused',

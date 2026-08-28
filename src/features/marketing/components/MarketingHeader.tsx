@@ -19,21 +19,21 @@ export function MarketingHeader() {
           {/* Logo */}
           <Link
             href={ROUTES.HOME}
-            className="flex items-center gap-2.5 group transition-transform hover:scale-105"
+            className="group flex items-center gap-2.5 transition-transform hover:scale-105"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-primary to-brand-secondary shadow-md shadow-brand-primary/20 text-white">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-primary to-brand-secondary text-white shadow-md shadow-brand-primary/20">
               <Sparkles className="h-5 w-5 animate-pulse" />
             </div>
-            <span className="font-display text-xl font-bold tracking-tight bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text font-display text-xl font-bold tracking-tight text-transparent">
               {COMMON_COPY.APP_NAME}
             </span>
           </Link>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
+          <nav className="hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex">
             <Link
               href={ROUTES.BROWSE}
-              className="flex items-center gap-1.5 hover:text-foreground transition-colors"
+              className="flex items-center gap-1.5 transition-colors hover:text-foreground"
             >
               <Compass className="h-4 w-4" />
               {COMMON_COPY.NAV.BROWSE}
@@ -53,7 +53,7 @@ export function MarketingHeader() {
 
             {session?.user ? (
               <div className="flex items-center gap-2">
-                <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-muted-foreground font-medium px-2 py-1 bg-card rounded-md border border-border/60">
+                <span className="hidden items-center gap-1.5 rounded-md border border-border/60 bg-card px-2 py-1 text-xs font-medium text-muted-foreground sm:inline-flex">
                   <UserIcon className="h-3 w-3 text-brand-primary" />
                   {session.user.name || session.user.email}
                 </span>

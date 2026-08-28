@@ -1,15 +1,7 @@
 import { ok, err, type Result } from '../shared/result';
 import { createDomainError, type DomainError, DOMAIN_ERROR_CODES } from '../shared/errors';
-import {
-  type GameStatus,
-  type TurnPhase,
-  canTransitionGame,
-} from './game-state-machine';
-import {
-  type GameChainEntity,
-  type GameTurnEntity,
-  createTurnEntity,
-} from './chain-builder';
+import { type GameStatus, type TurnPhase, canTransitionGame } from './game-state-machine';
+import { type GameChainEntity, type GameTurnEntity, createTurnEntity } from './chain-builder';
 import { getAssignedPlayerForTurn, getTurnPhase, getTotalTurnsPerChain } from './turn-order';
 import { computeTurnEndsAt, getPhaseDurationSeconds } from '../timer/timer-calculator';
 import { calculatePauseRemainingMs, calculateResumeTurnEndsAt } from '../timer/timer-rules';
@@ -118,10 +110,7 @@ export function transitionGame(
       );
     }
     const resumeTime = event.resumedAt || now;
-    const newTurnEndsAt = calculateResumeTurnEndsAt(
-      game.pauseRemainingMs ?? 30000,
-      resumeTime
-    );
+    const newTurnEndsAt = calculateResumeTurnEndsAt(game.pauseRemainingMs ?? 30000, resumeTime);
     return ok({
       ...game,
       status: 'IN_PROGRESS',
@@ -158,19 +147,15 @@ export function transitionGame(
   let updatedTurn: GameTurnEntity;
   const submitTime =
     event.type === 'TIMER_EXPIRED'
-      ? (event.expiredAt || now)
+      ? event.expiredAt || now
       : event.type === 'SUBMIT_DESCRIPTION' || event.type === 'SUBMIT_DRAWING'
-        ? (event.submittedAt || now)
+        ? event.submittedAt || now
         : now;
-
 
   if (event.type === 'SUBMIT_DESCRIPTION') {
     if (game.activePlayerId !== event.playerId) {
       return err(
-        createDomainError(
-          DOMAIN_ERROR_CODES.NOT_YOUR_TURN,
-          'It is not your turn to submit.'
-        )
+        createDomainError(DOMAIN_ERROR_CODES.NOT_YOUR_TURN, 'It is not your turn to submit.')
       );
     }
     if (game.turnPhase !== 'DESCRIBE') {
@@ -197,10 +182,7 @@ export function transitionGame(
   } else if (event.type === 'SUBMIT_DRAWING') {
     if (game.activePlayerId !== event.playerId) {
       return err(
-        createDomainError(
-          DOMAIN_ERROR_CODES.NOT_YOUR_TURN,
-          'It is not your turn to submit.'
-        )
+        createDomainError(DOMAIN_ERROR_CODES.NOT_YOUR_TURN, 'It is not your turn to submit.')
       );
     }
     if (game.turnPhase !== 'DRAW') {
@@ -252,18 +234,13 @@ export function transitionGame(
     };
   } else {
     return err(
-      createDomainError(
-        DOMAIN_ERROR_CODES.INVALID_GAME_TRANSITION,
-        'Unknown game event type.'
-      )
+      createDomainError(DOMAIN_ERROR_CODES.INVALID_GAME_TRANSITION, 'Unknown game event type.')
     );
   }
 
   // Update current chain turns
   const newTurns = [...currentChain.turns];
-  const existingTurnIndex = newTurns.findIndex(
-    (t) => t.turnIndex === game.currentTurnIndex
-  );
+  const existingTurnIndex = newTurns.findIndex((t) => t.turnIndex === game.currentTurnIndex);
 
   if (existingTurnIndex >= 0) {
     newTurns[existingTurnIndex] = updatedTurn;
@@ -295,7 +272,10 @@ export function transitionGame(
       if (c.chainIndex === game.currentChainIndex) {
         return {
           ...c,
-          turns: [...c.turns, createTurnEntity(`${c.chainIndex}_${nextTurnIndex}`, nextTurnIndex, nextPlayerId)],
+          turns: [
+            ...c.turns,
+            createTurnEntity(`${c.chainIndex}_${nextTurnIndex}`, nextTurnIndex, nextPlayerId),
+          ],
         };
       }
       return c;

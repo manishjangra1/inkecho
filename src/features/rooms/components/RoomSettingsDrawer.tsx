@@ -87,7 +87,7 @@ export function RoomSettingsDrawer({ room, open, onOpenChange }: RoomSettingsDra
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium text-foreground">Max Players</span>
-              <span className="font-mono text-xs font-semibold text-brand-primary bg-brand-primary/10 px-2 py-0.5 rounded">
+              <span className="rounded bg-brand-primary/10 px-2 py-0.5 font-mono text-xs font-semibold text-brand-primary">
                 {maxPlayers} Players
               </span>
             </div>
@@ -110,7 +110,7 @@ export function RoomSettingsDrawer({ room, open, onOpenChange }: RoomSettingsDra
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium text-foreground">Rounds</span>
-              <span className="font-mono text-xs font-semibold text-brand-secondary bg-brand-secondary/10 px-2 py-0.5 rounded">
+              <span className="rounded bg-brand-secondary/10 px-2 py-0.5 font-mono text-xs font-semibold text-brand-secondary">
                 {roundCount} Round{roundCount > 1 ? 's' : ''}
               </span>
             </div>
@@ -133,7 +133,7 @@ export function RoomSettingsDrawer({ room, open, onOpenChange }: RoomSettingsDra
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium text-foreground">Drawing Timer</span>
-              <span className="font-mono text-xs font-semibold text-brand-accent bg-brand-accent/10 px-2 py-0.5 rounded">
+              <span className="rounded bg-brand-accent/10 px-2 py-0.5 font-mono text-xs font-semibold text-brand-accent">
                 {drawTimerSec}s
               </span>
             </div>
@@ -156,7 +156,7 @@ export function RoomSettingsDrawer({ room, open, onOpenChange }: RoomSettingsDra
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium text-foreground">Describe Timer</span>
-              <span className="font-mono text-xs font-semibold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded">
+              <span className="rounded bg-amber-400/10 px-2 py-0.5 font-mono text-xs font-semibold text-amber-400">
                 {describeTimerSec}s
               </span>
             </div>
@@ -178,7 +178,7 @@ export function RoomSettingsDrawer({ room, open, onOpenChange }: RoomSettingsDra
           {/* Switches */}
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="drawerAllowSpectators" className="text-sm font-medium cursor-pointer">
+              <Label htmlFor="drawerAllowSpectators" className="cursor-pointer text-sm font-medium">
                 Allow Spectators
               </Label>
               <Controller
@@ -195,7 +195,7 @@ export function RoomSettingsDrawer({ room, open, onOpenChange }: RoomSettingsDra
             </div>
 
             <div className="flex items-center justify-between">
-              <Label htmlFor="drawerProfanityFilter" className="text-sm font-medium cursor-pointer">
+              <Label htmlFor="drawerProfanityFilter" className="cursor-pointer text-sm font-medium">
                 Profanity Filter
               </Label>
               <Controller

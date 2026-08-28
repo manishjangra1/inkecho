@@ -46,8 +46,7 @@ export const REALTIME_EVENTS = {
   ERROR: 'error',
 } as const;
 
-export type RealtimeEventName =
-  (typeof REALTIME_EVENTS)[keyof typeof REALTIME_EVENTS];
+export type RealtimeEventName = (typeof REALTIME_EVENTS)[keyof typeof REALTIME_EVENTS];
 
 export interface RealtimeEnvelope<T = unknown> {
   readonly name: RealtimeEventName;

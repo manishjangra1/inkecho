@@ -21,11 +21,7 @@ interface PlayerCardMenuProps {
   readonly onPlayerUpdated?: () => void;
 }
 
-export function PlayerCardMenu({
-  roomCode,
-  participant,
-  onPlayerUpdated,
-}: PlayerCardMenuProps) {
+export function PlayerCardMenu({ roomCode, participant, onPlayerUpdated }: PlayerCardMenuProps) {
   const [isLoading, setIsLoading] = React.useState(false);
 
   const handleKick = async () => {
@@ -85,13 +81,13 @@ export function PlayerCardMenu({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-44">
-        <DropdownMenuItem onClick={handleTransferHost} className="gap-2 cursor-pointer">
+        <DropdownMenuItem onClick={handleTransferHost} className="cursor-pointer gap-2">
           <Crown className="h-4 w-4 text-amber-400" />
           <span>{LOBBY_COPY.TRANSFER_HOST}</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={handleKick}
-          className="gap-2 text-destructive focus:text-destructive cursor-pointer"
+          className="cursor-pointer gap-2 text-destructive focus:text-destructive"
         >
           <UserX className="h-4 w-4" />
           <span>{LOBBY_COPY.KICK_PLAYER}</span>

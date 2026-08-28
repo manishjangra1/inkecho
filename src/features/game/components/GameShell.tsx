@@ -18,15 +18,8 @@ export interface GameShellProps {
 }
 
 export function GameShell({ roomCode }: GameShellProps) {
-  const {
-    game,
-    currentTurn,
-    isHost,
-    isSpectator,
-    isPaused,
-    connectionState,
-    isLoading,
-  } = useGameState(roomCode);
+  const { game, currentTurn, isHost, isSpectator, isPaused, connectionState, isLoading } =
+    useGameState(roomCode);
 
   const [isPauseLoading, setIsPauseLoading] = useState(false);
 
@@ -57,21 +50,18 @@ export function GameShell({ roomCode }: GameShellProps) {
 
   if (isLoading || !game || !currentTurn) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center space-y-4 p-4">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        <p className="text-sm font-medium text-muted-foreground">
-          Loading game session...
-        </p>
+      <div className="flex min-h-screen flex-col items-center justify-center space-y-4 p-4">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="text-sm font-medium text-muted-foreground">Loading game session...</p>
       </div>
     );
   }
 
   const totalTurns = getTotalTurnsPerChain(game.playerOrder.length);
-  const isDisconnected =
-    connectionState === 'disconnected' || connectionState === 'suspended';
+  const isDisconnected = connectionState === 'disconnected' || connectionState === 'suspended';
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/20">
+    <div className="flex min-h-screen flex-col bg-background text-foreground selection:bg-primary/20">
       {isSpectator && <SpectatorBanner />}
       {isDisconnected && <ReconnectBanner />}
 
@@ -88,7 +78,7 @@ export function GameShell({ roomCode }: GameShellProps) {
         isPauseLoading={isPauseLoading}
       />
 
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-8 sm:py-12 flex flex-col justify-center">
+      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center px-4 py-8 sm:py-12">
         <GamePhaseRouter
           roomCode={roomCode}
           roomId={game.roomId}
@@ -98,11 +88,7 @@ export function GameShell({ roomCode }: GameShellProps) {
       </main>
 
       {isPaused && (
-        <PauseOverlay
-          isHost={isHost}
-          onResume={handlePauseToggle}
-          isResuming={isPauseLoading}
-        />
+        <PauseOverlay isHost={isHost} onResume={handlePauseToggle} isResuming={isPauseLoading} />
       )}
     </div>
   );

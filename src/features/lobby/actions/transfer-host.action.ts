@@ -14,9 +14,10 @@ const transferHostSchema = z.object({
   newHostPlayerId: uuidSchema,
 });
 
-export async function transferHostAction(
-  input: { roomCode: string; newHostPlayerId: string }
-): Promise<ActionResult<RoomSnapshotDto>> {
+export async function transferHostAction(input: {
+  roomCode: string;
+  newHostPlayerId: string;
+}): Promise<ActionResult<RoomSnapshotDto>> {
   const correlationId = await getCorrelationId();
 
   try {

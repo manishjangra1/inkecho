@@ -31,18 +31,8 @@ export function CopyLinkButton({
   };
 
   return (
-    <Button
-      type="button"
-      variant="outline"
-      size="sm"
-      onClick={handleCopy}
-      className={className}
-    >
-      {hasCopied ? (
-        <Check className="h-4 w-4 text-game-ready" />
-      ) : (
-        <Copy className="h-4 w-4" />
-      )}
+    <Button type="button" variant="outline" size="sm" onClick={handleCopy} className={className}>
+      {hasCopied ? <Check className="h-4 w-4 text-game-ready" /> : <Copy className="h-4 w-4" />}
       <span>{hasCopied ? 'Copied!' : label}</span>
     </Button>
   );

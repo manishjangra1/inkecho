@@ -5,10 +5,7 @@
 /**
  * Calculates remaining milliseconds at the moment of pausing.
  */
-export function calculatePauseRemainingMs(
-  turnEndsAt: Date,
-  pausedAt: Date = new Date()
-): number {
+export function calculatePauseRemainingMs(turnEndsAt: Date, pausedAt: Date = new Date()): number {
   const remaining = turnEndsAt.getTime() - pausedAt.getTime();
   return Math.max(0, remaining);
 }

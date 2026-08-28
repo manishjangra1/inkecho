@@ -26,18 +26,18 @@ export function SubmitButton({
       disabled={disabled || isSubmitting}
       onClick={onClick}
       className={cn(
-        'w-full sm:w-auto min-w-[160px] font-semibold text-base py-6 shadow-md transition-all',
+        'w-full min-w-[160px] py-6 text-base font-semibold shadow-md transition-all sm:w-auto',
         className
       )}
     >
       {isSubmitting ? (
         <>
-          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
           Submitting...
         </>
       ) : (
         <>
-          <Send className="w-5 h-5 mr-2" />
+          <Send className="mr-2 h-5 w-5" />
           {label}
         </>
       )}

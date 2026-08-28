@@ -72,16 +72,10 @@ export function JoinRoomForm({ initialCode = '' }: JoinRoomFormProps) {
           control={control}
           name="roomCode"
           render={({ field }) => (
-            <RoomCodeInput
-              value={field.value}
-              onChange={field.onChange}
-              disabled={isLoading}
-            />
+            <RoomCodeInput value={field.value} onChange={field.onChange} disabled={isLoading} />
           )}
         />
-        {errors.roomCode && (
-          <p className="text-xs text-destructive">{errors.roomCode.message}</p>
-        )}
+        {errors.roomCode && <p className="text-xs text-destructive">{errors.roomCode.message}</p>}
       </div>
 
       {/* Nickname for guest */}
@@ -106,16 +100,12 @@ export function JoinRoomForm({ initialCode = '' }: JoinRoomFormProps) {
           control={control}
           name="asSpectator"
           render={({ field }) => (
-            <Checkbox
-              id="asSpectator"
-              checked={field.value}
-              onCheckedChange={field.onChange}
-            />
+            <Checkbox id="asSpectator" checked={field.value} onCheckedChange={field.onChange} />
           )}
         />
         <Label
           htmlFor="asSpectator"
-          className="text-xs font-normal text-muted-foreground cursor-pointer"
+          className="cursor-pointer text-xs font-normal text-muted-foreground"
         >
           Join as spectator (watch only)
         </Label>

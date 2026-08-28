@@ -18,20 +18,20 @@ export function FeaturesGrid() {
   };
 
   return (
-    <section className="py-24 relative overflow-hidden">
+    <section className="relative overflow-hidden py-24">
       <Container size="lg">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto space-y-3 mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold font-display tracking-tight text-foreground">
+        <div className="mx-auto mb-16 max-w-2xl space-y-3 text-center">
+          <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             {COMMON_COPY.FEATURES.SECTION_TITLE}
           </h2>
-          <p className="text-muted-foreground text-base sm:text-lg">
+          <p className="text-base text-muted-foreground sm:text-lg">
             {COMMON_COPY.FEATURES.SECTION_SUBTITLE}
           </p>
         </div>
 
         {/* Features 3x2 Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {COMMON_COPY.FEATURES.ITEMS.map((item, idx) => (
             <motion.div
               key={item.title}
@@ -46,10 +46,10 @@ export function FeaturesGrid() {
             >
               <Card
                 variant="interactive"
-                className="h-full border-border/60 bg-card/50 backdrop-blur-sm p-2 hover:border-brand-primary/40"
+                className="h-full border-border/60 bg-card/50 p-2 backdrop-blur-sm hover:border-brand-primary/40"
               >
                 <CardHeader className="space-y-3 p-4">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-muted/60 border border-border">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-muted/60">
                     {iconMap[item.icon] ?? <Sparkles className="h-6 w-6 text-brand-primary" />}
                   </div>
                   <CardTitle className="text-lg font-semibold text-foreground">
@@ -57,7 +57,7 @@ export function FeaturesGrid() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-4 pt-0">
-                  <p className="text-sm text-muted-foreground leading-relaxed">
+                  <p className="text-sm leading-relaxed text-muted-foreground">
                     {item.description}
                   </p>
                 </CardContent>

@@ -97,10 +97,7 @@ export function toGameEntity(raw: Game): GameEntity {
   };
 }
 
-export function toTurnSnapshotDto(
-  game: GameEntity,
-  viewerPlayerId: string
-): TurnSnapshotDto {
+export function toTurnSnapshotDto(game: GameEntity, viewerPlayerId: string): TurnSnapshotDto {
   const isMyTurn = game.activePlayerId === viewerPlayerId;
   const promptContext = isMyTurn
     ? getActivePlayerPromptContext(
@@ -125,10 +122,7 @@ export function toTurnSnapshotDto(
   };
 }
 
-export function toGameSnapshotDto(
-  game: GameEntity,
-  viewerPlayerId: string
-): GameSnapshotDto {
+export function toGameSnapshotDto(game: GameEntity, viewerPlayerId: string): GameSnapshotDto {
   const filteredChains = filterChainsForViewer(
     game.chains,
     viewerPlayerId,

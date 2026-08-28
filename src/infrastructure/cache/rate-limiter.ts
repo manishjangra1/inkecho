@@ -8,7 +8,11 @@ interface RateLimitRecord {
 class InMemoryRateLimiter {
   private readonly store = new Map<string, RateLimitRecord>();
 
-  async check(key: string, limit: number, windowSec: number): Promise<{ allowed: boolean; remaining: number }> {
+  async check(
+    key: string,
+    limit: number,
+    windowSec: number
+  ): Promise<{ allowed: boolean; remaining: number }> {
     const now = Date.now();
     const windowMs = windowSec * 1000;
     const record = this.store.get(key);

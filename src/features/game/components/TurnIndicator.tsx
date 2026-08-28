@@ -28,17 +28,13 @@ export function TurnIndicator({
     <div className={cn('flex items-center gap-3', className)}>
       <div
         className={cn(
-          'flex items-center gap-2 px-3 py-1 rounded-md text-xs font-semibold uppercase tracking-wider border shadow-sm',
+          'flex items-center gap-2 rounded-md border px-3 py-1 text-xs font-semibold uppercase tracking-wider shadow-sm',
           isDescribe
-            ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-            : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+            ? 'border-blue-500/20 bg-blue-500/10 text-blue-400'
+            : 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
         )}
       >
-        {isDescribe ? (
-          <FileText className="w-3.5 h-3.5" />
-        ) : (
-          <Pencil className="w-3.5 h-3.5" />
-        )}
+        {isDescribe ? <FileText className="h-3.5 w-3.5" /> : <Pencil className="h-3.5 w-3.5" />}
         <span>{isDescribe ? 'Describe' : 'Draw'}</span>
       </div>
 
@@ -47,9 +43,7 @@ export function TurnIndicator({
         {isMyTurn ? (
           <span className="ml-2 font-bold text-primary">(Your Turn)</span>
         ) : activePlayerName ? (
-          <span className="ml-2 text-foreground font-medium">
-            ({activePlayerName}&apos;s turn)
-          </span>
+          <span className="ml-2 font-medium text-foreground">({activePlayerName}&apos;s turn)</span>
         ) : null}
       </div>
     </div>

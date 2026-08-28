@@ -57,12 +57,14 @@ export const COMMON_COPY = {
     ITEMS: [
       {
         title: 'Instant Play',
-        description: 'No account needed. Jump straight into private or public rooms as a guest in seconds.',
+        description:
+          'No account needed. Jump straight into private or public rooms as a guest in seconds.',
         icon: 'Zap',
       },
       {
         title: 'Real-time Sync',
-        description: 'Lightning-fast synchronous gameplay powered by low-latency edge realtime infrastructure.',
+        description:
+          'Lightning-fast synchronous gameplay powered by low-latency edge realtime infrastructure.',
         icon: 'Activity',
       },
       {
@@ -82,7 +84,8 @@ export const COMMON_COPY = {
       },
       {
         title: 'Private & Safe',
-        description: 'Customizable room timers, optional profanity filters, and room host moderation tools.',
+        description:
+          'Customizable room timers, optional profanity filters, and room host moderation tools.',
         icon: 'Shield',
       },
     ],

@@ -1,15 +1,7 @@
 import { prisma } from '../prisma.client';
 import { ok, err, type Result } from '@/domain/shared/result';
-import {
-  NotFoundError,
-  ConflictError,
-  type AppError,
-} from '@/shared/lib/errors/app-error';
-import {
-  toGameEntity,
-  chainsToPrisma,
-  toGameSnapshotDto,
-} from '../mappers/game.mapper';
+import { NotFoundError, ConflictError, type AppError } from '@/shared/lib/errors/app-error';
+import { toGameEntity, chainsToPrisma, toGameSnapshotDto } from '../mappers/game.mapper';
 import type { GameEntity } from '@/domain/game/game-transitions';
 import type { GameChainEntity } from '@/domain/game/chain-builder';
 import type { GameStatus, TurnPhase } from '@/domain/game/game-state-machine';
@@ -113,18 +105,27 @@ export class GameRepository {
 
     if (result.count === 0) {
       const latest = await this.findById(id);
-      const snapshot = latest.ok ? toGameSnapshotDto(latest.value, current.value.activePlayerId) : null;
+      const snapshot = latest.ok
+        ? toGameSnapshotDto(latest.value, current.value.activePlayerId)
+        : null;
       return err(
-        new ConflictError('VERSION_CONFLICT', 'Game state has evolved. Resyncing with latest version.', {
-          snapshot,
-        })
+        new ConflictError(
+          'VERSION_CONFLICT',
+          'Game state has evolved. Resyncing with latest version.',
+          {
+            snapshot,
+          }
+        )
       );
     }
 
     return this.findById(id);
   }
 
-  async update(id: string, data: Partial<Prisma.GameUpdateInput>): Promise<Result<GameEntity, AppError>> {
+  async update(
+    id: string,
+    data: Partial<Prisma.GameUpdateInput>
+  ): Promise<Result<GameEntity, AppError>> {
     try {
       const updated = await prisma.game.update({
         where: { id },

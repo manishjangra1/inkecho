@@ -9,11 +9,5 @@ export interface PriorDrawingCardProps {
 }
 
 export function PriorDrawingCard({ drawingUrl, className }: PriorDrawingCardProps) {
-  return (
-    <PromptCard
-      type="DRAWING"
-      drawingUrl={drawingUrl}
-      className={className}
-    />
-  );
+  return <PromptCard type="DRAWING" drawingUrl={drawingUrl} className={className} />;
 }

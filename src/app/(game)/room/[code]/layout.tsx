@@ -6,11 +6,7 @@ import { RoomHeader } from '@/features/rooms/components/RoomHeader';
 import { RoomShell } from '@/shared/ui/layout/RoomShell';
 import { RealtimeProvider } from '@/features/realtime/providers/RealtimeProvider';
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ code: string }>;
-}) {
+export async function generateMetadata({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
   return {
     title: `Room ${code.toUpperCase()}`,
@@ -40,14 +36,8 @@ export default async function RoomLayout({
     ctx.type !== 'anonymous' && ctx.playerId
       ? ctx.playerId
       : `spectator_${room.code.toLowerCase()}`;
-  const displayName =
-    ctx.type !== 'anonymous' && ctx.displayName ? ctx.displayName : 'Spectator';
-  const role =
-    ctx.type !== 'anonymous' && ctx.role
-      ? ctx.role
-      : isHost
-        ? 'HOST'
-        : 'SPECTATOR';
+  const displayName = ctx.type !== 'anonymous' && ctx.displayName ? ctx.displayName : 'Spectator';
+  const role = ctx.type !== 'anonymous' && ctx.role ? ctx.role : isHost ? 'HOST' : 'SPECTATOR';
 
   return (
     <RealtimeProvider
@@ -57,10 +47,7 @@ export default async function RoomLayout({
       displayName={displayName}
       role={role}
     >
-      <RoomShell header={<RoomHeader room={room} isHost={isHost} />}>
-        {children}
-      </RoomShell>
+      <RoomShell header={<RoomHeader room={room} isHost={isHost} />}>{children}</RoomShell>
     </RealtimeProvider>
   );
 }
-

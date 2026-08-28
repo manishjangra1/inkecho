@@ -5,9 +5,4 @@ export interface RealtimePresenceData {
   readonly connectionStatus: 'ONLINE' | 'RECONNECTING';
 }
 
-export type ConnectionState =
-  | 'connecting'
-  | 'connected'
-  | 'disconnected'
-  | 'suspended'
-  | 'failed';
+export type ConnectionState = 'connecting' | 'connected' | 'disconnected' | 'suspended' | 'failed';

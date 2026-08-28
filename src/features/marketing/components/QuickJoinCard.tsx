@@ -36,11 +36,11 @@ export function QuickJoinCard() {
       <CardContent className="p-4">
         <form onSubmit={handleJoin} className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+            <span className="flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               <Hash className="h-3.5 w-3.5 text-brand-primary" />
               Quick Join Room
             </span>
-            <span className="text-xs text-muted-foreground font-mono">
+            <span className="font-mono text-xs text-muted-foreground">
               {code.length}/{ROOM_CONFIG.ROOM_CODE_LENGTH}
             </span>
           </div>
@@ -51,14 +51,14 @@ export function QuickJoinCard() {
               onChange={handleInputChange}
               placeholder="e.g. ABC123"
               error={!!error}
-              className="font-mono text-center text-lg uppercase tracking-widest bg-background/80 focus:border-brand-primary h-12"
+              className="h-12 bg-background/80 text-center font-mono text-lg uppercase tracking-widest focus:border-brand-primary"
               maxLength={ROOM_CONFIG.ROOM_CODE_LENGTH}
               aria-label="Room code"
             />
             <Button
               type="submit"
               variant="gradient"
-              className="h-12 px-5 shrink-0"
+              className="h-12 shrink-0 px-5"
               disabled={code.length !== ROOM_CONFIG.ROOM_CODE_LENGTH}
             >
               <span>Join</span>
@@ -66,7 +66,7 @@ export function QuickJoinCard() {
             </Button>
           </div>
 
-          {error && <p className="text-xs text-destructive font-medium">{error}</p>}
+          {error && <p className="text-xs font-medium text-destructive">{error}</p>}
         </form>
       </CardContent>
     </Card>

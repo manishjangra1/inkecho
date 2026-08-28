@@ -46,9 +46,6 @@ export function getPhaseDurationSeconds(
 /**
  * Computes the new turnEndsAt Date from a start time and duration.
  */
-export function computeTurnEndsAt(
-  startedAt: Date = new Date(),
-  durationSeconds: number
-): Date {
+export function computeTurnEndsAt(startedAt: Date = new Date(), durationSeconds: number): Date {
   return new Date(startedAt.getTime() + durationSeconds * 1000);
 }

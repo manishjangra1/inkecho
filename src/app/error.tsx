@@ -18,24 +18,22 @@ export default function RootErrorBoundary({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <Container size="sm">
-        <Card variant="glass" className="p-8 text-center space-y-6 border-destructive/30">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-destructive/10 text-destructive border border-destructive/20 shadow-sm">
+        <Card variant="glass" className="space-y-6 border-destructive/30 p-8 text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-destructive/20 bg-destructive/10 text-destructive shadow-sm">
             <AlertTriangle className="h-7 w-7" />
           </div>
 
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground font-display">
+            <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">
               Something went wrong
             </h1>
-            <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+            <p className="mx-auto max-w-sm text-sm text-muted-foreground">
               We encountered an unexpected glitch. Your session data is intact.
             </p>
             {error.digest && (
-              <p className="text-xs font-mono text-muted-foreground/60">
-                Digest: {error.digest}
-              </p>
+              <p className="font-mono text-xs text-muted-foreground/60">Digest: {error.digest}</p>
             )}
           </div>
 

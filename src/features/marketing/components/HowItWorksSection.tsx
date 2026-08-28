@@ -16,20 +16,20 @@ export function HowItWorksSection() {
   ];
 
   return (
-    <section className="py-20 bg-muted/20 border-y border-border/40 relative">
+    <section className="relative border-y border-border/40 bg-muted/20 py-20">
       <Container size="lg">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto space-y-3 mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold font-display tracking-tight text-foreground">
+        <div className="mx-auto mb-16 max-w-2xl space-y-3 text-center">
+          <h2 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             {COMMON_COPY.HOW_IT_WORKS.SECTION_TITLE}
           </h2>
-          <p className="text-muted-foreground text-base sm:text-lg">
+          <p className="text-base text-muted-foreground sm:text-lg">
             {COMMON_COPY.HOW_IT_WORKS.SECTION_SUBTITLE}
           </p>
         </div>
 
         {/* 4 Steps Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {COMMON_COPY.HOW_IT_WORKS.STEPS.map((step, idx) => (
             <motion.div
               key={step.number}
@@ -44,14 +44,14 @@ export function HowItWorksSection() {
             >
               <Card
                 variant="interactive"
-                className="h-full flex flex-col justify-between border-border/60 bg-card/70 backdrop-blur-sm"
+                className="flex h-full flex-col justify-between border-border/60 bg-card/70 backdrop-blur-sm"
               >
                 <CardHeader className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-background border border-border shadow-inner">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-background shadow-inner">
                       {icons[idx]}
                     </div>
-                    <span className="font-display font-extrabold text-3xl text-muted-foreground/30">
+                    <span className="font-display text-3xl font-extrabold text-muted-foreground/30">
                       0{step.number}
                     </span>
                   </div>
@@ -60,7 +60,7 @@ export function HowItWorksSection() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
+                  <p className="text-sm leading-relaxed text-muted-foreground">
                     {step.description}
                   </p>
                 </CardContent>

@@ -92,12 +92,7 @@ export class EventPublisher {
     );
   }
 
-  async playerKicked(
-    roomId: string,
-    playerId: string,
-    kickedBy: string,
-    correlationId?: string
-  ) {
+  async playerKicked(roomId: string, playerId: string, kickedBy: string, correlationId?: string) {
     return this.publish(
       roomId,
       REALTIME_EVENTS.PLAYER_KICKED,
@@ -160,11 +155,7 @@ export class EventPublisher {
 
   // --- Game Lifecycle Events ---
 
-  async gameStarted(
-    roomId: string,
-    game: GameEntity,
-    correlationId?: string
-  ) {
+  async gameStarted(roomId: string, game: GameEntity, correlationId?: string) {
     const firstChain = game.chains[0];
     return this.publish(
       roomId,
@@ -314,12 +305,7 @@ export class EventPublisher {
     );
   }
 
-  async roomClosed(
-    roomId: string,
-    reason: string,
-    message: string,
-    correlationId?: string
-  ) {
+  async roomClosed(roomId: string, reason: string, message: string, correlationId?: string) {
     return this.publish(
       roomId,
       REALTIME_EVENTS.ROOM_CLOSED,

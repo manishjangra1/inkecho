@@ -15,9 +15,9 @@ const leaveSchema = z.object({
   roomCode: roomCodeSchema,
 });
 
-export async function leaveRoomAction(
-  input: { roomCode: string }
-): Promise<ActionResult<LeaveRoomResponse>> {
+export async function leaveRoomAction(input: {
+  roomCode: string;
+}): Promise<ActionResult<LeaveRoomResponse>> {
   const correlationId = await getCorrelationId();
 
   try {

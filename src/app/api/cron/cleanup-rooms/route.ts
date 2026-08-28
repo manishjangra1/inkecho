@@ -5,10 +5,7 @@ import { env } from '@/shared/config/env';
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization');
-  if (
-    env.NODE_ENV === 'production' &&
-    authHeader !== `Bearer ${env.CRON_SECRET}`
-  ) {
+  if (env.NODE_ENV === 'production' && authHeader !== `Bearer ${env.CRON_SECRET}`) {
     return new NextResponse('Unauthorized', { status: 401 });
   }
 

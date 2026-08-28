@@ -36,29 +36,22 @@ export function InviteLinkBar({ roomCode }: InviteLinkBarProps) {
     }
   };
 
-  const hasNativeShare =
-    typeof navigator !== 'undefined' && !!navigator.share;
+  const hasNativeShare = typeof navigator !== 'undefined' && !!navigator.share;
 
   return (
-    <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 rounded-2xl bg-card/60 border border-border/80 backdrop-blur-md shadow-sm">
-      <div className="flex items-center gap-3 w-full sm:w-auto">
+    <div className="flex w-full flex-col items-center justify-between gap-3 rounded-2xl border border-border/80 bg-card/60 p-3.5 shadow-sm backdrop-blur-md sm:flex-row">
+      <div className="flex w-full items-center gap-3 sm:w-auto">
         <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Room Code:
         </span>
-        <span className="font-mono font-black text-xl tracking-widest text-brand-primary bg-muted/60 px-3 py-1 rounded-lg border border-border">
+        <span className="rounded-lg border border-border bg-muted/60 px-3 py-1 font-mono text-xl font-black tracking-widest text-brand-primary">
           {roomCode}
         </span>
       </div>
 
-      <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+      <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
         {hasNativeShare && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleShare}
-            className="gap-2"
-          >
+          <Button type="button" variant="outline" size="sm" onClick={handleShare} className="gap-2">
             <Share2 className="h-4 w-4" />
             Share
           </Button>

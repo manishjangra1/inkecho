@@ -1,7 +1,4 @@
-import {
-  REALTIME_EVENTS,
-  type RealtimeEnvelope,
-} from '@/shared/constants/realtime-events';
+import { REALTIME_EVENTS, type RealtimeEnvelope } from '@/shared/constants/realtime-events';
 import type { GameStoreState } from '@/features/game/stores/game-store';
 
 /**
