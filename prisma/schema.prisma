@@ -1,0 +1,430 @@
+// InkEcho — MongoDB Prisma Schema
+// Finalized Phase 3. See docs/phase-3/ for review notes and index strategy.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum RoomVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum RoomStatus {
+  LOBBY
+  IN_PROGRESS
+  REVEAL
+  CLOSED
+}
+
+enum ParticipantRole {
+  HOST
+  PLAYER
+  SPECTATOR
+}
+
+enum ConnectionStatus {
+  ONLINE
+  RECONNECTING
+  OFFLINE
+}
+
+enum GameStatus {
+  IN_PROGRESS
+  PAUSED
+  REVEAL
+  COMPLETED
+}
+
+enum TurnPhase {
+  DESCRIBE
+  DRAW
+}
+
+enum ReportTargetType {
+  DRAWING
+  DESCRIPTION
+  USER
+}
+
+enum ReportReason {
+  NSFW
+  HARASSMENT
+  SPAM
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  DISMISSED
+}
+
+enum PromptCategory {
+  FUNNY
+  OBJECT
+  ACTION
+  POP_CULTURE
+}
+
+enum RoomCloseReason {
+  HOST
+  IDLE_TIMEOUT
+  EMPTY
+  ADMIN
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BETTER AUTH MODELS (+ InkEcho extensions on User)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model User {
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  name              String
+  email             String    @unique
+  emailVerified     Boolean   @default(false)
+  image             String?
+  role              UserRole  @default(USER)
+  bannedUntil       DateTime?
+  bannedPermanently Boolean   @default(false)
+  deletedAt         DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  accounts         Account[]
+  sessions         Session[]
+  roomParticipants RoomParticipant[]
+  gameHistory      GameHistory[]
+  userStats        UserStats?
+  userAchievements UserAchievement[]
+  reportsReviewed  Report[]          @relation("ReportReviewer")
+
+  @@index([deletedAt])
+  @@map("users")
+}
+
+model Account {
+  id                    String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId                String    @db.ObjectId
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Session {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model Verification {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, value])
+  @@index([expiresAt])
+  @@map("verifications")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GUEST SESSIONS
+// ─────────────────────────────────────────────────────────────────────────────
+
+model GuestSession {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  token       String   @unique
+  displayName String
+  playerId    String
+  roomId      String   @db.ObjectId
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+
+  room         Room              @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  participants RoomParticipant[]
+
+  @@index([roomId])
+  @@index([playerId])
+  @@index([expiresAt]) // TTL: configure expireAfterSeconds=0 in Atlas (see docs/phase-3)
+  @@map("guest_sessions")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ROOMS
+// ─────────────────────────────────────────────────────────────────────────────
+
+type RoomSettings {
+  maxPlayers       Int     @default(8)
+  minPlayers       Int     @default(3)
+  roundCount       Int     @default(1)
+  describeTimerSec Int     @default(60)
+  drawTimerSec     Int     @default(90)
+  profanityFilter  Boolean @default(false)
+  allowSpectators  Boolean @default(true)
+}
+
+model Room {
+  id              String          @id @default(auto()) @map("_id") @db.ObjectId
+  code            String          @unique
+  hostPlayerId    String
+  visibility      RoomVisibility  @default(PRIVATE)
+  status          RoomStatus      @default(LOBBY)
+  settings        RoomSettings
+  participantIds  String[]        @default([])
+  spectatorIds    String[]        @default([])
+  kickedPlayerIds String[]        @default([])
+  currentGameId   String?         @db.ObjectId
+  lastActivityAt  DateTime        @default(now())
+  closedAt        DateTime?
+  closeReason     RoomCloseReason?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  deletedAt       DateTime?
+
+  currentGame  Game?             @relation("RoomCurrentGame", fields: [currentGameId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  games        Game[]            @relation("RoomGames")
+  participants RoomParticipant[]
+  guestSessions GuestSession[]
+  gameHistory  GameHistory[]
+
+  @@index([status, visibility, lastActivityAt(sort: Desc)])
+  @@index([lastActivityAt])
+  @@index([deletedAt])
+  @@map("rooms")
+}
+
+model RoomParticipant {
+  id               String           @id @default(auto()) @map("_id") @db.ObjectId
+  roomId           String           @db.ObjectId
+  playerId         String
+  userId           String?          @db.ObjectId
+  guestSessionId   String?          @db.ObjectId
+  displayName      String
+  avatarUrl        String?
+  role             ParticipantRole  @default(PLAYER)
+  isReady          Boolean          @default(false)
+  connectionStatus ConnectionStatus @default(ONLINE)
+  joinedAt         DateTime         @default(now())
+  leftAt           DateTime?
+
+  room         Room          @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  guestSession GuestSession? @relation(fields: [guestSessionId], references: [id], onDelete: SetNull)
+
+  @@unique([roomId, playerId])
+  @@index([roomId, role])
+  @@index([userId])
+  @@map("room_participants")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GAME (embedded chains + turns)
+// ─────────────────────────────────────────────────────────────────────────────
+
+type GameTurn {
+  id               String
+  turnIndex        Int
+  playerId         String
+  phase            TurnPhase
+  textContent      String?
+  drawingUrl       String?
+  drawingPublicId  String?
+  submittedAt      DateTime?
+  skipped          Boolean   @default(false)
+  autoSubmitted    Boolean   @default(false)
+}
+
+type GameChain {
+  chainIndex    Int
+  starterPrompt String
+  turns         GameTurn[]
+}
+
+type GameVotes {
+  counts Json // { "0": 3, "1": 1 } chainIndex → vote count
+}
+
+model Game {
+  id                 String     @id @default(auto()) @map("_id") @db.ObjectId
+  roomId             String     @db.ObjectId
+  status             GameStatus @default(IN_PROGRESS)
+  version            Int        @default(1)
+  currentRoundIndex  Int        @default(0)
+  currentChainIndex  Int        @default(0)
+  currentTurnIndex   Int        @default(0)
+  turnPhase          TurnPhase  @default(DESCRIBE)
+  turnStartedAt      DateTime
+  turnEndsAt         DateTime
+  activePlayerId     String
+  chains             GameChain[]
+  playerOrder        String[]
+  votes              GameVotes?
+  revealChainIndex   Int        @default(0)
+  revealStepIndex    Int        @default(0)
+  pausedAt           DateTime?
+  pauseRemainingMs   Int?
+  completedAt        DateTime?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  room        Room          @relation("RoomGames", fields: [roomId], references: [id], onDelete: Cascade)
+  roomCurrent Room?         @relation("RoomCurrentGame")
+  reports     Report[]
+  history     GameHistory[]
+
+  @@index([roomId, status])
+  @@index([roomId, createdAt(sort: Desc)])
+  @@map("games")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PROFILE & ACHIEVEMENTS
+// ─────────────────────────────────────────────────────────────────────────────
+
+model GameHistory {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  gameId        String    @db.ObjectId
+  roomId        String    @db.ObjectId
+  roomCode      String
+  userId        String    @db.ObjectId
+  playerId      String
+  placement     Int?
+  chainsPlayed  Int
+  wonVote       Boolean   @default(false)
+  playedAt      DateTime  @default(now())
+  snapshotUrl   String?
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, playedAt(sort: Desc)])
+  @@index([gameId])
+  @@map("game_history")
+}
+
+model UserStats {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String   @unique @db.ObjectId
+  gamesPlayed      Int      @default(0)
+  gamesWon         Int      @default(0)
+  chainsCompleted  Int      @default(0)
+  turnsSubmitted   Int      @default(0)
+  updatedAt        DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_stats")
+}
+
+model Achievement {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  code        String   @unique
+  name        String
+  description String
+  iconUrl     String?
+  criteria    Json
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  userAchievements UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String   @db.ObjectId
+  achievementId String   @db.ObjectId
+  unlockedAt    DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+  @@map("user_achievements")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MODERATION
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Report {
+  id               String           @id @default(auto()) @map("_id") @db.ObjectId
+  reporterPlayerId String
+  reporterUserId   String?          @db.ObjectId
+  targetType       ReportTargetType
+  targetId         String
+  gameId           String           @db.ObjectId
+  reason           ReportReason
+  notes            String?
+  status           ReportStatus     @default(PENDING)
+  reviewedById     String?          @db.ObjectId
+  reviewedAt       DateTime?
+  createdAt        DateTime         @default(now())
+
+  game       Game  @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  reviewedBy User? @relation("ReportReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt(sort: Desc)])
+  @@index([gameId])
+  @@map("reports")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PROMPT POOL
+// ─────────────────────────────────────────────────────────────────────────────
+
+model PromptPool {
+  id       String         @id @default(auto()) @map("_id") @db.ObjectId
+  text     String
+  category PromptCategory
+  isActive Boolean        @default(true)
+  language String         @default("en")
+
+  @@index([isActive, category])
+  @@map("prompt_pool")
+}
