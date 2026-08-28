@@ -55,6 +55,19 @@ export function GameChatSidebar({
     }
   };
 
+  // Hydrate in-memory recent messages from server cache on mount/refresh
+  React.useEffect(() => {
+    if (!roomCode) return;
+    fetch(`/api/rooms/${encodeURIComponent(roomCode)}/chat`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.success && Array.isArray(data?.data?.messages)) {
+          useChatStore.getState().setInitialMessages(data.data.messages);
+        }
+      })
+      .catch(() => {});
+  }, [roomCode]);
+
   // Sound & Smart Auto-Scroll when new messages arrive
   React.useEffect(() => {
     if (messages.length > prevMessagesLength.current) {

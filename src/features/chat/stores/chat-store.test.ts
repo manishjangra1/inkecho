@@ -67,4 +67,32 @@ describe('useChatStore', () => {
     useChatStore.getState().toggleSound();
     expect(useChatStore.getState().isSoundEnabled).toBe(!initial);
   });
+
+  it('hydrates initial messages without duplicate entries', () => {
+    const msg1: ChatMessageDto = {
+      id: 'm1',
+      roomId: 'r1',
+      senderId: 'p1',
+      senderName: 'Alice',
+      text: 'First',
+      role: 'PLAYER',
+      isSystem: false,
+      timestamp: '2026-08-28T10:00:00.000Z',
+    };
+    const msg2: ChatMessageDto = {
+      id: 'm2',
+      roomId: 'r1',
+      senderId: 'p2',
+      senderName: 'Bob',
+      text: 'Second',
+      role: 'PLAYER',
+      isSystem: false,
+      timestamp: '2026-08-28T10:01:00.000Z',
+    };
+
+    useChatStore.getState().addMessage(msg1);
+    useChatStore.getState().setInitialMessages([msg1, msg2]);
+    expect(useChatStore.getState().messages).toHaveLength(2);
+    expect(useChatStore.getState().messages[1]?.id).toBe('m2');
+  });
 });

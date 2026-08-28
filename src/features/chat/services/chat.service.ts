@@ -13,6 +13,10 @@ import type { ChatMessageDto, ChatSenderRole } from '../types/chat.types';
 // In-memory sliding rate limiter per player (no DB overhead)
 const recentMessageTimestamps = new Map<string, number[]>();
 
+// In-memory recent messages buffer per room (up to 50 items, zero DB writes)
+const roomRecentMessages = new Map<string, ChatMessageDto[]>();
+const MAX_RECENT_MESSAGES = 50;
+
 // Basic profanity wordlist for filtering when enabled in room settings
 const PROFANITY_REGEX =
   /\b(fuck|shit|bitch|asshole|bastard|cunt|dick|pussy|fag|slut|whore)\b/gi;
@@ -23,10 +27,18 @@ function filterProfanity(text: string): string {
 
 export class ChatService {
   /**
-   * Reset rate limits (useful for testing)
+   * Reset rate limits and in-memory cache (useful for testing)
    */
   public clearRateLimits(): void {
     recentMessageTimestamps.clear();
+    roomRecentMessages.clear();
+  }
+
+  /**
+   * Retrieves ephemeral in-memory messages for a room without database queries.
+   */
+  public getRecentMessages(roomCode: string): ChatMessageDto[] {
+    return roomRecentMessages.get(roomCode.toUpperCase()) || [];
   }
 
   /**
@@ -110,7 +122,12 @@ export class ChatService {
       timestamp: new Date().toISOString(),
     };
 
-    // 7. Publish to Ably Realtime (zero DB writes)
+    // 7. Store in ephemeral in-memory room buffer
+    const existing = roomRecentMessages.get(room.code) || [];
+    const updated = [...existing, messageDto].slice(-MAX_RECENT_MESSAGES);
+    roomRecentMessages.set(room.code, updated);
+
+    // 8. Publish to Ably Realtime (zero DB writes)
     await eventPublisher.chatMessage(room.id, messageDto, correlationId);
 
     return ok(messageDto);
