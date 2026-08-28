@@ -20,15 +20,25 @@ export interface GameShellProps {
 
 export function GameShell({ roomCode }: GameShellProps) {
   const router = useRouter();
-  const { game, currentTurn, isHost, isSpectator, isPaused, connectionState, isLoading } =
-    useGameState(roomCode);
+  const {
+    game,
+    currentTurn,
+    isHost,
+    isSpectator,
+    isPaused,
+    connectionState,
+    isLoading,
+    isNoActiveGame,
+  } = useGameState(roomCode);
 
   useEffect(() => {
     if (game?.status === 'REVEAL' || game?.status === 'COMPLETED') {
       toast.info('Game turns finished! Directing to the story reveal…');
       router.push(`/room/${roomCode}/reveal`);
+    } else if (isNoActiveGame) {
+      router.push(`/room/${roomCode}`);
     }
-  }, [game?.status, roomCode, router]);
+  }, [game?.status, isNoActiveGame, roomCode, router]);
 
   const [isPauseLoading, setIsPauseLoading] = useState(false);
 
@@ -61,7 +71,9 @@ export function GameShell({ roomCode }: GameShellProps) {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center space-y-3 p-4">
         <Loader2 className="h-6 w-6 animate-spin text-white" />
-        <p className="text-xs font-mono text-neutral-400">Loading game session...</p>
+        <p className="text-xs font-mono text-neutral-400">
+          {isNoActiveGame ? 'Redirecting to room lobby…' : 'Loading game session...'}
+        </p>
       </div>
     );
   }
