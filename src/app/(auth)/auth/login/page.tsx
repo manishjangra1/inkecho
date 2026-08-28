@@ -1,5 +1,8 @@
 import * as React from 'react';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/infrastructure/auth/next-auth.config';
 import { AuthCard } from '@/features/auth/components/AuthCard';
 import { LoginForm } from '@/features/auth/components/LoginForm';
 import { Skeleton } from '@/shared/ui/skeleton';
@@ -10,7 +13,12 @@ export const metadata = {
   description: 'Sign in to your InkEcho account to access custom drawings and game history.',
 };
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const session = await getServerSession(authOptions);
+  if (session?.user) {
+    redirect(ROUTES.HOME);
+  }
+
   return (
     <AuthCard
       title="Welcome Back"

@@ -19,8 +19,21 @@ export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const returnUrl = searchParams.get('returnUrl') || ROUTES.HOME;
+  const authError = searchParams.get('error');
 
   const [isLoading, setIsLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    if (authError) {
+      if (authError === 'OAuthAccountNotLinked') {
+        toast.error('To confirm your identity, please sign in with the original provider or password.');
+      } else if (authError === 'CredentialsSignin') {
+        toast.error('Invalid email or password.');
+      } else {
+        toast.error(`Authentication error: ${authError}`);
+      }
+    }
+  }, [authError]);
 
   const {
     register,

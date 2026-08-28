@@ -1,4 +1,7 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/infrastructure/auth/next-auth.config';
 import { AuthCard } from '@/features/auth/components/AuthCard';
 import { RegisterForm } from '@/features/auth/components/RegisterForm';
 import { ROUTES } from '@/shared/constants/routes';
@@ -8,7 +11,12 @@ export const metadata = {
   description: 'Create an InkEcho account to save your drawings and stats.',
 };
 
-export default function RegisterPage() {
+export default async function RegisterPage() {
+  const session = await getServerSession(authOptions);
+  if (session?.user) {
+    redirect(ROUTES.HOME);
+  }
+
   return (
     <AuthCard
       title="Create Account"
