@@ -3,13 +3,32 @@ import { z } from 'zod';
 const serverSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   DATABASE_URL: z.string().default('mongodb://localhost:27017/inkecho'),
-  BETTER_AUTH_SECRET: z.string().min(1).default('development_secret_32_characters_long_min'),
-  BETTER_AUTH_URL: z.string().default('http://localhost:3000'),
+  NEXTAUTH_SECRET: z
+    .string()
+    .min(1)
+    .default(
+      process.env.BETTER_AUTH_SECRET ||
+        process.env.NEXTAUTH_SECRET ||
+        'development_secret_32_characters_long_min'
+    ),
+  NEXTAUTH_URL: z
+    .string()
+    .default(
+      process.env.BETTER_AUTH_URL ||
+        process.env.NEXTAUTH_URL ||
+        'http://localhost:3000'
+    ),
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
   GITHUB_CLIENT_ID: z.string().optional(),
   GITHUB_CLIENT_SECRET: z.string().optional(),
-  GUEST_SESSION_SECRET: z.string().min(1).default('development_guest_secret_32_characters_long'),
+  GUEST_SESSION_SECRET: z
+    .string()
+    .min(1)
+    .default(
+      process.env.GUEST_SESSION_SECRET ||
+        'development_guest_secret_32_characters_long'
+    ),
   GUEST_SESSION_TTL_HOURS: z.coerce.number().default(24),
   ABLY_API_KEY: z.string().default('dummy:dummy'),
   ABLY_TOKEN_TTL_SECONDS: z.coerce.number().default(3600),

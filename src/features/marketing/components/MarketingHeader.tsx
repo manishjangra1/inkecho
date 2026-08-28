@@ -1,14 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { Sparkles, Plus, Compass, LogIn } from 'lucide-react';
+import { Sparkles, Plus, Compass, LogIn, LogOut, User as UserIcon } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { ThemeToggle } from '@/shared/ui/theme-toggle';
 import { Container } from '@/shared/ui/layout/Container';
+import { useSession, signOut } from '@/features/auth/lib/auth-client';
 import { ROUTES } from '@/shared/constants/routes';
 import { COMMON_COPY } from '@/shared/constants/copy/common';
 
 export function MarketingHeader() {
+  const { data: session } = useSession();
+
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl transition-all">
       <Container size="lg">
@@ -48,12 +51,30 @@ export function MarketingHeader() {
               </Button>
             </Link>
 
-            <Link href={ROUTES.AUTH.LOGIN}>
-              <Button variant="outline" size="sm" className="gap-1.5">
-                <LogIn className="h-4 w-4" />
-                {COMMON_COPY.NAV.LOGIN}
-              </Button>
-            </Link>
+            {session?.user ? (
+              <div className="flex items-center gap-2">
+                <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-muted-foreground font-medium px-2 py-1 bg-card rounded-md border border-border/60">
+                  <UserIcon className="h-3 w-3 text-brand-primary" />
+                  {session.user.name || session.user.email}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => signOut({ callbackUrl: '/' })}
+                  className="gap-1.5 text-xs"
+                >
+                  <LogOut className="h-3.5 w-3.5" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Link href={ROUTES.AUTH.LOGIN}>
+                <Button variant="outline" size="sm" className="gap-1.5">
+                  <LogIn className="h-4 w-4" />
+                  {COMMON_COPY.NAV.LOGIN}
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </Container>

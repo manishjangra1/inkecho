@@ -4,16 +4,28 @@ import { cn } from '@/shared/lib/cn';
 export interface PageHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   description?: string;
+  badge?: React.ReactNode;
   actions?: React.ReactNode;
 }
 
-export function PageHeader({ title, description, actions, className, ...props }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  description,
+  badge,
+  actions,
+  className,
+  ...props
+}: PageHeaderProps) {
   return (
     <div
-      className={cn('flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between py-6', className)}
+      className={cn(
+        'flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between py-6',
+        className
+      )}
       {...props}
     >
-      <div className="space-y-1">
+      <div className="space-y-1.5">
+        {badge && <div>{badge}</div>}
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground font-display">
           {title}
         </h1>

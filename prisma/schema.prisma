@@ -89,14 +89,15 @@ enum RoomCloseReason {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// BETTER AUTH MODELS (+ InkEcho extensions on User)
+// NEXT AUTH MODELS (+ InkEcho extensions on User)
 // ─────────────────────────────────────────────────────────────────────────────
 
 model User {
   id                String    @id @default(auto()) @map("_id") @db.ObjectId
-  name              String
-  email             String    @unique
-  emailVerified     Boolean   @default(false)
+  name              String?
+  email             String?   @unique
+  emailVerified     DateTime?
+  password          String?
   image             String?
   role              UserRole  @default(USER)
   bannedUntil       DateTime?
@@ -118,54 +119,51 @@ model User {
 }
 
 model Account {
-  id                    String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId                String    @db.ObjectId
-  accountId             String
-  providerId            String
-  accessToken           String?
-  refreshToken          String?
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
-  scope                 String?
-  password              String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([providerId, accountId])
-  @@index([userId])
-  @@map("accounts")
-}
-
-model Session {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  token     String   @unique
-  expiresAt DateTime
-  ipAddress String?
-  userAgent String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([provider, providerAccountId])
   @@index([userId])
-  @@index([expiresAt])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
   @@map("sessions")
 }
 
-model Verification {
+model VerificationToken {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   identifier String
-  value      String
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  token      String
+  expires    DateTime
 
-  @@unique([identifier, value])
-  @@index([expiresAt])
-  @@map("verifications")
+  @@unique([identifier, token])
+  @@map("verification_tokens")
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

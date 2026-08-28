@@ -1,6 +1,7 @@
 export const COMMON_COPY = {
   APP_NAME: 'InkEcho',
   TAGLINE: 'Draw. Describe. Watch it echo.',
+  APP_TAGLINE: 'Draw. Describe. Watch it echo.',
   HERO: {
     TITLE: 'Draw. Describe.',
     TITLE_HIGHLIGHT: 'Watch it echo.',
@@ -11,6 +12,18 @@ export const COMMON_COPY = {
     QUICK_JOIN: 'Quick Join',
     ENTER_CODE: 'Enter 6-character code',
     JOIN_BUTTON: 'Join →',
+  },
+  BROWSE: {
+    PAGE_TITLE: 'Browse Public Rooms',
+    PAGE_SUBTITLE: 'Join active open game lobbies with players worldwide.',
+  },
+  CREATE_ROOM: {
+    TITLE: 'Create Game Room',
+    SUBTITLE: 'Customize rules and host a game with friends.',
+  },
+  QUICK_JOIN: {
+    TITLE: 'Join Game Room',
+    SUBTITLE: 'Enter a 6-character room code to join.',
   },
   HOW_IT_WORKS: {
     SECTION_TITLE: 'How It Works',

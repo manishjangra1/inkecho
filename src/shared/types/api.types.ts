@@ -26,6 +26,8 @@ export type ActionResponse<T> =
   | { readonly success: true; readonly data: T; readonly correlationId?: string }
   | { readonly success: false; readonly error: ApiError };
 
+export type ActionResult<T> = ActionResponse<T>;
+
 export interface HealthCheckResponse {
   readonly status: 'healthy' | 'degraded' | 'unhealthy';
   readonly timestamp: string;

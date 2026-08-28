@@ -69,10 +69,14 @@ export class ConflictError extends AppError {
 }
 
 export class GameStateError extends AppError {
-  readonly code = 'INVALID_GAME_TRANSITION';
+  readonly code: string;
   readonly statusCode = 409;
-  constructor(message: string = 'Action not allowed in current game state.') {
+  constructor(
+    code: string = 'INVALID_GAME_TRANSITION',
+    message: string = 'Action not allowed in current game state.'
+  ) {
     super(message);
+    this.code = code;
   }
 }
 
