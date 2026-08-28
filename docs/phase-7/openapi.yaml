@@ -462,6 +462,28 @@ paths:
         '200':
           description: Kicked
 
+  /rooms/{code}/transfer-host:
+    post:
+      tags: [Rooms]
+      summary: Transfer room host
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/RoomCode'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [newHostPlayerId]
+              properties:
+                newHostPlayerId:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Host transferred
+
   /rooms/{code}/game/start:
     post:
       tags: [Game]
@@ -571,6 +593,70 @@ paths:
         '422':
           description: Empty canvas
 
+  /rooms/{code}/game/pause:
+    post:
+      tags: [Game]
+      summary: Pause game (host)
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/RoomCode'
+      responses:
+        '200':
+          description: Game paused
+        '403':
+          description: Not host
+
+  /rooms/{code}/game/resume:
+    post:
+      tags: [Game]
+      summary: Resume game (host)
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/RoomCode'
+      responses:
+        '200':
+          description: Game resumed
+        '403':
+          description: Not host
+
+  /rooms/{code}/game/vote:
+    post:
+      tags: [Game]
+      summary: Vote on reveal chain
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/RoomCode'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [chainIndex]
+              properties:
+                chainIndex:
+                  type: integer
+                  minimum: 0
+      responses:
+        '200':
+          description: Vote recorded
+
+  /rooms/{code}/game/rematch:
+    post:
+      tags: [Game]
+      summary: Return room to lobby for rematch (host)
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/RoomCode'
+      responses:
+        '200':
+          description: Returned to lobby
+        '403':
+          description: Not host
+
   /realtime/token:
     get:
       tags: [Realtime]
@@ -609,6 +695,21 @@ paths:
         '200':
           description: Updated
 
+  /profile/history:
+    get:
+      tags: [Profile]
+      summary: Get user game history
+      security:
+        - authCookie: []
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+
   /reports:
     post:
       tags: [Reports]
@@ -619,10 +720,139 @@ paths:
         '201':
           description: Created
 
+  /admin/reports:
+    get:
+      tags: [Admin]
+      summary: List moderation reports
+      security:
+        - authCookie: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [PENDING, REVIEWED, DISMISSED]
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Forbidden
+
+  /admin/reports/{id}:
+    get:
+      tags: [Admin]
+      summary: Get moderation report details
+      security:
+        - authCookie: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Forbidden
+        '404':
+          description: Report not found
+    patch:
+      tags: [Admin]
+      summary: Review moderation report
+      security:
+        - authCookie: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [REVIEWED, DISMISSED]
+                action:
+                  type: string
+                  enum: [DISMISS, BAN_USER]
+                banDurationHours:
+                  type: integer
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Forbidden
+
+  /admin/users/{id}/ban:
+    post:
+      tags: [Admin]
+      summary: Ban user
+      security:
+        - authCookie: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason, permanent]
+              properties:
+                reason:
+                  type: string
+                permanent:
+                  type: boolean
+                durationHours:
+                  type: integer
+      responses:
+        '200':
+          description: User banned
+        '403':
+          description: Forbidden
+
   /cron/cleanup-rooms:
     post:
       tags: [Cron]
       summary: Cleanup inactive rooms
+      security:
+        - cronBearer: []
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+
+  /cron/advance-reveal:
+    post:
+      tags: [Cron]
+      summary: Auto-advance reveal phase
+      security:
+        - cronBearer: []
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+
+  /cron/process-timers:
+    post:
+      tags: [Cron]
+      summary: Process expired turn timers
       security:
         - cronBearer: []
       responses:

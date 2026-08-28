@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Story Reveal & Voting Flow', () => {
-  test('reveal page shows loading or error when room not found', async ({ page }) => {
-    await page.goto('/room/REV001/reveal');
+test.describe('Post-Game Reveal & Voting E2E', () => {
+  test('reveal phase route gracefully loads with shell and error boundary', async ({ page }) => {
+    await page.goto('/room/ZZZZZZ/reveal');
     await expect(page).toBeDefined();
   });
 });

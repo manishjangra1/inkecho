@@ -1,6 +1,7 @@
 import { roomRepository } from '@/infrastructure/db/repositories/room.repository';
 import { participantRepository } from '@/infrastructure/db/repositories/participant.repository';
 import { guestSessionService } from '@/features/auth/services/guest-session.service';
+import { eventPublisher } from '@/infrastructure/realtime/event-publisher';
 import { generateRoomCode } from '@/domain/shared/value-objects/room-code';
 import { isRoomFull } from '@/domain/room/room-rules';
 import { ok, err, type Result } from '@/domain/shared/result';
@@ -240,6 +241,24 @@ export class RoomService {
   ): Promise<Result<RoomSnapshotDto, AppError>> {
     authorize(ctx, 'room:settings');
     return roomRepository.updateSettings(dto.roomCode, dto.settings);
+  }
+
+  async closeRoom(roomCode: string, ctx: AuthContext): Promise<Result<void, AppError>> {
+    authorize(ctx, 'room:settings');
+    const roomResult = await roomRepository.findByCode(roomCode);
+    if (!roomResult.ok) {
+      return err(new NotFoundError('ROOM_NOT_FOUND', 'Room not found.'));
+    }
+
+    const room = roomResult.value;
+    if (ctx.type === 'anonymous' || !ctx.playerId || room.hostPlayerId !== ctx.playerId) {
+      return err(new ForbiddenError('NOT_HOST', 'Only the room host can close the room.'));
+    }
+
+    await roomRepository.close(roomCode, 'HOST');
+    await eventPublisher.roomClosed(room.id, 'HOST', 'Room has been closed by the host.');
+
+    return ok(undefined);
   }
 }
 

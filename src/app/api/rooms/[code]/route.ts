@@ -47,3 +47,24 @@ export async function PATCH(
     return handleApiError(error, correlationId);
   }
 }
+
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ code: string }> }
+) {
+  const correlationId = await getCorrelationId();
+
+  try {
+    const { code } = await params;
+    const ctx = await getAuthContext();
+
+    const result = await roomService.closeRoom(code, ctx);
+    if (!result.ok) {
+      return handleApiError(result.error, correlationId);
+    }
+
+    return new NextResponse(null, { status: 204 });
+  } catch (error) {
+    return handleApiError(error, correlationId);
+  }
+}

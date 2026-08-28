@@ -22,10 +22,13 @@ export async function POST(_request: Request, context: RouteContext) {
       return handleApiError(startRes.error, correlationId);
     }
 
-    return NextResponse.json({
-      success: true,
-      data: startRes.value,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        data: startRes.value,
+      },
+      { status: 201 }
+    );
   } catch (error) {
     return handleApiError(error, correlationId);
   }
