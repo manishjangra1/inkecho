@@ -54,4 +54,25 @@ describe('Game Store (Zustand)', () => {
     expect(state.game?.version).toBe(5);
     expect(state.game?.currentTurnIndex).toBe(2);
   });
+
+  it('resetGame resets game data while keeping room context intact', () => {
+    useGameStore.getState().initRoomContext({
+      roomCode: 'ABCD12',
+      roomId: 'room_123',
+      playerId: 'player_123',
+      isHost: true,
+      isSpectator: false,
+    });
+
+    useGameStore.getState().setPaused(true, 30);
+
+    useGameStore.getState().resetGame();
+
+    const state = useGameStore.getState();
+    expect(state.game).toBeNull();
+    expect(state.isPaused).toBe(false);
+    expect(state.remainingSeconds).toBe(0);
+    expect(state.roomCode).toBe('ABCD12');
+    expect(state.playerId).toBe('player_123');
+  });
 });

@@ -47,8 +47,8 @@ export function useRevealPlayback({ roomCode, autoPlayDefault = true }: UseRevea
       if (!res.ok) return { success: false, data: { status: 'UNKNOWN' } };
       return res.json();
     },
-    refetchInterval: 3000,
-    staleTime: 2000,
+    refetchInterval: 1500,
+    staleTime: 1000,
   });
 
   useEffect(() => {

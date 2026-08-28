@@ -34,9 +34,9 @@ export function GameShell({ roomCode }: GameShellProps) {
   useEffect(() => {
     if (game?.status === 'REVEAL' || game?.status === 'COMPLETED') {
       toast.info('Game turns finished! Directing to the story reveal…');
-      router.push(`/room/${roomCode}/reveal`);
+      router.push(`/room/${encodeURIComponent(roomCode)}/reveal`);
     } else if (isNoActiveGame) {
-      router.push(`/room/${roomCode}`);
+      router.push(`/room/${encodeURIComponent(roomCode)}/lobby`);
     }
   }, [game?.status, isNoActiveGame, roomCode, router]);
 

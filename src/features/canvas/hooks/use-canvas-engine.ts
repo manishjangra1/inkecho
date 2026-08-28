@@ -86,15 +86,25 @@ export function useCanvasEngine(options: UseCanvasEngineOptions = {}) {
     const rect = canvas.parentElement.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
 
-    // Calculate aspect-ratio-bound logical dimensions
-    const displayWidth = rect.width;
-    const displayHeight = displayWidth / CANVAS_CONFIG.DIMENSIONS.ASPECT_RATIO;
+    // Calculate aspect-ratio-bound logical dimensions with aspect-fit
+    const maxWidth = rect.width;
+    const maxHeight = rect.height;
+
+    let displayWidth = maxWidth;
+    let displayHeight = displayWidth / CANVAS_CONFIG.DIMENSIONS.ASPECT_RATIO;
+
+    if (maxHeight > 0 && displayHeight > maxHeight) {
+      displayHeight = maxHeight;
+      displayWidth = displayHeight * CANVAS_CONFIG.DIMENSIONS.ASPECT_RATIO;
+    }
+
+    if (displayWidth <= 0 || displayHeight <= 0) return;
 
     canvas.width = Math.round(displayWidth * dpr);
     canvas.height = Math.round(displayHeight * dpr);
 
-    canvas.style.width = `${displayWidth}px`;
-    canvas.style.height = `${displayHeight}px`;
+    canvas.style.width = `${Math.round(displayWidth)}px`;
+    canvas.style.height = `${Math.round(displayHeight)}px`;
 
     redraw();
   }, [redraw]);

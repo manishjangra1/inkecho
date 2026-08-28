@@ -26,6 +26,7 @@ export interface GameStoreState {
   setTurn: (turn: TurnSnapshotDto, version: number, status?: GameStatus) => void;
   setRemainingSeconds: (seconds: number) => void;
   setConnectionState: (state: GameStoreState['connectionState']) => void;
+  resetGame: () => void;
   reset: () => void;
 }
 
@@ -134,6 +135,13 @@ export const useGameStore = create<GameStoreState>((set) => ({
   setRemainingSeconds: (seconds) => set({ remainingSeconds: Math.max(0, seconds) }),
 
   setConnectionState: (connectionState) => set({ connectionState }),
+
+  resetGame: () =>
+    set({
+      game: null,
+      isPaused: false,
+      remainingSeconds: 0,
+    }),
 
   reset: () =>
     set({

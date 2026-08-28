@@ -12,7 +12,7 @@ export interface DrawingCanvasProps {
 }
 
 export function DrawingCanvas({ engine, className, isLoading = false }: DrawingCanvasProps) {
-  const { canvasRef, pointerHandlers, isDrawing, isExporting } = engine;
+  const { canvasRef, pointerHandlers, isExporting } = engine;
 
   if (isLoading) {
     return <CanvasSkeleton className={className} />;
@@ -21,8 +21,7 @@ export function DrawingCanvas({ engine, className, isLoading = false }: DrawingC
   return (
     <div
       className={cn(
-        'relative aspect-[4/3] w-full select-none overflow-hidden rounded-[4px] border border-neutral-700 bg-white transition-colors',
-        isDrawing && 'border-white',
+        'relative flex h-full w-full items-center justify-center select-none overflow-hidden bg-[#262626]',
         className
       )}
       style={{ touchAction: 'none' }}
@@ -30,7 +29,7 @@ export function DrawingCanvas({ engine, className, isLoading = false }: DrawingC
       <canvas
         ref={canvasRef}
         {...pointerHandlers}
-        className="block h-full w-full cursor-crosshair touch-none bg-white"
+        className="block cursor-crosshair touch-none bg-[#262626]"
         aria-label="Drawing canvas"
         role="region"
       />

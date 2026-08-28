@@ -179,6 +179,7 @@ export class RoomRepository {
         where: { id: current.id },
         data: {
           status,
+          currentGameId: status === 'LOBBY' ? null : current.currentGameId,
           lastActivityAt: new Date(),
         },
         include: {

@@ -57,13 +57,13 @@ export function RevealStep({ step, isLatest, onReport, stepNumber, className }: 
         {/* Step Content */}
         <div className="flex flex-1 items-center justify-center p-0 overflow-hidden">
           {isDraw ? (
-            <div className="flex h-full w-full items-center justify-center bg-white p-0 overflow-hidden">
+            <div className="flex h-full w-full items-center justify-center bg-[#262626] p-0 overflow-hidden">
               {step.drawingUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={step.drawingUrl}
                   alt={`Drawing by ${step.authorDisplayName}`}
-                  className="h-full w-full object-contain bg-white"
+                  className="h-full w-full object-contain bg-[#262626]"
                   loading="lazy"
                 />
               ) : (

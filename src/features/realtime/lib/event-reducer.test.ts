@@ -162,4 +162,50 @@ describe('Realtime Event Reducer', () => {
 
     expect(useGameStore.getState().isPaused).toBe(false);
   });
+
+  it('handles RETURNED_TO_LOBBY and resets game state', () => {
+    useGameStore.getState().setSnapshot({
+      id: 'game123',
+      roomId: 'room123',
+      status: 'REVEAL',
+      version: 5,
+      currentRoundIndex: 0,
+      currentChainIndex: 0,
+      currentTurnIndex: 2,
+      turnPhase: 'DESCRIBE',
+      activePlayerId: 'p1',
+      playerOrder: ['p1', 'p2'],
+      currentTurn: {
+        id: '0_2',
+        chainIndex: 0,
+        turnIndex: 2,
+        phase: 'DESCRIBE',
+        activePlayerId: 'p1',
+        turnStartedAt: new Date().toISOString(),
+        turnEndsAt: new Date().toISOString(),
+        isMyTurn: false,
+        promptContext: null,
+      },
+      chains: [],
+      serverTime: new Date().toISOString(),
+    });
+
+    reduceRealtimeEvent(
+      {
+        name: REALTIME_EVENTS.RETURNED_TO_LOBBY,
+        version: 0,
+        scope: 'room',
+        timestamp: new Date().toISOString(),
+        correlationId: 'rematch-1',
+        payload: { roomStatus: 'LOBBY' },
+      },
+      useGameStore.getState(),
+      'p1'
+    );
+
+    const store = useGameStore.getState();
+    expect(store.game).toBeNull();
+    expect(store.isPaused).toBe(false);
+    expect(store.roomCode).toBe('TEST01'); // Room context preserved
+  });
 });

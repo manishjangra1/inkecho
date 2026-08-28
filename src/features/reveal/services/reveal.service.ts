@@ -91,8 +91,7 @@ export class RevealService {
     const winningChainIndex = this.calculateWinningChain(votes, chains.length);
 
     const isHost =
-      (ctx.type === 'guest' && ctx.role === 'HOST') ||
-      (ctx.type === 'registered' && room.hostPlayerId === ctx.playerId);
+      ctx.type !== 'anonymous' && (ctx.playerId === room.hostPlayerId || ctx.role === 'HOST');
     const isSpectator = ctx.type === 'guest' && ctx.role === 'SPECTATOR';
 
     return ok({
@@ -224,7 +223,7 @@ export class RevealService {
     }
 
     // 4. Reset room status to LOBBY and reset participant readiness
-    await roomRepository.updateStatus(room.id, 'LOBBY');
+    await roomRepository.updateStatus(room.code, 'LOBBY');
     await participantRepository.resetAllReady(room.id);
 
     // 5. Broadcast returned_to_lobby

@@ -83,15 +83,15 @@ export function DescribePhase({ roomCode, roomId, currentTurn }: DescribePhasePr
   return (
     <div className="flex h-full w-full flex-col lg:flex-row gap-3 overflow-hidden select-none">
       {/* Left Column: Drawing covers the entire section with zero padding */}
-      <div className="flex flex-1 flex-col items-center justify-center overflow-hidden rounded-[4px] border border-border bg-white shadow-xl">
-        <div className="flex h-full w-full items-center justify-center bg-white">
+      <div className="flex flex-1 flex-col items-center justify-center overflow-hidden rounded-[4px] border border-border bg-[#262626] shadow-xl">
+        <div className="flex h-full w-full items-center justify-center bg-[#262626]">
           {currentTurn.promptContext ? (
             currentTurn.promptContext.drawingUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={currentTurn.promptContext.drawingUrl}
                 alt="Previous Drawing"
-                className="h-full w-full object-contain bg-white"
+                className="h-full w-full object-contain bg-[#262626]"
               />
             ) : (
               <div className="w-full max-w-lg space-y-3 rounded-[4px] border border-border bg-[#141414] p-8 text-center shadow-2xl">

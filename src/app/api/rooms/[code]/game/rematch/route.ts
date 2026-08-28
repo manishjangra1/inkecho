@@ -14,7 +14,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ co
       roomCode: code.toUpperCase(),
     });
 
-    const ctx = await getAuthContext();
+    const ctx = await getAuthContext(code);
     const res = await revealService.rematch(input, ctx);
 
     if (!res.ok) {

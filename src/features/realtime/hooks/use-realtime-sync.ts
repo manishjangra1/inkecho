@@ -26,6 +26,15 @@ export function useRealtimeSync(roomCode: string, playerId: string) {
         queryClient.invalidateQueries({
           queryKey: [QUERY_KEYS.ROOM, roomCode],
         });
+        queryClient.invalidateQueries({
+          queryKey: ['room-status', roomCode],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['reveal', roomCode],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['game', roomCode],
+        });
       }
     },
     [queryClient, roomCode, playerId]

@@ -203,6 +203,7 @@ describe('RevealService', () => {
     if (res.ok) {
       expect(res.value.roomStatus).toBe('LOBBY');
     }
+    expect(roomRepository.updateStatus).toHaveBeenCalledWith('TEST01', 'LOBBY');
     expect(participantRepository.resetAllReady).toHaveBeenCalledWith('room-1');
     expect(eventPublisher.returnedToLobby).toHaveBeenCalledWith('room-1');
   });

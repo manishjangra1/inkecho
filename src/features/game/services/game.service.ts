@@ -172,10 +172,17 @@ export class GameService {
       updatedGame.version
     );
 
-    await eventPublisher.turnChanged(dto.roomId, updatedGame, {
-      chainIndex: game.currentChainIndex,
-      turnIndex: game.currentTurnIndex,
-    });
+    if (updatedGame.status === 'REVEAL') {
+      if (roomResult.ok) {
+        await roomRepository.updateStatus(roomResult.value.code, 'REVEAL');
+      }
+      await eventPublisher.revealStarted(dto.roomId, updatedGame.version);
+    } else {
+      await eventPublisher.turnChanged(dto.roomId, updatedGame, {
+        chainIndex: game.currentChainIndex,
+        turnIndex: game.currentTurnIndex,
+      });
+    }
 
     return ok({
       version: updatedGame.version,
@@ -285,10 +292,17 @@ export class GameService {
       updatedGame.version
     );
 
-    await eventPublisher.turnChanged(dto.roomId, updatedGame, {
-      chainIndex: game.currentChainIndex,
-      turnIndex: game.currentTurnIndex,
-    });
+    if (updatedGame.status === 'REVEAL') {
+      if (roomResult.ok) {
+        await roomRepository.updateStatus(roomResult.value.code, 'REVEAL');
+      }
+      await eventPublisher.revealStarted(dto.roomId, updatedGame.version);
+    } else {
+      await eventPublisher.turnChanged(dto.roomId, updatedGame, {
+        chainIndex: game.currentChainIndex,
+        turnIndex: game.currentTurnIndex,
+      });
+    }
 
     return ok({
       version: updatedGame.version,
@@ -454,10 +468,17 @@ export class GameService {
     }));
 
     if (updateRes.ok) {
-      await eventPublisher.turnChanged(game.roomId, updateRes.value, {
-        chainIndex: game.currentChainIndex,
-        turnIndex: game.currentTurnIndex,
-      });
+      if (updateRes.value.status === 'REVEAL') {
+        if (roomRes.ok) {
+          await roomRepository.updateStatus(roomRes.value.code, 'REVEAL');
+        }
+        await eventPublisher.revealStarted(game.roomId, updateRes.value.version);
+      } else {
+        await eventPublisher.turnChanged(game.roomId, updateRes.value, {
+          chainIndex: game.currentChainIndex,
+          turnIndex: game.currentTurnIndex,
+        });
+      }
     }
 
     return updateRes;

@@ -124,6 +124,11 @@ export function reduceRealtimeEvent(
       break;
     }
 
+    case REALTIME_EVENTS.RETURNED_TO_LOBBY: {
+      store.resetGame();
+      break;
+    }
+
     default:
       break;
   }

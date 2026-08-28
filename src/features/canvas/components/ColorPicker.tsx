@@ -11,11 +11,17 @@ export interface ColorPickerProps {
   readonly selectedColor: string;
   readonly onSelectColor: (color: string) => void;
   readonly disabled?: boolean;
+  readonly className?: string;
 }
 
-export function ColorPicker({ selectedColor, onSelectColor, disabled = false }: ColorPickerProps) {
+export function ColorPicker({
+  selectedColor,
+  onSelectColor,
+  disabled = false,
+  className,
+}: ColorPickerProps) {
   return (
-    <div className="flex flex-wrap items-center gap-1.5">
+    <div className={cn('flex items-center justify-between gap-1 w-full', className)}>
       {CANVAS_CONFIG.BRUSH.PALETTE.map((item) => {
         const isSelected = selectedColor.toLowerCase() === item.hex.toLowerCase();
         return (
@@ -27,11 +33,11 @@ export function ColorPicker({ selectedColor, onSelectColor, disabled = false }: 
             aria-label={`Select ${item.name} color`}
             title={item.name}
             className={cn(
-              'relative h-7 w-7 rounded-full border border-border/40 transition-transform focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background sm:h-8 sm:w-8',
+              'relative h-6 w-6 shrink-0 rounded-full border border-neutral-700 transition-transform focus:outline-none',
               isSelected
-                ? 'scale-110 ring-2 ring-primary'
-                : 'opacity-90 hover:scale-105 hover:opacity-100',
-              disabled && 'cursor-not-allowed opacity-50'
+                ? 'scale-110 ring-2 ring-white border-transparent'
+                : 'opacity-85 hover:scale-105 hover:opacity-100',
+              disabled && 'cursor-not-allowed opacity-40'
             )}
             style={{ backgroundColor: item.hex }}
           >
@@ -39,7 +45,7 @@ export function ColorPicker({ selectedColor, onSelectColor, disabled = false }: 
               <span className="absolute inset-0 flex items-center justify-center">
                 <Check
                   className={cn(
-                    'h-4 w-4',
+                    'h-3 w-3',
                     item.hex.toLowerCase() === '#ffffff' || item.hex.toLowerCase() === '#eab308'
                       ? 'text-black'
                       : 'text-white'
@@ -60,18 +66,18 @@ export function ColorPicker({ selectedColor, onSelectColor, disabled = false }: 
             variant="outline"
             size="icon"
             disabled={disabled}
-            className="h-7 w-7 rounded-full border-dashed sm:h-8 sm:w-8"
+            className="h-6 w-6 shrink-0 rounded-full border border-dashed border-neutral-600 bg-[#1A1A1A] p-0 text-neutral-400 hover:text-white hover:border-neutral-400"
             aria-label="Custom color picker"
             title="Custom color"
           >
-            <Palette className="h-3.5 w-3.5" />
+            <Palette className="h-3 w-3" />
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-48 space-y-2 border-border bg-card/95 p-3 backdrop-blur"
-          align="center"
+          className="w-48 space-y-2 border-border bg-[#161616] p-3 text-white shadow-xl"
+          align="end"
         >
-          <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
             Custom Hex
           </div>
           <div className="flex items-center gap-2">
@@ -79,7 +85,7 @@ export function ColorPicker({ selectedColor, onSelectColor, disabled = false }: 
               type="color"
               value={selectedColor}
               onChange={(e) => onSelectColor(e.target.value)}
-              className="h-8 w-8 cursor-pointer rounded border border-border bg-transparent"
+              className="h-7 w-7 cursor-pointer rounded border border-border bg-transparent"
               aria-label="Color input"
             />
             <input
@@ -93,7 +99,7 @@ export function ColorPicker({ selectedColor, onSelectColor, disabled = false }: 
               }}
               placeholder="#FFFFFF"
               maxLength={7}
-              className="flex-1 rounded border border-input bg-background px-2 py-1 font-mono text-xs uppercase"
+              className="flex-1 rounded border border-neutral-700 bg-[#111111] px-2 py-1 font-mono text-xs uppercase text-white"
             />
           </div>
         </PopoverContent>
