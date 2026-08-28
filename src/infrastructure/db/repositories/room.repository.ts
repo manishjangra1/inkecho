@@ -228,9 +228,8 @@ export class RoomRepository {
 
       const allRooms = await prisma.room.findMany({
         where: {
-          status: 'LOBBY',
+          status: { in: ['LOBBY', 'IN_PROGRESS', 'REVEAL'] },
           visibility: 'PUBLIC',
-          deletedAt: null,
         },
         include: { participants: true },
         orderBy: { lastActivityAt: 'desc' },
@@ -260,9 +259,8 @@ export class RoomRepository {
       const staleRooms = await prisma.room.findMany({
         where: {
           OR: [
-            { createdAt: { lt: twoDaysAgo }, status: 'LOBBY' },
-            { createdAt: { lt: sevenDaysAgo } },
             { lastActivityAt: { lt: twoDaysAgo } },
+            { createdAt: { lt: sevenDaysAgo } },
           ],
           deletedAt: null,
         },
@@ -272,7 +270,7 @@ export class RoomRepository {
       const toDeleteIds: string[] = [];
       for (const room of staleRooms) {
         const activePlayers = (room.participants || []).filter((p) => !p.leftAt);
-        if (activePlayers.length === 0 || room.createdAt < twoDaysAgo) {
+        if (activePlayers.length === 0 || room.createdAt < sevenDaysAgo) {
           toDeleteIds.push(room.id);
         }
       }

@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { usePublicRooms } from '../hooks/use-public-rooms';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { Button } from '@/shared/ui/button';
-import { RefreshCw, Plus, ArrowRight } from 'lucide-react';
+import { Badge } from '@/shared/ui/badge';
+import { RefreshCw, Plus, ArrowRight, Eye, Users } from 'lucide-react';
 import { ROUTES } from '@/shared/constants/routes';
 
 export function PublicRoomList() {
@@ -80,6 +81,7 @@ export function PublicRoomList() {
           <thead className="border-b border-border bg-[#0E0E0E] text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">
             <tr>
               <th className="px-3.5 py-2">Room Code</th>
+              <th className="px-3.5 py-2">Status</th>
               <th className="px-3.5 py-2">Host</th>
               <th className="px-3.5 py-2">Players</th>
               <th className="px-3.5 py-2">Rounds</th>
@@ -88,33 +90,77 @@ export function PublicRoomList() {
             </tr>
           </thead>
           <tbody className="divide-y divide-[#1C1C1C]">
-            {items.map((room) => (
-              <tr key={room.id} className="hover:bg-[#161616] transition-colors">
-                <td className="px-3.5 py-2 font-mono font-bold text-white">
-                  {room.code}
-                </td>
-                <td className="px-3.5 py-2 text-neutral-300 font-medium truncate max-w-[120px]">
-                  {room.hostDisplayName}
-                </td>
-                <td className="px-3.5 py-2 font-mono text-neutral-400">
-                  {room.playerCount} / {room.maxPlayers}
-                </td>
-                <td className="px-3.5 py-2 font-mono text-neutral-400">
-                  {room.roundCount}
-                </td>
-                <td className="px-3.5 py-2 font-mono text-neutral-400">
-                  {room.drawTimerSec}s
-                </td>
-                <td className="px-3.5 py-2 text-right">
-                  <Link href={`/join/${room.code}`}>
-                    <Button variant="outline" size="sm" className="h-6 gap-1 px-2 text-[11px]">
-                      <span>Join</span>
-                      <ArrowRight className="h-3 w-3" />
-                    </Button>
-                  </Link>
-                </td>
-              </tr>
-            ))}
+            {items.map((room) => {
+              const isFull = room.playerCount >= room.maxPlayers;
+              const isLobby = room.status === 'LOBBY';
+              const canJoinAsPlayer = isLobby && !isFull;
+              const canSpectate = room.allowSpectators && (!isLobby || isFull);
+
+              return (
+                <tr key={room.id} className="hover:bg-[#161616] transition-colors">
+                  <td className="px-3.5 py-2 font-mono font-bold text-white">
+                    {room.code}
+                  </td>
+                  <td className="px-3.5 py-2">
+                    {room.status === 'LOBBY' ? (
+                      <span className="inline-flex items-center rounded-[3px] border border-emerald-500/20 bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-400">
+                        Lobby
+                      </span>
+                    ) : room.status === 'IN_PROGRESS' ? (
+                      <span className="inline-flex items-center rounded-[3px] border border-amber-500/20 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-400">
+                        In Game
+                      </span>
+                    ) : room.status === 'REVEAL' ? (
+                      <span className="inline-flex items-center rounded-[3px] border border-sky-500/20 bg-sky-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-sky-400">
+                        Reveal
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center rounded-[3px] border border-neutral-700 bg-neutral-800 px-1.5 py-0.5 text-[10px] font-semibold text-neutral-400">
+                        {room.status}
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-3.5 py-2 text-neutral-300 font-medium truncate max-w-[120px]">
+                    {room.hostDisplayName}
+                  </td>
+                  <td className="px-3.5 py-2 font-mono text-neutral-400">
+                    <span className="flex items-center gap-1">
+                      <Users className="h-3 w-3 text-neutral-500" />
+                      {room.playerCount} / {room.maxPlayers}
+                    </span>
+                  </td>
+                  <td className="px-3.5 py-2 font-mono text-neutral-400">
+                    {room.roundCount}
+                  </td>
+                  <td className="px-3.5 py-2 font-mono text-neutral-400">
+                    {room.drawTimerSec}s
+                  </td>
+                  <td className="px-3.5 py-2 text-right">
+                    {canJoinAsPlayer ? (
+                      <Link href={`/join/${room.code}`}>
+                        <Button variant="outline" size="sm" className="h-6 gap-1 px-2 text-[11px] text-white hover:bg-neutral-800">
+                          <span>Join</span>
+                          <ArrowRight className="h-3 w-3" />
+                        </Button>
+                      </Link>
+                    ) : canSpectate ? (
+                      <Link href={`/join/${room.code}?asSpectator=true`}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-6 gap-1 px-2 text-[11px] text-amber-300 border-amber-500/30 hover:border-amber-500/60 hover:bg-amber-500/10"
+                        >
+                          <Eye className="h-3 w-3" />
+                          <span>Spectate</span>
+                        </Button>
+                      </Link>
+                    ) : (
+                      <span className="text-[11px] text-neutral-600 font-mono">Full</span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

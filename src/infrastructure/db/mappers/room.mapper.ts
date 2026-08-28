@@ -28,12 +28,14 @@ export interface RoomSnapshotDto {
 export interface RoomListItemDto {
   readonly id: string;
   readonly code: string;
+  readonly status: 'LOBBY' | 'IN_PROGRESS' | 'REVEAL' | 'CLOSED';
   readonly hostDisplayName: string;
   readonly playerCount: number;
   readonly maxPlayers: number;
   readonly roundCount: number;
   readonly drawTimerSec: number;
   readonly describeTimerSec: number;
+  readonly allowSpectators: boolean;
   readonly createdAt: string;
 }
 
@@ -89,12 +91,14 @@ export function toRoomListItemDto(
   return {
     id: room.id,
     code: room.code,
+    status: room.status,
     hostDisplayName: host?.displayName ?? 'Host',
     playerCount: activePlayers.length,
     maxPlayers: room.settings.maxPlayers,
     roundCount: room.settings.roundCount,
     drawTimerSec: room.settings.drawTimerSec,
     describeTimerSec: room.settings.describeTimerSec,
+    allowSpectators: room.settings.allowSpectators ?? true,
     createdAt: room.createdAt.toISOString(),
   };
 }
