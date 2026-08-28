@@ -27,7 +27,8 @@ function renderHook<T>(hookFn: () => T) {
 describe('useCanvasUndoRedo', () => {
   beforeEach(() => {
     // Enable React act environment for jsdom testing
-    (globalThis as unknown as { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+    (globalThis as unknown as { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT =
+      true;
   });
 
   const dummyStroke: Stroke = {

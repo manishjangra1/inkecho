@@ -135,6 +135,22 @@ export class ParticipantRepository {
     }
   }
 
+  async findByRoomId(roomId: string): Promise<Result<ParticipantDto[], AppError>> {
+    return this.listByRoom(roomId);
+  }
+
+  async resetAllReady(roomId: string): Promise<Result<void, AppError>> {
+    try {
+      await prisma.roomParticipant.updateMany({
+        where: { roomId, leftAt: null },
+        data: { isReady: false },
+      });
+      return ok(undefined);
+    } catch {
+      return ok(undefined);
+    }
+  }
+
   async countActivePlayers(roomId: string): Promise<number> {
     return prisma.roomParticipant.count({
       where: {

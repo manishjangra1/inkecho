@@ -3,9 +3,13 @@ import { prisma } from '@/infrastructure/db/prisma.client';
 import { gameService } from '@/features/game/services/game.service';
 import { env } from '@/shared/config/env';
 
-export async function GET(request: Request) {
+async function handleCleanupRooms(request: Request) {
   const authHeader = request.headers.get('authorization');
-  if (env.NODE_ENV === 'production' && authHeader !== `Bearer ${env.CRON_SECRET}`) {
+  if (
+    env.NODE_ENV === 'production' &&
+    env.CRON_SECRET &&
+    authHeader !== `Bearer ${env.CRON_SECRET}`
+  ) {
     return new NextResponse('Unauthorized', { status: 401 });
   }
 
@@ -40,14 +44,23 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json({
-      success: true,
-      cleanedRooms: closedRooms.count,
-      processedExpiries: activeGames.length,
+      data: {
+        closedCount: closedRooms.count,
+        processedExpiries: activeGames.length,
+      },
     });
   } catch {
     return NextResponse.json(
-      { success: false, error: 'Failed to run cleanup cron' },
+      { error: { code: 'CRON_ERROR', message: 'Failed to run cleanup cron' } },
       { status: 500 }
     );
   }
+}
+
+export async function GET(request: Request) {
+  return handleCleanupRooms(request);
+}
+
+export async function POST(request: Request) {
+  return handleCleanupRooms(request);
 }

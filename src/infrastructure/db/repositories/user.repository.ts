@@ -55,6 +55,71 @@ export class UserRepository {
 
     return false;
   }
+
+  async findMany(
+    page: number = 1,
+    limit: number = 20,
+    search?: string
+  ): Promise<Result<{ items: UserProfileDto[]; total: number; totalPages: number }, AppError>> {
+    try {
+      const where = search
+        ? {
+            deletedAt: null,
+            OR: [
+              { name: { contains: search, mode: 'insensitive' as const } },
+              { email: { contains: search, mode: 'insensitive' as const } },
+            ],
+          }
+        : { deletedAt: null };
+
+      const skip = (Math.max(1, page) - 1) * limit;
+
+      const [users, total] = await Promise.all([
+        prisma.user.findMany({
+          where,
+          orderBy: { createdAt: 'desc' },
+          skip,
+          take: limit,
+        }),
+        prisma.user.count({ where }),
+      ]);
+
+      return ok({
+        items: users.map(toUserProfileDto),
+        total,
+        totalPages: Math.ceil(total / limit) || 1,
+      });
+    } catch {
+      return err(new NotFoundError('USERS_FETCH_FAILED', 'Failed to fetch users.'));
+    }
+  }
+
+  async banUser(
+    id: string,
+    data: { permanent: boolean; durationHours?: number; reason?: string }
+  ): Promise<Result<{ bannedUntil: string | null; permanent: boolean }, AppError>> {
+    try {
+      const bannedUntil =
+        !data.permanent && data.durationHours
+          ? new Date(Date.now() + data.durationHours * 3600 * 1000)
+          : null;
+
+      const updated = await prisma.user.update({
+        where: { id },
+        data: {
+          bannedPermanently: data.permanent,
+          bannedUntil,
+        },
+      });
+
+      return ok({
+        bannedUntil: updated.bannedUntil?.toISOString() ?? null,
+        permanent: updated.bannedPermanently,
+      });
+    } catch {
+      return err(new NotFoundError('USER_BAN_FAILED', 'Failed to ban user.'));
+    }
+  }
 }
 
 export const userRepository = new UserRepository();

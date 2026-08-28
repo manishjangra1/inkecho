@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import path from 'path';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -39,6 +40,15 @@ const nextConfig: NextConfig = {
         ],
       },
     ];
+  },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        ably: path.resolve(process.cwd(), 'node_modules/ably/build/ably.min.js'),
+      };
+    }
+    return config;
   },
 };
 

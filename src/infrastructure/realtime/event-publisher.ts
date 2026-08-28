@@ -294,6 +294,60 @@ export class EventPublisher {
     );
   }
 
+  async revealStarted(
+    roomId: string,
+    chainCount: number,
+    revealStepDurationMs: number = 3000,
+    version: number = 1,
+    correlationId?: string
+  ) {
+    return this.publish(
+      roomId,
+      REALTIME_EVENTS.REVEAL_STARTED,
+      { chainCount, revealStepDurationMs },
+      version,
+      'game',
+      correlationId
+    );
+  }
+
+  async revealChainStep(
+    roomId: string,
+    chainIndex: number,
+    stepIndex: number,
+    stepType: 'STARTER_PROMPT' | 'DESCRIPTION' | 'DRAWING',
+    content: { promptText?: string; textContent?: string; drawingUrl?: string },
+    playerName: string,
+    version: number = 1,
+    correlationId?: string
+  ) {
+    return this.publish(
+      roomId,
+      REALTIME_EVENTS.REVEAL_CHAIN_STEP,
+      { chainIndex, stepIndex, stepType, content, playerName },
+      version,
+      'game',
+      correlationId
+    );
+  }
+
+  async revealCompleted(
+    roomId: string,
+    gameId: string,
+    votes: Record<string, number>,
+    version: number = 1,
+    correlationId?: string
+  ) {
+    return this.publish(
+      roomId,
+      REALTIME_EVENTS.REVEAL_COMPLETED,
+      { gameId, votes },
+      version,
+      'game',
+      correlationId
+    );
+  }
+
   async returnedToLobby(roomId: string, correlationId?: string) {
     return this.publish(
       roomId,

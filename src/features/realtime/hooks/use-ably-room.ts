@@ -23,57 +23,64 @@ export function useAblyRoom({ roomId, playerId, displayName, role, onMessage }: 
     if (!roomId || !playerId) return;
 
     let isMounted = true;
-    let client: Ably.Realtime;
+    let client: Ably.Realtime | null = null;
 
-    try {
-      client = createAblyRealtimeClient(roomId, playerId);
-      clientRef.current = client;
-
-      const channelName = getRoomChannelName(roomId);
-      const channel = client.channels.get(channelName);
-      channelRef.current = channel;
-
-      // Monitor connection state
-      client.connection.on((stateChange) => {
-        if (!isMounted) return;
-        const current = stateChange.current as ConnectionState;
-        setConnectionState(current);
-      });
-
-      // Subscribe to all incoming channel messages
-      const messageListener = (msg: Ably.Message) => {
-        if (onMessage) {
-          onMessage(msg);
+    async function initAbly() {
+      try {
+        client = await createAblyRealtimeClient(roomId, playerId);
+        if (!isMounted) {
+          client.close();
+          return;
         }
-      };
 
-      channel.subscribe(messageListener);
+        clientRef.current = client;
 
-      // Enter presence
-      const presenceData: RealtimePresenceData = {
-        playerId,
-        displayName,
-        role,
-        connectionStatus: 'ONLINE',
-      };
+        const channelName = getRoomChannelName(roomId);
+        const channel = client.channels.get(channelName);
+        channelRef.current = channel;
 
-      channel.presence.enter(presenceData).catch(() => {});
-    } catch {
-      setConnectionState('disconnected');
+        // Monitor connection state
+        client.connection.on((stateChange) => {
+          if (!isMounted) return;
+          const current = stateChange.current as ConnectionState;
+          setConnectionState(current);
+        });
+
+        // Subscribe to all incoming channel messages
+        const messageListener = (msg: Ably.Message) => {
+          if (onMessage) {
+            onMessage(msg);
+          }
+        };
+
+        channel.subscribe(messageListener);
+
+        // Enter presence
+        const presenceData: RealtimePresenceData = {
+          playerId,
+          displayName,
+          role,
+          connectionStatus: 'ONLINE',
+        };
+
+        channel.presence.enter(presenceData).catch(() => {});
+      } catch {
+        if (isMounted) {
+          setConnectionState('failed');
+        }
+      }
     }
+
+    void initAbly();
 
     return () => {
       isMounted = false;
-      try {
-        if (channelRef.current) {
-          channelRef.current.presence.leave().catch(() => {});
-          channelRef.current.unsubscribe();
-        }
-        if (clientRef.current) {
-          clientRef.current.close();
-        }
-      } catch {
-        // ignore cleanup errors
+      if (channelRef.current) {
+        channelRef.current.presence.leave().catch(() => {});
+        channelRef.current.unsubscribe();
+      }
+      if (clientRef.current) {
+        clientRef.current.close();
       }
     };
   }, [roomId, playerId, displayName, role, onMessage]);
