@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Plus, Compass, LogIn, LogOut, ChevronDown, User as UserIcon, Settings } from 'lucide-react';
+import { Plus, Compass, LogIn, LogOut, ChevronDown, User as UserIcon } from 'lucide-react';
 import { Logo } from '@/shared/ui/logo';
 import { Button } from '@/shared/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
@@ -101,13 +101,6 @@ export function MarketingHeader() {
                     <Link href="/profile" className="flex items-center gap-2">
                       <UserIcon className="h-3.5 w-3.5" />
                       <span>Profile</span>
-                    </Link>
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem asChild className="hover:bg-[#1A1A1A] hover:text-white cursor-pointer rounded-[3px] text-xs px-2 py-1.5">
-                    <Link href="/settings" className="flex items-center gap-2">
-                      <Settings className="h-3.5 w-3.5" />
-                      <span>Settings</span>
                     </Link>
                   </DropdownMenuItem>
 
