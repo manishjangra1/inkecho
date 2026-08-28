@@ -23,6 +23,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from '@/shared/ui/toast';
 import { ROUTES } from '@/shared/constants/routes';
 import { useRoom } from '../hooks/use-room';
+import { useRoomLeaveGuard } from '../hooks/use-room-leave-guard';
 import { useGameStore } from '@/features/game/stores/game-store';
 import type { RoomSnapshotDto } from '../types/room.types';
 
@@ -39,17 +40,26 @@ export function RoomHeader({ room: initialRoom, isHost: initialIsHost }: RoomHea
 
   const [settingsOpen, setSettingsOpen] = React.useState(false);
   const [deleteAlertOpen, setDeleteAlertOpen] = React.useState(false);
+  const [leaveAlertOpen, setLeaveAlertOpen] = React.useState(false);
   const [isLeaving, setIsLeaving] = React.useState(false);
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [copied, setCopied] = React.useState(false);
+
+  // Guard against accidental back button and prompt on tab/browser close
+  useRoomLeaveGuard({
+    roomCode: room.code,
+    onRequestLeave: () => setLeaveAlertOpen(true),
+  });
 
   const handleLeave = async () => {
     try {
       setIsLeaving(true);
       await leaveRoomAction({ roomCode: room.code });
       toast.success('Left the room.');
+      setLeaveAlertOpen(false);
       router.push(ROUTES.HOME);
     } catch {
+      setLeaveAlertOpen(false);
       router.push(ROUTES.HOME);
     }
   };
@@ -91,7 +101,7 @@ export function RoomHeader({ room: initialRoom, isHost: initialIsHost }: RoomHea
       <header className="sticky top-0 z-40 flex h-12 w-full shrink-0 items-center justify-between border-b border-border bg-[#0E0E0E] px-4 select-none">
         {/* Left: Brand & Room Code */}
         <div className="flex items-center gap-3">
-          <Logo href={ROUTES.HOME} size="md" />
+          <Logo href={null} onClick={() => setLeaveAlertOpen(true)} size="md" />
           <div className="h-3 w-px bg-neutral-800" />
           <div className="flex items-center gap-2">
             <button
@@ -151,7 +161,7 @@ export function RoomHeader({ room: initialRoom, isHost: initialIsHost }: RoomHea
           <Button
             variant="ghost"
             size="sm"
-            onClick={handleLeave}
+            onClick={() => setLeaveAlertOpen(true)}
             disabled={isLeaving}
             className="h-7 gap-1.5 px-2.5 text-xs text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900"
           >
@@ -172,6 +182,36 @@ export function RoomHeader({ room: initialRoom, isHost: initialIsHost }: RoomHea
           }}
         />
       )}
+
+      {/* Leave Room Confirmation Dialog */}
+      <AlertDialog open={leaveAlertOpen} onOpenChange={setLeaveAlertOpen}>
+        <AlertDialogContent className="max-w-md bg-[#111111] border border-border p-5 rounded-[6px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-base font-bold text-white flex items-center gap-2">
+              <LogOut className="h-4 w-4 text-neutral-300" />
+              Leave Room {room.code}?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-xs text-neutral-400 leading-relaxed pt-1">
+              Are you sure you want to leave this game room? Your active session in this room will end.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="pt-3 gap-2">
+            <AlertDialogCancel
+              disabled={isLeaving}
+              className="h-8 text-xs border-[#262626] bg-[#161616] text-neutral-300 hover:text-white"
+            >
+              Stay
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleLeave}
+              disabled={isLeaving}
+              className="h-8 text-xs font-semibold bg-[#D9534F] hover:bg-[#c9302c] text-white border-none"
+            >
+              {isLeaving ? 'Leaving...' : 'Leave Room'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Delete Room Confirmation Dialog */}
       <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>

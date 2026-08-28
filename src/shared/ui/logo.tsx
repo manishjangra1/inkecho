@@ -78,7 +78,8 @@ export function LogoMark({
 }
 
 export interface LogoProps {
-  readonly href?: string;
+  readonly href?: string | null;
+  readonly onClick?: (e: React.MouseEvent) => void;
   readonly className?: string;
   readonly textClassName?: string;
   readonly size?: 'sm' | 'md' | 'lg';
@@ -87,6 +88,7 @@ export interface LogoProps {
 
 export function Logo({
   href = ROUTES.HOME,
+  onClick,
   className,
   textClassName,
   size = 'md',
@@ -117,6 +119,18 @@ export function Logo({
       )}
     </div>
   );
+
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className="flex items-center hover:opacity-95 transition-opacity cursor-pointer bg-transparent border-0 p-0 text-left"
+      >
+        {content}
+      </button>
+    );
+  }
 
   if (href) {
     return (
