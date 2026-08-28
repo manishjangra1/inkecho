@@ -53,6 +53,54 @@ export class ParticipantRepository {
     return ok(toParticipantDto(participant));
   }
 
+  async findByRoomAndUser(
+    roomId: string,
+    userId: string
+  ): Promise<Result<ParticipantDto | null, AppError>> {
+    try {
+      const participant = await prisma.roomParticipant.findFirst({
+        where: {
+          roomId,
+          userId,
+        },
+        orderBy: { joinedAt: 'desc' },
+      });
+
+      if (!participant) {
+        return ok(null);
+      }
+
+      return ok(toParticipantDto(participant));
+    } catch {
+      return ok(null);
+    }
+  }
+
+  async reactivateParticipant(
+    roomId: string,
+    playerId: string,
+    displayName: string,
+    role?: ParticipantRole
+  ): Promise<Result<ParticipantDto, AppError>> {
+    try {
+      const updated = await prisma.roomParticipant.update({
+        where: {
+          roomId_playerId: { roomId, playerId },
+        },
+        data: {
+          leftAt: null,
+          connectionStatus: 'ONLINE',
+          displayName,
+          ...(role ? { role } : {}),
+        },
+      });
+
+      return ok(toParticipantDto(updated));
+    } catch {
+      return err(new NotFoundError('PARTICIPANT_NOT_FOUND', 'Participant not found in room.'));
+    }
+  }
+
   async listByRoom(roomId: string): Promise<Result<ParticipantDto[], AppError>> {
     try {
       const participants = await prisma.roomParticipant.findMany({

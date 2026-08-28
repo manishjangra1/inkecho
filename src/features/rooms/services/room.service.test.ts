@@ -68,8 +68,22 @@ describe('RoomService', () => {
   });
 
   it('joins an existing room in LOBBY state', async () => {
-    vi.spyOn(roomRepository, 'findByCode').mockResolvedValue(ok(mockRoom));
-    vi.spyOn(participantRepository, 'countActivePlayers').mockResolvedValue(2);
+    const roomWithHost = {
+      ...mockRoom,
+      participants: [
+        {
+          id: 'p1',
+          playerId: 'host-player-id',
+          displayName: 'HostPlayer',
+          role: 'HOST' as const,
+          isReady: true,
+          connectionStatus: 'ONLINE' as const,
+          joinedAt: new Date().toISOString(),
+        },
+      ],
+    };
+    vi.spyOn(roomRepository, 'findByCode').mockResolvedValue(ok(roomWithHost));
+    vi.spyOn(participantRepository, 'countActivePlayers').mockResolvedValue(1);
     vi.spyOn(participantRepository, 'create').mockResolvedValue(
       ok({
         id: 'p2',
@@ -100,5 +114,113 @@ describe('RoomService', () => {
       expect(result.value.role).toBe('PLAYER');
       expect(result.value.redirectTo).toBe('lobby');
     }
+  });
+
+  it('reconnects existing registered user without creating duplicate player', async () => {
+    vi.spyOn(roomRepository, 'findByCode').mockResolvedValue(ok(mockRoom));
+    vi.spyOn(participantRepository, 'findByRoomAndUser').mockResolvedValue(
+      ok({
+        id: 'p-existing',
+        playerId: 'host-player-id',
+        userId: 'user-123',
+        displayName: 'RegisteredHost',
+        role: 'HOST',
+        isReady: true,
+        connectionStatus: 'ONLINE',
+        joinedAt: new Date().toISOString(),
+      })
+    );
+    vi.spyOn(participantRepository, 'reactivateParticipant').mockResolvedValue(
+      ok({
+        id: 'p-existing',
+        playerId: 'host-player-id',
+        userId: 'user-123',
+        displayName: 'RegisteredHost',
+        role: 'HOST',
+        isReady: true,
+        connectionStatus: 'ONLINE',
+        joinedAt: new Date().toISOString(),
+      })
+    );
+    vi.spyOn(guestSessionService, 'create').mockResolvedValue(
+      ok({
+        guestSessionId: 'g-reconn',
+        token: 'token-reconn',
+        playerId: 'host-player-id',
+        expiresAt: new Date(),
+      })
+    );
+
+    const result = await roomService.joinRoom(
+      { roomCode: 'ABC123', displayName: 'RegisteredHost', asSpectator: false },
+      { type: 'registered', userId: 'user-123', displayName: 'RegisteredHost', userRole: 'USER' }
+    );
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.playerId).toBe('host-player-id');
+      expect(result.value.role).toBe('HOST');
+    }
+  });
+
+  it('auto-promotes next player when host leaves', async () => {
+    vi.spyOn(roomRepository, 'findByCode').mockResolvedValue(ok(mockRoom));
+    vi.spyOn(participantRepository, 'markLeft').mockResolvedValue(ok(undefined));
+    vi.spyOn(guestSessionService, 'revoke').mockResolvedValue(ok(undefined));
+    vi.spyOn(participantRepository, 'listByRoom').mockResolvedValue(
+      ok([
+        {
+          id: 'p-next',
+          playerId: 'player-2',
+          displayName: 'PlayerTwo',
+          role: 'PLAYER',
+          isReady: false,
+          connectionStatus: 'ONLINE',
+          joinedAt: new Date().toISOString(),
+        },
+      ])
+    );
+    const updateRoleSpy = vi.spyOn(participantRepository, 'updateRole').mockResolvedValue(
+      ok({
+        id: 'p-next',
+        playerId: 'player-2',
+        displayName: 'PlayerTwo',
+        role: 'HOST',
+        isReady: false,
+        connectionStatus: 'ONLINE',
+        joinedAt: new Date().toISOString(),
+      })
+    );
+    const updateHostSpy = vi.spyOn(roomRepository, 'updateHost').mockResolvedValue(ok(mockRoom));
+
+    const result = await roomService.leaveRoom('ABC123', {
+      type: 'guest',
+      guestSessionId: 'g1',
+      playerId: 'host-player-id',
+      roomId: mockRoom.id,
+      displayName: 'HostPlayer',
+      role: 'HOST',
+    });
+
+    expect(result.ok).toBe(true);
+    expect(updateRoleSpy).toHaveBeenCalledWith(mockRoom.id, 'player-2', 'HOST');
+    expect(updateHostSpy).toHaveBeenCalledWith('ABC123', 'player-2');
+  });
+
+  it('allows host to delete room', async () => {
+    vi.spyOn(roomRepository, 'findByCode').mockResolvedValue(ok(mockRoom));
+    const deleteSpy = vi.spyOn(roomRepository, 'delete').mockResolvedValue(ok(undefined));
+
+    const result = await roomService.deleteRoom('ABC123', {
+      type: 'guest',
+      guestSessionId: 'g1',
+      playerId: 'host-player-id',
+      roomId: mockRoom.id,
+      displayName: 'HostPlayer',
+      role: 'HOST',
+    });
+
+    expect(result.ok).toBe(true);
+    expect(deleteSpy).toHaveBeenCalledWith('ABC123');
   });
 });

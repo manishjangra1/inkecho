@@ -132,7 +132,7 @@ export class RoomService {
       return err(new ValidationError('Display name is required to join a room.'));
     }
 
-    // Role determination
+    // Role and redirect determination
     let role: 'HOST' | 'PLAYER' | 'SPECTATOR' = 'PLAYER';
     let redirectTo: 'lobby' | 'game' | 'reveal' | 'spectate' = 'lobby';
 
@@ -148,12 +148,79 @@ export class RoomService {
         )
       );
     } else {
+      redirectTo = 'lobby';
+    }
+
+    // 1. Check for existing participant record (Deduplication / Rejoining)
+    let existingParticipant = null;
+    if (ctx.type === 'registered' && ctx.userId) {
+      const userRes = await participantRepository.findByRoomAndUser(room.id, ctx.userId);
+      if (userRes.ok && userRes.value) {
+        existingParticipant = userRes.value;
+      }
+    } else if (ctx.type === 'guest' && ctx.playerId) {
+      const guestRes = await participantRepository.findByRoomAndPlayer(room.id, ctx.playerId);
+      if (guestRes.ok && guestRes.value) {
+        existingParticipant = guestRes.value;
+      }
+    }
+
+    // If caller already has a participant record in this room:
+    if (existingParticipant) {
+      const playerId = existingParticipant.playerId;
+      const isHost = room.hostPlayerId === playerId || existingParticipant.role === 'HOST';
+      const effectiveRole = isHost ? 'HOST' : dto.asSpectator ? 'SPECTATOR' : existingParticipant.role;
+
+      await participantRepository.reactivateParticipant(
+        room.id,
+        playerId,
+        displayName,
+        effectiveRole
+      );
+
+      if (isHost && room.hostPlayerId !== playerId) {
+        await roomRepository.updateHost(room.code, playerId);
+      }
+
+      const sessionResult = await guestSessionService.create({
+        roomId: room.id,
+        displayName,
+        playerId,
+        role: effectiveRole,
+        userId: ctx.type === 'registered' ? ctx.userId : undefined,
+      });
+
+      if (!sessionResult.ok) {
+        return err(sessionResult.error);
+      }
+
+      const refreshedRoom = await roomRepository.findByCode(dto.roomCode);
+
+      return ok({
+        playerId,
+        role: effectiveRole,
+        redirectTo,
+        room: refreshedRoom.ok ? refreshedRoom.value : room,
+        token: sessionResult.value.token,
+        expiresAt: sessionResult.value.expiresAt,
+      });
+    }
+
+    // 2. New Player joining: Check room capacity
+    if (role === 'PLAYER') {
       const activeCount = await participantRepository.countActivePlayers(room.id);
       if (isRoomFull(activeCount, room.settings.maxPlayers)) {
         return err(new ForbiddenError('ROOM_FULL', 'This room is currently full.'));
       }
-      role = 'PLAYER';
-      redirectTo = 'lobby';
+    }
+
+    // 3. Auto-assign Host if room has 0 active players or no active host
+    const activeCount = await participantRepository.countActivePlayers(room.id);
+    const activeParticipants = room.participants;
+    const hasActiveHost = activeParticipants.some((p) => p.playerId === room.hostPlayerId);
+
+    if ((activeCount === 0 || !hasActiveHost) && role !== 'SPECTATOR') {
+      role = 'HOST';
     }
 
     const playerId = crypto.randomUUID();
@@ -165,11 +232,15 @@ export class RoomService {
       displayName,
       avatarUrl: getAvatarUrl(playerId || displayName),
       role,
-      isReady: false,
+      isReady: role === 'HOST',
     });
 
     if (!participantResult.ok) {
       return err(participantResult.error);
+    }
+
+    if (role === 'HOST') {
+      await roomRepository.updateHost(room.code, playerId);
     }
 
     const sessionResult = await guestSessionService.create({
@@ -183,6 +254,14 @@ export class RoomService {
     if (!sessionResult.ok) {
       return err(sessionResult.error);
     }
+
+    // Broadcast player joined in realtime
+    const totalParticipantCount = (await participantRepository.countActivePlayers(room.id)) || 1;
+    await eventPublisher.playerJoined(
+      room.id,
+      participantResult.value,
+      totalParticipantCount
+    );
 
     const refreshedRoom = await roomRepository.findByCode(dto.roomCode);
 
@@ -216,23 +295,33 @@ export class RoomService {
       await participantRepository.markLeft(room.id, playerId);
       await guestSessionService.revoke(ctx.type === 'guest' ? ctx.guestSessionId : '');
 
+      let newHostPlayerId: string | undefined;
+
       // Check if room host left
       if (room.hostPlayerId === playerId) {
         const remaining = await participantRepository.listByRoom(room.id);
         const activePlayers = remaining.ok
-          ? remaining.value.filter((p) => p.role === 'HOST' || p.role === 'PLAYER')
+          ? remaining.value.filter((p) => p.playerId !== playerId && (p.role === 'HOST' || p.role === 'PLAYER'))
           : [];
 
         if (activePlayers.length === 0) {
           await roomRepository.close(room.code, 'HOST');
         } else {
+          // Auto-promote the next player to Host
           const nextHost = activePlayers[0];
           if (nextHost) {
+            newHostPlayerId = nextHost.playerId;
             await participantRepository.updateRole(room.id, nextHost.playerId, 'HOST');
             await roomRepository.updateHost(room.code, nextHost.playerId);
+            // Broadcast host changed in realtime
+            await eventPublisher.hostChanged(room.id, playerId, nextHost.playerId);
           }
         }
       }
+
+      const activeCount = await participantRepository.countActivePlayers(room.id);
+      // Broadcast player left in realtime
+      await eventPublisher.playerLeft(room.id, playerId, activeCount, newHostPlayerId);
     }
 
     return ok({ left: true });
@@ -246,22 +335,38 @@ export class RoomService {
     return roomRepository.updateSettings(dto.roomCode, dto.settings);
   }
 
-  async closeRoom(roomCode: string, ctx: AuthContext): Promise<Result<void, AppError>> {
-    authorize(ctx, 'room:settings');
+  async deleteRoom(roomCode: string, ctx: AuthContext): Promise<Result<void, AppError>> {
     const roomResult = await roomRepository.findByCode(roomCode);
     if (!roomResult.ok) {
       return err(new NotFoundError('ROOM_NOT_FOUND', 'Room not found.'));
     }
 
     const room = roomResult.value;
-    if (ctx.type === 'anonymous' || !ctx.playerId || room.hostPlayerId !== ctx.playerId) {
-      return err(new ForbiddenError('NOT_HOST', 'Only the room host can close the room.'));
+    const isHost =
+      (ctx.type === 'guest' && room.hostPlayerId === ctx.playerId) ||
+      (ctx.type === 'registered' &&
+        (room.hostPlayerId === ctx.playerId ||
+          room.participants.some((p) => p.userId === ctx.userId && p.role === 'HOST')));
+
+    if (!isHost && ctx.type !== 'registered') {
+      return err(new ForbiddenError('NOT_HOST', 'Only the room host can delete this room.'));
     }
 
-    await roomRepository.close(roomCode, 'HOST');
-    await eventPublisher.roomClosed(room.id, 'HOST', 'Room has been closed by the host.');
+    // Broadcast room_closed in realtime so all connected players are immediately kicked out
+    await eventPublisher.roomClosed(
+      room.id,
+      'HOST_DELETED',
+      'The host has deleted and closed this room.'
+    );
+
+    // Delete / close the room in the database
+    await roomRepository.delete(room.code);
 
     return ok(undefined);
+  }
+
+  async closeRoom(roomCode: string, ctx: AuthContext): Promise<Result<void, AppError>> {
+    return this.deleteRoom(roomCode, ctx);
   }
 }
 

@@ -27,9 +27,10 @@ interface RoomSettingsDrawerProps {
   readonly room: RoomSnapshotDto;
   readonly open: boolean;
   readonly onOpenChange: (open: boolean) => void;
+  readonly onDeleteRoom?: () => void;
 }
 
-export function RoomSettingsDrawer({ room, open, onOpenChange }: RoomSettingsDrawerProps) {
+export function RoomSettingsDrawer({ room, open, onOpenChange, onDeleteRoom }: RoomSettingsDrawerProps) {
   const [isLoading, setIsLoading] = React.useState(false);
 
   const { control, handleSubmit, watch } = useForm<UpdateRoomSettingsInput>({
@@ -221,26 +222,42 @@ export function RoomSettingsDrawer({ room, open, onOpenChange }: RoomSettingsDra
             </div>
           </div>
 
-          <DialogFooter className="pt-2 gap-2 sm:gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-              disabled={isLoading}
-              className="h-8 text-xs font-medium border-[#262626] bg-[#161616] text-neutral-300 hover:text-white"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              size="sm"
-              isLoading={isLoading}
-              disabled={isLoading}
-              className="h-8 text-xs font-semibold bg-white text-black hover:bg-neutral-200 border border-white"
-            >
-              Save Settings
-            </Button>
+          <DialogFooter className="pt-2 flex items-center justify-between sm:justify-between w-full">
+            {onDeleteRoom ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={onDeleteRoom}
+                disabled={isLoading}
+                className="h-8 text-xs text-[#D9534F] hover:bg-neutral-900 hover:text-[#D9534F] px-2"
+              >
+                Delete Room
+              </Button>
+            ) : (
+              <div />
+            )}
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => onOpenChange(false)}
+                disabled={isLoading}
+                className="h-8 text-xs font-medium border-[#262626] bg-[#161616] text-neutral-300 hover:text-white"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                size="sm"
+                isLoading={isLoading}
+                disabled={isLoading}
+                className="h-8 text-xs font-semibold bg-white text-black hover:bg-neutral-200 border border-white"
+              >
+                Save Settings
+              </Button>
+            </div>
           </DialogFooter>
         </form>
       </DialogContent>

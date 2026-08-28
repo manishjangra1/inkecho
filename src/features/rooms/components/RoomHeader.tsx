@@ -2,12 +2,23 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { LogOut, Settings, Users, Copy, Check } from 'lucide-react';
+import { LogOut, Settings, Users, Copy, Check, Trash2 } from 'lucide-react';
 import { Logo } from '@/shared/ui/logo';
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/shared/ui/alert-dialog';
 import { RoomSettingsDrawer } from './RoomSettingsDrawer';
 import { leaveRoomAction } from '../actions/leave-room.action';
+import { deleteRoomAction } from '../actions/delete-room.action';
 import { useRouter } from 'next/navigation';
 import { toast } from '@/shared/ui/toast';
 import { ROUTES } from '@/shared/constants/routes';
@@ -21,7 +32,9 @@ interface RoomHeaderProps {
 export function RoomHeader({ room, isHost }: RoomHeaderProps) {
   const router = useRouter();
   const [settingsOpen, setSettingsOpen] = React.useState(false);
+  const [deleteAlertOpen, setDeleteAlertOpen] = React.useState(false);
   const [isLeaving, setIsLeaving] = React.useState(false);
+  const [isDeleting, setIsDeleting] = React.useState(false);
   const [copied, setCopied] = React.useState(false);
 
   const handleLeave = async () => {
@@ -32,6 +45,23 @@ export function RoomHeader({ room, isHost }: RoomHeaderProps) {
       router.push(ROUTES.HOME);
     } catch {
       router.push(ROUTES.HOME);
+    }
+  };
+
+  const handleDeleteRoom = async () => {
+    try {
+      setIsDeleting(true);
+      const res = await deleteRoomAction({ roomCode: room.code });
+      if (!res.success) {
+        toast.error(res.error.message || 'Failed to delete room.');
+        setIsDeleting(false);
+        return;
+      }
+      toast.success(`Room ${room.code} deleted successfully.`);
+      router.push(ROUTES.HOME);
+    } catch {
+      toast.error('An unexpected error occurred while deleting room.');
+      setIsDeleting(false);
     }
   };
 
@@ -87,15 +117,29 @@ export function RoomHeader({ room, isHost }: RoomHeaderProps) {
         {/* Right Action Controls */}
         <div className="flex items-center gap-2">
           {isHost && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setSettingsOpen(true)}
-              className="h-7 gap-1.5 px-2.5 text-xs text-neutral-300 hover:text-white"
-            >
-              <Settings className="h-3.5 w-3.5" />
-              <span>Settings</span>
-            </Button>
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSettingsOpen(true)}
+                className="h-7 gap-1.5 px-2.5 text-xs text-neutral-300 hover:text-white"
+              >
+                <Settings className="h-3.5 w-3.5" />
+                <span>Settings</span>
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setDeleteAlertOpen(true)}
+                disabled={isDeleting}
+                className="h-7 gap-1.5 px-2.5 text-xs text-neutral-400 hover:text-[#D9534F] hover:bg-neutral-900"
+                title="Delete Room"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                <span>Delete Room</span>
+              </Button>
+            </>
           )}
 
           <Button
@@ -103,7 +147,7 @@ export function RoomHeader({ room, isHost }: RoomHeaderProps) {
             size="sm"
             onClick={handleLeave}
             disabled={isLeaving}
-            className="h-7 gap-1.5 px-2.5 text-xs text-neutral-400 hover:text-[#D9534F] hover:bg-neutral-900"
+            className="h-7 gap-1.5 px-2.5 text-xs text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900"
           >
             <LogOut className="h-3.5 w-3.5" />
             <span>Leave Room</span>
@@ -112,8 +156,46 @@ export function RoomHeader({ room, isHost }: RoomHeaderProps) {
       </header>
 
       {isHost && (
-        <RoomSettingsDrawer room={room} open={settingsOpen} onOpenChange={setSettingsOpen} />
+        <RoomSettingsDrawer
+          room={room}
+          open={settingsOpen}
+          onOpenChange={setSettingsOpen}
+          onDeleteRoom={() => {
+            setSettingsOpen(false);
+            setDeleteAlertOpen(true);
+          }}
+        />
       )}
+
+      {/* Delete Room Confirmation Dialog */}
+      <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
+        <AlertDialogContent className="max-w-md bg-[#111111] border border-border p-5 rounded-[6px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-base font-bold text-white flex items-center gap-2">
+              <Trash2 className="h-4 w-4 text-[#D9534F]" />
+              Delete Room {room.code}?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-xs text-neutral-400 leading-relaxed pt-1">
+              Are you sure you want to delete this room? All connected players will be disconnected and the room will be permanently removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="pt-3 gap-2">
+            <AlertDialogCancel
+              disabled={isDeleting}
+              className="h-8 text-xs border-[#262626] bg-[#161616] text-neutral-300 hover:text-white"
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteRoom}
+              disabled={isDeleting}
+              className="h-8 text-xs font-semibold bg-[#D9534F] hover:bg-[#c9302c] text-white border-none"
+            >
+              {isDeleting ? 'Deleting...' : 'Delete Room'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

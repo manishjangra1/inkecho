@@ -223,10 +223,14 @@ export class RoomRepository {
       const limit = Math.min(50, Math.max(1, params.limit || 12));
       const skip = (page - 1) * limit;
 
+      // Trigger background stale rooms cleanup (older than 2 days with 0 players)
+      void this.cleanupStaleRooms();
+
       const allRooms = await prisma.room.findMany({
         where: {
           status: 'LOBBY',
           visibility: 'PUBLIC',
+          deletedAt: null,
         },
         include: { participants: true },
         orderBy: { lastActivityAt: 'desc' },
@@ -245,6 +249,73 @@ export class RoomRepository {
       });
     } catch {
       return err(new NotFoundError('ROOMS_FETCH_FAILED', 'Failed to fetch public rooms.'));
+    }
+  }
+
+  async cleanupStaleRooms(): Promise<number> {
+    try {
+      const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+      const staleRooms = await prisma.room.findMany({
+        where: {
+          OR: [
+            { createdAt: { lt: twoDaysAgo }, status: 'LOBBY' },
+            { createdAt: { lt: sevenDaysAgo } },
+            { lastActivityAt: { lt: twoDaysAgo } },
+          ],
+          deletedAt: null,
+        },
+        include: { participants: true },
+      });
+
+      const toDeleteIds: string[] = [];
+      for (const room of staleRooms) {
+        const activePlayers = (room.participants || []).filter((p) => !p.leftAt);
+        if (activePlayers.length === 0 || room.createdAt < twoDaysAgo) {
+          toDeleteIds.push(room.id);
+        }
+      }
+
+      if (toDeleteIds.length > 0) {
+        await prisma.room.updateMany({
+          where: { id: { in: toDeleteIds } },
+          data: {
+            status: 'CLOSED',
+            deletedAt: new Date(),
+            closedAt: new Date(),
+            closeReason: 'IDLE_TIMEOUT',
+          },
+        });
+      }
+
+      return toDeleteIds.length;
+    } catch {
+      return 0;
+    }
+  }
+
+  async delete(code: string): Promise<Result<void, AppError>> {
+    try {
+      const normalizedCode = code.toUpperCase().trim();
+      const current = await prisma.room.findFirst({
+        where: { code: normalizedCode },
+      });
+
+      if (current && !current.deletedAt) {
+        await prisma.room.update({
+          where: { id: current.id },
+          data: {
+            status: 'CLOSED',
+            deletedAt: new Date(),
+            closedAt: new Date(),
+            closeReason: 'HOST',
+          },
+        });
+      }
+      return ok(undefined);
+    } catch {
+      return ok(undefined);
     }
   }
 
