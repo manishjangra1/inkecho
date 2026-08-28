@@ -82,7 +82,22 @@ describe('reduceRoomCacheEvent', () => {
     expect(updated.participants[0]?.isReady).toBe(false);
   });
 
-  it('handles HOST_CHANGED event', () => {
+  it('handles HOST_CHANGED event and demotes the previous host', () => {
+    const roomWithSecondPlayer: RoomSnapshotDto = {
+      ...mockRoom,
+      participants: [
+        ...mockRoom.participants,
+        {
+          id: 'p2',
+          playerId: 'player-2',
+          displayName: 'PlayerTwo',
+          role: 'PLAYER',
+          isReady: true,
+          connectionStatus: 'ONLINE',
+          joinedAt: '2026-08-28T10:01:00.000Z',
+        },
+      ],
+    };
     const envelope: RealtimeEnvelope = {
       name: REALTIME_EVENTS.HOST_CHANGED,
       payload: {
@@ -95,8 +110,44 @@ describe('reduceRoomCacheEvent', () => {
       correlationId: 'c3',
     };
 
-    const updated = reduceRoomCacheEvent(envelope, mockRoom);
+    const updated = reduceRoomCacheEvent(envelope, roomWithSecondPlayer);
     expect(updated.hostPlayerId).toBe('player-2');
+    expect(updated.participants.find((p) => p.playerId === 'player-2')?.role).toBe('HOST');
+    expect(updated.participants.find((p) => p.playerId === 'player-host')?.role).toBe('PLAYER');
+  });
+
+  it('handles PLAYER_KICKED event', () => {
+    const roomWithSecondPlayer: RoomSnapshotDto = {
+      ...mockRoom,
+      participants: [
+        ...mockRoom.participants,
+        {
+          id: 'p2',
+          playerId: 'player-2',
+          displayName: 'PlayerTwo',
+          role: 'PLAYER',
+          isReady: false,
+          connectionStatus: 'ONLINE',
+          joinedAt: '2026-08-28T10:01:00.000Z',
+        },
+      ],
+    };
+    const envelope: RealtimeEnvelope = {
+      name: REALTIME_EVENTS.PLAYER_KICKED,
+      payload: {
+        playerId: 'player-2',
+        kickedBy: 'player-host',
+        reason: 'KICKED_BY_HOST',
+      },
+      version: 0,
+      scope: 'room',
+      timestamp: new Date().toISOString(),
+      correlationId: 'c-kick',
+    };
+
+    const updated = reduceRoomCacheEvent(envelope, roomWithSecondPlayer);
+    expect(updated.participants).toHaveLength(1);
+    expect(updated.participants[0]?.playerId).toBe('player-host');
   });
 
   it('handles GAME_STARTED event', () => {

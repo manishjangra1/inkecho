@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { QUERY_KEYS } from '@/shared/constants/query-keys';
+import { GAME_CONFIG } from '@/shared/config/game.config';
 import { useGameStore } from '@/features/game/stores/game-store';
 import { useRealtimeSync } from '../hooks/use-realtime-sync';
 import { useAblyRoom } from '../hooks/use-ably-room';
+import { invalidateRoomSessionQueries } from '../lib/invalidate-room-queries';
 
 export interface RealtimeProviderProps {
   readonly roomId: string;
@@ -27,7 +28,6 @@ export function RealtimeProvider({
   const queryClient = useQueryClient();
   const initRoomContext = useGameStore((state) => state.initRoomContext);
   const setConnectionState = useGameStore((state) => state.setConnectionState);
-  const hasRefetchedOnConnect = useRef(false);
 
   useEffect(() => {
     initRoomContext({
@@ -52,22 +52,6 @@ export function RealtimeProvider({
   useEffect(() => {
     if (connectionState === 'connected') {
       setConnectionState('connected');
-
-      // One-time refetch after Ably connects to close the race-condition gap.
-      // Events fired between the initial HTTP fetch and WebSocket subscription
-      // would otherwise be missed permanently with polling disabled.
-      if (!hasRefetchedOnConnect.current) {
-        hasRefetchedOnConnect.current = true;
-        void queryClient.invalidateQueries({
-          queryKey: QUERY_KEYS.ROOM(roomCode),
-        });
-        void queryClient.invalidateQueries({
-          queryKey: ['game', roomCode],
-        });
-        void queryClient.invalidateQueries({
-          queryKey: ['reveal', roomCode],
-        });
-      }
     } else if (connectionState === 'connecting') {
       setConnectionState('connecting');
     } else if (connectionState === 'suspended') {
@@ -75,7 +59,28 @@ export function RealtimeProvider({
     } else {
       setConnectionState('disconnected');
     }
-  }, [connectionState, setConnectionState, queryClient, roomCode]);
+  }, [connectionState, setConnectionState]);
+
+  useEffect(() => {
+    if (connectionState === 'connected') {
+      invalidateRoomSessionQueries(queryClient, roomCode);
+      return;
+    }
+
+    let intervalId: ReturnType<typeof setInterval> | undefined;
+    const timeoutId = setTimeout(() => {
+      const poll = () => {
+        invalidateRoomSessionQueries(queryClient, roomCode);
+      };
+      poll();
+      intervalId = setInterval(poll, GAME_CONFIG.REALTIME_POLLING_INTERVAL_MS);
+    }, GAME_CONFIG.REALTIME_POLLING_FALLBACK_MS);
+
+    return () => {
+      clearTimeout(timeoutId);
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [connectionState, queryClient, roomCode]);
 
   return <>{children}</>;
 }

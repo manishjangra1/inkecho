@@ -34,6 +34,11 @@ export function reduceRealtimeEvent(
           turnIndex: number;
           turnEndsAt: string;
           starterPrompt: string;
+          promptContext?: {
+            type: 'STARTER_PROMPT' | 'DESCRIPTION' | 'DRAWING';
+            text?: string | null;
+            drawingUrl?: string | null;
+          } | null;
         };
       };
 
@@ -49,11 +54,11 @@ export function reduceRealtimeEvent(
           turnEndsAt: p.firstTurn.turnEndsAt,
           isMyTurn,
           promptContext: isMyTurn
-            ? {
+            ? (p.firstTurn.promptContext ?? {
                 type: 'STARTER_PROMPT',
                 text: p.firstTurn.starterPrompt,
                 drawingUrl: null,
-              }
+              })
             : null,
         },
         version,
@@ -71,6 +76,11 @@ export function reduceRealtimeEvent(
           turnIndex: number;
           activePlayerId: string;
           turnEndsAt: string;
+          promptContext?: {
+            type: 'STARTER_PROMPT' | 'DESCRIPTION' | 'DRAWING';
+            text?: string | null;
+            drawingUrl?: string | null;
+          } | null;
         };
         gameStatus: 'IN_PROGRESS' | 'PAUSED' | 'REVEAL' | 'COMPLETED';
       };
@@ -86,8 +96,7 @@ export function reduceRealtimeEvent(
           turnStartedAt: new Date().toISOString(),
           turnEndsAt: p.currentTurn.turnEndsAt,
           isMyTurn,
-          // Prompt context will be resolved when fetching snapshot or next active turn
-          promptContext: null,
+          promptContext: isMyTurn ? (p.currentTurn.promptContext ?? null) : null,
         },
         version,
         p.gameStatus

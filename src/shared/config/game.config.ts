@@ -6,5 +6,9 @@ export const GAME_CONFIG = {
   MAX_DESCRIPTION_LENGTH: 200,
   REVEAL_STEP_DURATION_MS: 3000,
   DISCONNECT_GRACE_PERIOD_SEC: 30,
+  /** Start HTTP snapshot polling if Ably stays disconnected this long. */
+  REALTIME_POLLING_FALLBACK_MS: 15_000,
+  /** Snapshot poll interval while Ably is unavailable. */
+  REALTIME_POLLING_INTERVAL_MS: 5_000,
   MAX_CANVAS_EXPORT_SIZE_BYTES: 2 * 1024 * 1024, // 2MB
 } as const;

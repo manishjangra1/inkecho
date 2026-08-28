@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useGameStore } from '../stores/game-store';
+import { QUERY_KEYS } from '@/shared/constants/query-keys';
 import type { GameSnapshotDto } from '../types/game.types';
 
 export function useGameState(roomCode: string) {
@@ -13,12 +14,12 @@ export function useGameState(roomCode: string) {
   const isPaused = useGameStore((state) => state.isPaused);
   const connectionState = useGameStore((state) => state.connectionState);
 
-  // Fetch initial game snapshot via REST with periodic polling fallback
+  // Fetch initial game snapshot via REST. RealtimeProvider invalidates on Ably events / reconnect.
   const { data, isLoading, isError, error, refetch } = useQuery<{
     success: boolean;
     data: GameSnapshotDto | null;
   }>({
-    queryKey: ['game', roomCode],
+    queryKey: QUERY_KEYS.GAME(roomCode),
     queryFn: async () => {
       const res = await fetch(`/api/rooms/${encodeURIComponent(roomCode)}/game`);
       if (res.status === 404) {

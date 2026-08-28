@@ -6,6 +6,7 @@ import { Button } from '@/shared/ui/button';
 import { toast } from 'sonner';
 import { RotateCcw, Loader2 } from 'lucide-react';
 import { rematchAction } from '../actions/rematch.action';
+import { ROUTES } from '@/shared/constants/routes';
 import { cn } from '@/shared/lib/cn';
 
 export interface PlayAgainButtonProps {
@@ -26,7 +27,7 @@ export function PlayAgainButton({ roomCode, isHost, className }: PlayAgainButton
         toast.error(res.error.message || 'Failed to start rematch.');
       } else {
         toast.success('Returning to Lobby!');
-        router.push(`/room/${encodeURIComponent(roomCode)}/lobby`);
+        router.push(ROUTES.ROOM.LOBBY(roomCode));
       }
     } catch {
       toast.error('An unexpected error occurred.');

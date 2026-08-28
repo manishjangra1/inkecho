@@ -14,6 +14,22 @@ export interface UseAblyRoomParams {
   readonly onMessage?: (message: Ably.Message) => void;
 }
 
+function mapAblyConnectionState(state: string): ConnectionState {
+  switch (state) {
+    case 'connected':
+      return 'connected';
+    case 'connecting':
+    case 'initialized':
+      return 'connecting';
+    case 'suspended':
+      return 'suspended';
+    case 'failed':
+      return 'failed';
+    default:
+      return 'disconnected';
+  }
+}
+
 export function useAblyRoom({ roomId, playerId, displayName, role, onMessage }: UseAblyRoomParams) {
   const [connectionState, setConnectionState] = useState<ConnectionState>('connecting');
   const clientRef = useRef<Ably.Realtime | null>(null);
@@ -47,14 +63,13 @@ export function useAblyRoom({ roomId, playerId, displayName, role, onMessage }: 
         const channel = client.channels.get(channelName);
         channelRef.current = channel;
 
-        // Monitor connection state
+        setConnectionState(mapAblyConnectionState(client.connection.state));
+
         client.connection.on((stateChange) => {
           if (!isMounted) return;
-          const current = stateChange.current as ConnectionState;
-          setConnectionState(current);
+          setConnectionState(mapAblyConnectionState(stateChange.current));
         });
 
-        // Subscribe to all incoming channel messages
         const messageListener = (msg: Ably.Message) => {
           if (onMessageRef.current) {
             onMessageRef.current(msg);
@@ -63,7 +78,6 @@ export function useAblyRoom({ roomId, playerId, displayName, role, onMessage }: 
 
         channel.subscribe(messageListener);
 
-        // Enter presence
         const presenceData: RealtimePresenceData = {
           playerId,
           displayName,

@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { voteChainAction } from '../actions/vote-chain.action';
+import { useRoom } from '@/features/rooms/hooks/use-room';
+import { QUERY_KEYS } from '@/shared/constants/query-keys';
+import { ROUTES } from '@/shared/constants/routes';
 import { GAME_CONFIG } from '@/shared/config/game.config';
 import type { RevealDataResponse, RevealChainItem } from '../types/reveal.types';
 
@@ -23,12 +26,12 @@ export function useRevealPlayback({ roomCode, autoPlayDefault = true }: UseRevea
   const [localVotes, setLocalVotes] = useState<Record<string, number>>({});
   const [winningChainIndex, setWinningChainIndex] = useState<number | null>(null);
 
-  // Fetch reveal snapshot with live polling fallback
+  // Fetch reveal snapshot
   const { data, isLoading, isError, refetch } = useQuery<{
     success: boolean;
     data: RevealDataResponse;
   }>({
-    queryKey: ['reveal', roomCode],
+    queryKey: QUERY_KEYS.REVEAL(roomCode),
     queryFn: async () => {
       const res = await fetch(`/api/rooms/${encodeURIComponent(roomCode)}/reveal`);
       if (!res.ok) {
@@ -40,24 +43,15 @@ export function useRevealPlayback({ roomCode, autoPlayDefault = true }: UseRevea
     staleTime: Infinity,
   });
 
-  // Query room status to detect rematch and route all players back to lobby
-  const { data: roomStatusData } = useQuery<{ success: boolean; data: { status: string } }>({
-    queryKey: ['room-status', roomCode],
-    queryFn: async () => {
-      const res = await fetch(`/api/rooms/${encodeURIComponent(roomCode)}`);
-      if (!res.ok) return { success: false, data: { status: 'UNKNOWN' } };
-      return res.json();
-    },
-    refetchInterval: false,
-    staleTime: Infinity,
-  });
+  // Query room status to detect rematch and route all players back to lobby in realtime
+  const { data: room } = useRoom(roomCode);
 
   useEffect(() => {
-    if (roomStatusData?.data?.status === 'LOBBY') {
+    if (room?.status === 'LOBBY') {
       toast.info('Returning to Game Lobby for rematch!');
-      router.push(`/room/${encodeURIComponent(roomCode)}/lobby`);
+      router.push(ROUTES.ROOM.LOBBY(roomCode));
     }
-  }, [roomStatusData?.data?.status, roomCode, router]);
+  }, [room?.status, roomCode, router]);
 
   const revealData = data?.data;
   const chains: readonly RevealChainItem[] = useMemo(() => revealData?.chains ?? [], [revealData]);

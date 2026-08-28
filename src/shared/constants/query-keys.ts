@@ -1,5 +1,7 @@
 export const QUERY_KEYS = {
   ROOM: (code: string) => ['room', code] as const,
+  GAME: (code: string) => ['game', code] as const,
+  REVEAL: (code: string) => ['reveal', code] as const,
   PUBLIC_ROOMS: ['public-rooms'] as const,
   AUTH_SESSION: ['auth-session'] as const,
   GUEST_SESSION: ['guest-session'] as const,

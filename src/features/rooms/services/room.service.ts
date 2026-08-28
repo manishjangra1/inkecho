@@ -342,7 +342,16 @@ export class RoomService {
     ctx: AuthContext
   ): Promise<Result<RoomSnapshotDto, AppError>> {
     authorize(ctx, 'room:settings');
-    return roomRepository.updateSettings(dto.roomCode, dto.settings);
+    const updated = await roomRepository.updateSettings(dto.roomCode, dto.settings);
+    if (updated.ok) {
+      const updatedBy = ctx.type !== 'anonymous' && ctx.playerId ? ctx.playerId : 'HOST';
+      await eventPublisher.roomSettingsUpdated(
+        updated.value.id,
+        updated.value.settings,
+        updatedBy
+      );
+    }
+    return updated;
   }
 
   async deleteRoom(roomCode: string, ctx: AuthContext): Promise<Result<void, AppError>> {

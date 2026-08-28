@@ -157,6 +157,15 @@ export class EventPublisher {
 
   async gameStarted(roomId: string, game: GameEntity, correlationId?: string) {
     const firstChain = game.chains[0];
+    const { getActivePlayerPromptContext } = await import('@/domain/game/visibility-filter');
+    const promptContext = getActivePlayerPromptContext(
+      game.chains,
+      game.currentChainIndex,
+      game.currentTurnIndex,
+      game.activePlayerId,
+      game.activePlayerId
+    );
+
     return this.publish(
       roomId,
       REALTIME_EVENTS.GAME_STARTED,
@@ -171,6 +180,7 @@ export class EventPublisher {
           turnIndex: game.currentTurnIndex,
           turnEndsAt: game.turnEndsAt.toISOString(),
           starterPrompt: firstChain?.starterPrompt ?? '',
+          promptContext,
         },
       },
       game.version,
@@ -223,6 +233,15 @@ export class EventPublisher {
     previousTurn: { chainIndex: number; turnIndex: number },
     correlationId?: string
   ) {
+    const { getActivePlayerPromptContext } = await import('@/domain/game/visibility-filter');
+    const promptContext = getActivePlayerPromptContext(
+      game.chains,
+      game.currentChainIndex,
+      game.currentTurnIndex,
+      game.activePlayerId,
+      game.activePlayerId
+    );
+
     return this.publish(
       roomId,
       REALTIME_EVENTS.TURN_CHANGED,
@@ -234,6 +253,7 @@ export class EventPublisher {
           turnIndex: game.currentTurnIndex,
           activePlayerId: game.activePlayerId,
           turnEndsAt: game.turnEndsAt.toISOString(),
+          promptContext,
         },
         gameStatus: game.status,
       },

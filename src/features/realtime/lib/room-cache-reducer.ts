@@ -16,6 +16,19 @@ function recomputeCanStart(room: RoomSnapshotDto): RoomSnapshotDto {
   };
 }
 
+function removeParticipant(
+  room: RoomSnapshotDto,
+  playerId: string,
+  newHostPlayerId?: string
+): RoomSnapshotDto {
+  return recomputeCanStart({
+    ...room,
+    hostPlayerId: newHostPlayerId ?? room.hostPlayerId,
+    participants: room.participants.filter((x) => x.playerId !== playerId),
+    spectators: room.spectators.filter((x) => x.playerId !== playerId),
+  });
+}
+
 /**
  * Pure cache reducer for RoomSnapshotDto
  * Applies Ably realtime envelope mutations directly into in-memory cached state.
@@ -61,13 +74,13 @@ export function reduceRoomCacheEvent(
         newHostPlayerId?: string;
       };
       if (!p?.playerId) return currentRoom;
+      return removeParticipant(currentRoom, p.playerId, p.newHostPlayerId);
+    }
 
-      return recomputeCanStart({
-        ...currentRoom,
-        hostPlayerId: p.newHostPlayerId ?? currentRoom.hostPlayerId,
-        participants: currentRoom.participants.filter((x) => x.playerId !== p.playerId),
-        spectators: currentRoom.spectators.filter((x) => x.playerId !== p.playerId),
-      });
+    case REALTIME_EVENTS.PLAYER_KICKED: {
+      const p = envelope.payload as { playerId: string };
+      if (!p?.playerId) return currentRoom;
+      return removeParticipant(currentRoom, p.playerId);
     }
 
     case REALTIME_EVENTS.PLAYER_READY_CHANGED: {
@@ -95,9 +108,11 @@ export function reduceRoomCacheEvent(
       return recomputeCanStart({
         ...currentRoom,
         hostPlayerId: p.newHostPlayerId,
-        participants: currentRoom.participants.map((x) =>
-          x.playerId === p.newHostPlayerId ? { ...x, role: 'HOST' as const } : x
-        ),
+        participants: currentRoom.participants.map((x) => {
+          if (x.playerId === p.newHostPlayerId) return { ...x, role: 'HOST' as const };
+          if (x.playerId === p.previousHostPlayerId) return { ...x, role: 'PLAYER' as const };
+          return x;
+        }),
       });
     }
 

@@ -37,6 +37,21 @@ export class LobbyService {
       return err(updated.error);
     }
 
+    const { eventPublisher } = await import('@/infrastructure/realtime/event-publisher');
+    const participantsRes = await participantRepository.listByRoom(ctx.roomId);
+    const activePlayers = participantsRes.ok
+      ? participantsRes.value.filter((p) => p.role === 'HOST' || p.role === 'PLAYER')
+      : [];
+    const readyCount = activePlayers.filter((p) => p.isReady).length;
+
+    await eventPublisher.playerReadyChanged(
+      ctx.roomId,
+      ctx.playerId,
+      isReady,
+      readyCount,
+      activePlayers.length
+    );
+
     return ok({
       playerId: ctx.playerId,
       isReady,
@@ -66,6 +81,10 @@ export class LobbyService {
     await roomRepository.addKickedPlayer(room.code, targetPlayerId);
     await guestSessionRepository.deleteByPlayer(room.id, targetPlayerId);
 
+    const { eventPublisher } = await import('@/infrastructure/realtime/event-publisher');
+    const kickerId = ctx.type !== 'anonymous' && ctx.playerId ? ctx.playerId : room.hostPlayerId;
+    await eventPublisher.playerKicked(room.id, targetPlayerId, kickerId);
+
     return ok({ kickedPlayerId: targetPlayerId });
   }
 
@@ -92,6 +111,9 @@ export class LobbyService {
     await participantRepository.updateRole(room.id, oldHostPlayerId, 'PLAYER');
     await participantRepository.updateRole(room.id, newHostPlayerId, 'HOST');
     const updatedRoom = await roomRepository.updateHost(room.code, newHostPlayerId);
+
+    const { eventPublisher } = await import('@/infrastructure/realtime/event-publisher');
+    await eventPublisher.hostChanged(room.id, oldHostPlayerId, newHostPlayerId);
 
     return updatedRoom;
   }
