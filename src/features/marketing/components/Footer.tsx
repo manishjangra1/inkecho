@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Sparkles } from 'lucide-react';
+import { Logo } from '@/shared/ui/logo';
 import { Container } from '@/shared/ui/layout/Container';
 import { ROUTES } from '@/shared/constants/routes';
 import { COMMON_COPY } from '@/shared/constants/copy/common';
@@ -10,12 +10,7 @@ export function Footer() {
       <Container size="lg">
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row text-xs">
           {/* Logo & Tagline */}
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-3.5 w-3.5 text-white" />
-            <span className="font-semibold text-white uppercase tracking-wider text-xs">
-              {COMMON_COPY.APP_NAME}
-            </span>
-          </div>
+          <Logo href={ROUTES.HOME} size="sm" />
 
           {/* Nav & Legal Links */}
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-neutral-400">

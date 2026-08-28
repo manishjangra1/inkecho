@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Sparkles, Plus, Compass, LogIn, LogOut, ChevronDown, User as UserIcon, Settings } from 'lucide-react';
+import { Plus, Compass, LogIn, LogOut, ChevronDown, User as UserIcon, Settings } from 'lucide-react';
+import { Logo } from '@/shared/ui/logo';
 import { Button } from '@/shared/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import {
@@ -46,15 +47,7 @@ export function MarketingHeader() {
       <Container size="lg">
         <div className="flex h-12 items-center justify-between">
           {/* Logo */}
-          <Link
-            href={ROUTES.HOME}
-            className="flex items-center gap-2 text-white hover:opacity-90 transition-opacity"
-          >
-            <Sparkles className="h-4 w-4 text-white" />
-            <span className="text-xs font-bold uppercase tracking-wider text-white">
-              {COMMON_COPY.APP_NAME}
-            </span>
-          </Link>
+          <Logo href={ROUTES.HOME} size="md" />
 
           {/* Navigation Links */}
           <nav className="hidden items-center gap-4 text-xs font-medium text-neutral-400 md:flex">

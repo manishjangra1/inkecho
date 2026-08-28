@@ -49,7 +49,9 @@ export default async function RoomLayout({
       displayName={displayName}
       role={role}
     >
-      <RoomShell header={<RoomHeader room={room} isHost={isHost} />}>{children}</RoomShell>
+      <RoomShell header={<RoomHeader room={room} isHost={isHost} />} roomCode={room.code}>
+        {children}
+      </RoomShell>
     </RealtimeProvider>
   );
 }

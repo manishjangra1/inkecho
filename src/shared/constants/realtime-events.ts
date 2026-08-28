@@ -41,6 +41,9 @@ export const REALTIME_EVENTS = {
   REVEAL_CHAIN_STEP: 'reveal_chain_step',
   REVEAL_COMPLETED: 'reveal_completed',
 
+  // Chat Events
+  CHAT_MESSAGE: 'chat_message',
+
   // Errors & Lifecycle
   ROOM_CLOSED: 'room_closed',
   ERROR: 'error',

@@ -1,0 +1,51 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  fill="none">
+
+  <defs>
+    <linearGradient id="inkechoGradient" x1="96" y1="96" x2="416" y2="416" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#7C5CFF"/>
+      <stop offset="100%" stop-color="#00C2FF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Continuous ribbon -->
+  <path
+    d="
+      M156 136
+      C156 92 192 64 240 64
+      L272 64
+      C320 64 356 92 356 136
+
+      C356 170 338 194 308 208
+
+      C270 226 246 240 246 272
+
+      C246 304 270 318 308 336
+
+      C338 350 356 374 356 408
+
+      C356 452 320 480 272 480
+      L240 480
+
+      C192 480 156 452 156 408"
+    stroke="url(#inkechoGradient)"
+    stroke-width="44"
+    stroke-linecap="round"
+    stroke-linejoin="round"/>
+
+  <!-- Center bar (I) -->
+  <line
+    x1="256"
+    y1="150"
+    x2="256"
+    y2="362"
+    stroke="#F8FAFC"
+    stroke-width="26"
+    stroke-linecap="round"/>
+
+  <!-- Echo pulse -->
+  <circle cx="256" cy="422" r="18" fill="#00C2FF"/>
+
+</svg>

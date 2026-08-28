@@ -2,7 +2,8 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Sparkles, LogOut, Settings, Users, Copy, Check } from 'lucide-react';
+import { LogOut, Settings, Users, Copy, Check } from 'lucide-react';
+import { Logo } from '@/shared/ui/logo';
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
 import { RoomSettingsDrawer } from './RoomSettingsDrawer';
@@ -49,10 +50,7 @@ export function RoomHeader({ room, isHost }: RoomHeaderProps) {
       <header className="sticky top-0 z-40 flex h-12 w-full shrink-0 items-center justify-between border-b border-border bg-[#0E0E0E] px-4 select-none">
         {/* Left: Brand & Room Code */}
         <div className="flex items-center gap-3">
-          <Link href={ROUTES.HOME} className="flex items-center gap-2 text-white hover:opacity-90">
-            <Sparkles className="h-4 w-4 text-white" />
-            <span className="font-semibold text-xs tracking-wider uppercase">InkEcho</span>
-          </Link>
+          <Logo href={ROUTES.HOME} size="md" />
           <div className="h-3 w-px bg-neutral-800" />
           <div className="flex items-center gap-2">
             <span className="font-mono text-xs font-semibold text-neutral-300">

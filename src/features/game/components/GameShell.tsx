@@ -10,6 +10,7 @@ import { SpectatorBanner } from './SpectatorBanner';
 import { ReconnectBanner } from './ReconnectBanner';
 import { useGameState } from '../hooks/use-game-state';
 import { useGameTimer } from '../hooks/use-game-timer';
+import { useGameStore } from '../stores/game-store';
 import { pauseGameAction } from '../actions/pause-game.action';
 import { resumeGameAction } from '../actions/resume-game.action';
 import { expireTurnAction } from '../actions/expire-turn.action';
@@ -22,6 +23,7 @@ export interface GameShellProps {
 
 export function GameShell({ roomCode }: GameShellProps) {
   const router = useRouter();
+  const playerId = useGameStore((state) => state.playerId) || undefined;
   const {
     game,
     currentTurn,
@@ -114,7 +116,7 @@ export function GameShell({ roomCode }: GameShellProps) {
         isPauseLoading={isPauseLoading}
       />
 
-      {/* Main Game Stage Router */}
+      {/* Main Stage Workspace (Describe, Draw, Waiting) */}
       <div className="flex flex-1 flex-col overflow-hidden">
         <GamePhaseRouter
           roomCode={roomCode}

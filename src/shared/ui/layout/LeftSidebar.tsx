@@ -9,9 +9,9 @@ import {
   LogIn,
   History,
   Settings,
-  Sparkles,
   Radio,
 } from 'lucide-react';
+import { LogoMark } from '@/shared/ui/logo';
 import { cn } from '@/shared/lib/cn';
 import { Badge } from '@/shared/ui/badge';
 import { PlayerAvatar } from '@/shared/ui/player-avatar';
@@ -43,7 +43,7 @@ export function LeftSidebar({ currentUserName = 'Guest Player', isOnline = true 
       <div className="flex flex-col gap-5 p-3">
         {/* Nav Header */}
         <div className="flex items-center gap-2 px-2 pt-1 text-xs font-semibold text-white">
-          <Sparkles className="h-3.5 w-3.5" />
+          <LogoMark sizeClassName="h-4 w-4" />
           <span>InkEcho Hub</span>
         </div>
 

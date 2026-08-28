@@ -369,6 +369,32 @@ export class EventPublisher {
       correlationId
     );
   }
+
+  // --- Chat Events ---
+
+  async chatMessage(
+    roomId: string,
+    message: {
+      id: string;
+      roomId: string;
+      senderId: string;
+      senderName: string;
+      text: string;
+      role: 'HOST' | 'PLAYER' | 'SPECTATOR' | 'SYSTEM';
+      isSystem?: boolean;
+      timestamp: string;
+    },
+    correlationId?: string
+  ) {
+    return this.publish(
+      roomId,
+      REALTIME_EVENTS.CHAT_MESSAGE,
+      message,
+      0,
+      'game',
+      correlationId
+    );
+  }
 }
 
 export const eventPublisher = new EventPublisher();

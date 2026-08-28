@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Link from 'next/link';
-import { Sparkles } from 'lucide-react';
+import { LogoMark } from '@/shared/ui/logo';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
 import { COMMON_COPY } from '@/shared/constants/copy/common';
 import { ROUTES } from '@/shared/constants/routes';
@@ -17,9 +17,9 @@ export function AuthCard({ title, description, children, footer }: AuthCardProps
     <div className="mx-auto w-full max-w-md">
       <Card variant="glass" className="border-border/60 shadow-xl backdrop-blur-md">
         <CardHeader className="space-y-3 pb-6 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-brand-primary to-brand-secondary text-white shadow-glow">
-            <Link href={ROUTES.HOME}>
-              <Sparkles className="h-6 w-6" />
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#141414] border border-neutral-800 text-white shadow-glow">
+            <Link href={ROUTES.HOME} className="flex items-center justify-center">
+              <LogoMark sizeClassName="h-7 w-7" />
             </Link>
           </div>
           <div>
