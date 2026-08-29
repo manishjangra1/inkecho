@@ -62,7 +62,7 @@ export function useRoomLeaveGuard({
     // Push a dummy state so that pressing Back triggers popstate on our page instead of instantly navigating away
     window.history.pushState({ inInkEchoRoom: true }, '', window.location.href);
 
-    const handlePopState = (e: PopStateEvent) => {
+    const handlePopState = (_e: PopStateEvent) => {
       // Re-push state to keep the user on the current room page
       window.history.pushState({ inInkEchoRoom: true }, '', window.location.href);
       // Trigger confirmation dialog

@@ -21,7 +21,11 @@ export function ChatMessageItem({ message, isCurrentUser }: ChatMessageItemProps
     }
   }, [message.timestamp]);
 
-  // System Notification Styling
+  const isEmojiOnly = React.useMemo(() => {
+    const trimmed = message.text.trim();
+    return trimmed.length <= 8 && !/[a-zA-Z0-9]/.test(trimmed);
+  }, [message.text]);
+
   if (message.isSystem || message.role === 'SYSTEM') {
     return (
       <div className="flex items-center gap-1.5 rounded-[4px] border border-neutral-800/80 bg-[#121212]/60 px-2 py-1 text-[11px] text-neutral-400">
@@ -31,13 +35,6 @@ export function ChatMessageItem({ message, isCurrentUser }: ChatMessageItemProps
       </div>
     );
   }
-
-  // Check if message is purely 1-3 emojis
-  const isEmojiOnly = React.useMemo(() => {
-    const trimmed = message.text.trim();
-    // Simple check: short length and no alphanumeric characters
-    return trimmed.length <= 8 && !/[a-zA-Z0-9]/.test(trimmed);
-  }, [message.text]);
 
   return (
     <div

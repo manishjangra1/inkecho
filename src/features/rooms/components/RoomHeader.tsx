@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import Link from 'next/link';
 import { LogOut, Settings, Users, Copy, Check, Trash2 } from 'lucide-react';
 import { Logo } from '@/shared/ui/logo';
 import { Button } from '@/shared/ui/button';

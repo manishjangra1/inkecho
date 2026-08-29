@@ -5,7 +5,6 @@ import { MessageSquare, X } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { GameChatSidebar } from './GameChatSidebar';
 import { useChatStore } from '../stores/chat-store';
-import { cn } from '@/shared/lib/cn';
 
 export interface MobileChatDrawerProps {
   readonly roomCode: string;

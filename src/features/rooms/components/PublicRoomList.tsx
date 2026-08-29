@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePublicRooms } from '../hooks/use-public-rooms';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { Button } from '@/shared/ui/button';
-import { Badge } from '@/shared/ui/badge';
 import { RefreshCw, Plus, ArrowRight, Eye, Users } from 'lucide-react';
 import { ROUTES } from '@/shared/constants/routes';
 
